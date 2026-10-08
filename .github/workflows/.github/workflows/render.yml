@@ -1,0 +1,30 @@
+name: Render Video
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Render Remotion Video
+        run: npx remotion render MatchPreview out/highlight_60s.mp4 --gl=angle
+
+      - name: Upload Video Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Football-Highlight-Video
+          path: out/highlight_60s.mp4
