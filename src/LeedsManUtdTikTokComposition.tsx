@@ -18,6 +18,18 @@ const OutroGraphic: React.FC = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const logoLeft = interpolate(frame, [0, 32], [-320, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const logoRight = interpolate(frame, [0, 32], [320, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const logoScale = interpolate(frame, [0, 32, 45], [0.65, 1.08, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill
@@ -82,10 +94,58 @@ const OutroGraphic: React.FC = () => {
 
       <div
         style={{
+          position: "absolute",
+          top: "20%",
+          left: "8%",
+          width: 250,
+          height: 250,
+          borderRadius: "50%",
+          border: "7px solid #f7d46a",
+          background: "radial-gradient(circle, #244c3d, #071610 72%)",
+          boxShadow: "0 0 45px rgba(247,212,106,0.45)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transform: `translateX(${logoLeft}px) scale(${logoScale})`,
+          zIndex: 3,
+        }}
+      >
+        <div style={{ textAlign: "center", fontWeight: 900 }}>
+          <div style={{ fontSize: 34, color: "#f7d46a" }}>LUFC</div>
+          <div style={{ fontSize: 18, marginTop: 8 }}>LEEDS</div>
+          <div style={{ fontSize: 18 }}>UNITED</div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "20%",
+          right: "8%",
+          width: 250,
+          height: 250,
+          borderRadius: "50%",
+          border: "7px solid #d9d9e2",
+          background: "radial-gradient(circle, #7e1824, #19070b 72%)",
+          boxShadow: "0 0 45px rgba(220,35,55,0.45)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transform: `translateX(${logoRight}px) scale(${logoScale})`,
+          zIndex: 3,
+        }}
+      >
+        <div style={{ textAlign: "center", fontWeight: 900 }}>
+          <div style={{ fontSize: 34, color: "#ffffff" }}>MUFC</div>
+          <div style={{ fontSize: 18, marginTop: 8 }}>MANCHESTER</div>
+          <div style={{ fontSize: 18 }}>UNITED</div>
+        </div>
+      </div>
+      <div
+        style={{
           zIndex: 2,
           width: "86%",
           textAlign: "center",
-          transform: `translateY(${rise}px)`,
+          transform: `translateY(${rise + 85}px)`,
         }}
       >
         <div
@@ -101,7 +161,7 @@ const OutroGraphic: React.FC = () => {
         <div
           style={{
             marginTop: 35,
-            fontSize: 48,
+            fontSize: 44,
             fontWeight: 900,
             color: "#f7d46a",
             textShadow: "0 4px 24px rgba(0,0,0,0.65)",
@@ -109,12 +169,20 @@ const OutroGraphic: React.FC = () => {
         >
           LEEDS UNITED
         </div>
-        <div style={{ fontSize: 62, fontWeight: 900, marginTop: 8 }}>
+        <div
+          style={{
+            fontSize: 100,
+            fontWeight: 900,
+            marginTop: 8,
+            color: "#ffffff",
+            textShadow: "0 0 35px rgba(247,212,106,0.5)",
+          }}
+        >
           1 — 2
         </div>
         <div
           style={{
-            fontSize: 48,
+            fontSize: 44,
             fontWeight: 900,
             color: "#e9e9ee",
             marginTop: 8,
@@ -124,7 +192,7 @@ const OutroGraphic: React.FC = () => {
         </div>
         <div
           style={{
-            marginTop: 65,
+            marginTop: 55,
             padding: "24px 18px",
             background: "#f7d46a",
             color: "#071610",
@@ -134,16 +202,6 @@ const OutroGraphic: React.FC = () => {
           }}
         >
           WHAT'S YOUR PREDICTION?
-        </div>
-        <div
-          style={{
-            fontSize: 25,
-            marginTop: 22,
-            color: "#e1e8e3",
-            letterSpacing: 2,
-          }}
-        >
-          COMMENT BELOW
         </div>
       </div>
     </AbsoluteFill>
