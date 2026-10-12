@@ -148,6 +148,126 @@ const ScoreHeader: React.FC = () => (
   </div>
 );
 
+
+type TacticalType = "press" | "midfield" | "counter" | "attack";
+
+const tacticalScenes: {
+  from: number;
+  duration: number;
+  type: TacticalType;
+  title: string;
+  subtitle: string;
+}[] = [
+  { from: 240, duration: 120, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
+  { from: 360, duration: 120, type: "press", title: "PRESSING TRAP", subtitle: "Compress space • contest second balls" },
+  { from: 720, duration: 120, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
+  { from: 1080, duration: 120, type: "counter", title: "UNITED COUNTER-ATTACK", subtitle: "Win possession • attack open space" },
+  { from: 1440, duration: 120, type: "attack", title: "ATTACKING PATTERNS", subtitle: "Wide overloads • forward runs" },
+];
+
+const TacticalGraphic: React.FC<{
+  type: TacticalType;
+  title: string;
+  subtitle: string;
+}> = ({ type, title, subtitle }) => {
+  const frame = useCurrentFrame();
+  const pulse = 0.88 + Math.sin(frame / 7) * 0.12;
+
+  const dots: { x: number; y: number; team: "leeds" | "united"; label?: string }[] =
+    type === "press"
+      ? [
+          { x: 130, y: 130, team: "leeds" }, { x: 240, y: 205, team: "leeds" },
+          { x: 350, y: 115, team: "leeds" }, { x: 470, y: 210, team: "leeds" },
+          { x: 610, y: 135, team: "united" }, { x: 700, y: 240, team: "united" },
+          { x: 555, y: 340, team: "united" }, { x: 720, y: 395, team: "united" },
+        ]
+      : type === "midfield"
+      ? [
+          { x: 130, y: 110, team: "leeds" }, { x: 240, y: 220, team: "leeds" },
+          { x: 390, y: 150, team: "leeds" }, { x: 500, y: 300, team: "leeds" },
+          { x: 300, y: 340, team: "united" }, { x: 440, y: 235, team: "united" },
+          { x: 600, y: 160, team: "united" }, { x: 710, y: 340, team: "united" },
+        ]
+      : type === "counter"
+      ? [
+          { x: 100, y: 150, team: "united" }, { x: 230, y: 260, team: "united" },
+          { x: 390, y: 170, team: "united" }, { x: 550, y: 250, team: "united" },
+          { x: 680, y: 130, team: "united" }, { x: 300, y: 110, team: "leeds" },
+          { x: 470, y: 355, team: "leeds" }, { x: 680, y: 365, team: "leeds" },
+        ]
+      : [
+          { x: 100, y: 235, team: "leeds" }, { x: 230, y: 130, team: "leeds" },
+          { x: 360, y: 300, team: "leeds" }, { x: 520, y: 140, team: "leeds" },
+          { x: 680, y: 245, team: "leeds" }, { x: 280, y: 365, team: "united" },
+          { x: 460, y: 365, team: "united" }, { x: 650, y: 110, team: "united" },
+        ];
+
+  const arrows =
+    type === "press"
+      ? [[130,130,240,205],[350,115,470,210],[470,210,610,135]]
+      : type === "midfield"
+      ? [[240,220,390,150],[390,150,440,235],[440,235,500,300]]
+      : type === "counter"
+      ? [[100,150,230,260],[230,260,390,170],[390,170,550,250],[550,250,680,130]]
+      : [[100,235,230,130],[230,130,520,140],[520,140,680,245],[360,300,680,245]];
+
+  return (
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(3,7,16,0.16)" }}>
+      <div style={{
+        position: "absolute", top: 465, width: 900, height: 820, padding: 28,
+        boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
+        background: "linear-gradient(145deg, rgba(3,12,24,0.96), rgba(7,29,35,0.94))",
+        border: "2px solid rgba(247,217,0,0.72)",
+        boxShadow: "0 0 36px rgba(0,0,0,0.42)",
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ color: "#F7D900", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>TACTICAL BOARD</div>
+          <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>LEEDS · MAN UTD</div>
+        </div>
+        <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>{title}</div>
+        <div style={{ color: "#D8E2EA", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
+        <svg viewBox="0 0 840 470" style={{ width: "100%", marginTop: 24, display: "block" }}>
+          <defs>
+            <marker id="tacticalArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L6,3 z" fill="#F7D900" />
+            </marker>
+          </defs>
+          <rect x="2" y="2" width="836" height="466" rx="16" fill="#0A493A" stroke="#D5E8DC" strokeWidth="3" />
+          <line x1="420" y1="3" x2="420" y2="467" stroke="#D5E8DC" strokeWidth="2" opacity="0.8" />
+          <circle cx="420" cy="235" r="68" fill="none" stroke="#D5E8DC" strokeWidth="2" opacity="0.8" />
+          <circle cx="420" cy="235" r="4" fill="#D5E8DC" />
+          <rect x="2" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+          <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+          <rect x="2" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+          <rect x="800" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+          {arrows.map((a, i) => (
+            <line key={i} x1={a[0]} y1={a[1]} x2={a[2]} y2={a[3]}
+              stroke="#F7D900" strokeWidth="5" strokeLinecap="round"
+              markerEnd="url(#tacticalArrow)" opacity={pulse} />
+          ))}
+          {dots.map((d, i) => (
+            <g key={i}>
+              <circle cx={d.x} cy={d.y} r="19"
+                fill={d.team === "leeds" ? "#F7D900" : "#DA291C"}
+                stroke="#FFFFFF" strokeWidth="3" />
+              <circle cx={d.x} cy={d.y} r="5" fill={d.team === "leeds" ? "#17212B" : "#FFFFFF"} />
+            </g>
+          ))}
+          <text x="26" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">LEEDS</text>
+          <text x="690" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">UNITED</text>
+        </svg>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, color: "#D8E2EA", fontSize: 17 }}>
+          <span><span style={{ color: "#F7D900" }}>●</span> Leeds United</span>
+          <span><span style={{ color: "#DA291C" }}>●</span> Manchester United</span>
+        </div>
+        <div style={{ marginTop: 14, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
+          ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 const MatchGraphic: React.FC = () => {
   const frame = useCurrentFrame();
   const pulse = 0.85 + Math.sin(frame / 8) * 0.15;
@@ -213,7 +333,7 @@ const MatchGraphic: React.FC = () => {
 export const LeedsManUtdComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
-      {clips.map((clip) => (
+      {clips.filter((clip) => !clip.file.startsWith("ot_fans_atmosphere/")).map((clip) => (
         <Sequence
           key={clip.file}
           from={clip.from}
@@ -236,6 +356,11 @@ export const LeedsManUtdComposition: React.FC = () => {
         </Sequence>
       ))}
       <MatchGraphic />
+      {tacticalScenes.map((scene) => (
+        <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
+          <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
+        </Sequence>
+      ))}
       <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
     </AbsoluteFill>
   );
