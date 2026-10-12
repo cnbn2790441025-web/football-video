@@ -283,7 +283,10 @@ const StadiumBackground: React.FC = () => {
             <stop offset="100%" stopColor="#050b15" />
           </linearGradient>
           <linearGradient id="stadiumPitch" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#176c4b" />
+            <stop offset="0%" stopColor="#176c4b" stopOpacity="0" />
+            <stop offset="12%" stopColor="#176c4b" stopOpacity="0.3" />
+            <stop offset="25%" stopColor="#176c4b" stopOpacity="0.75" />
+            <stop offset="40%" stopColor="#176c4b" stopOpacity="1" />
             <stop offset="100%" stopColor="#062c24" />
           </linearGradient>
           <radialGradient id="stadiumGlow">
