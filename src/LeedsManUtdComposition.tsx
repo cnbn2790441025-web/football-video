@@ -4,7 +4,6 @@ import {
   Audio,
   Composition,
   Img,
-  OffthreadVideo,
   Sequence,
   interpolate,
   staticFile,
@@ -12,22 +11,7 @@ import {
 } from "remotion";
 
 
-const clips = [
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part1.mp4", from: 0, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part2.mp4", from: 120, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 240, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 360, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 480, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 600, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 720, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 840, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 960, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 1080, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 1200, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 1320, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 1440, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 1560, duration: 100 },
-];
+
 
 const gold = "#F7D900";
 const red = "#DA291C";
@@ -268,60 +252,166 @@ const TacticalGraphic: React.FC<{
   );
 };
 
+
+const StadiumBackground: React.FC = () => {
+  const frame = useCurrentFrame();
+  const cycle = frame % 180;
+  const reveal = interpolate(frame, [0, 75, 180], [0.18, 1, 1], {
+    extrapolateRight: "clamp",
+  });
+  const sweep = Math.sin(cycle / 180 * Math.PI * 2);
+  const lights = 0.62 + 0.28 * Math.sin(cycle / 12);
+
+  return (
+    <AbsoluteFill style={{ overflow: "hidden", background: "#020711" }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse at 50% 35%, #17334b 0%, #071321 48%, #01040b 100%)",
+      }} />
+      <svg
+        viewBox="0 0 1080 1920"
+        preserveAspectRatio="xMidYMid slice"
+        style={{
+          position: "absolute", width: "100%", height: "100%",
+          opacity: reveal,
+        }}
+      >
+        <defs>
+          <linearGradient id="stadiumStand" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#31475b" />
+            <stop offset="48%" stopColor="#111f31" />
+            <stop offset="100%" stopColor="#050b15" />
+          </linearGradient>
+          <linearGradient id="stadiumPitch" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#176c4b" />
+            <stop offset="100%" stopColor="#062c24" />
+          </linearGradient>
+          <radialGradient id="stadiumGlow">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#8fd7ff" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        <path d="M-80 480 Q540 70 1160 480 L1160 1120 L-80 1120Z"
+          fill="url(#stadiumStand)" />
+        {Array.from({ length: 10 }, (_, i) => {
+          const y = 390 + i * 66;
+          return (
+            <path key={`tier-${i}`}
+              d={`M-80 ${y + 110} Q540 ${y - 170} 1160 ${y + 110}`}
+              fill="none" stroke={i % 2 ? "#7890a6" : "#263e55"}
+              strokeWidth="20" opacity="0.55" />
+          );
+        })}
+        {Array.from({ length: 150 }, (_, i) => {
+          const x = (i * 83) % 1100;
+          const y = 470 + ((i * 47) % 490);
+          const color = i % 7 === 0 ? "#f7d900" : i % 9 === 0 ? "#da291c" : "#d8e7f3";
+          return (
+            <circle key={`seat-${i}`} cx={x} cy={y} r={2 + (i % 3)}
+              fill={color} opacity={0.18 + 0.18 * Math.abs(Math.sin(cycle / 9 + i))} />
+          );
+        })}
+
+        <g opacity={lights}>
+          <path d="M80 300 L360 740 L245 740Z" fill="#d7efff" opacity="0.07" />
+          <path d="M1000 300 L720 740 L835 740Z" fill="#d7efff" opacity="0.07" />
+          <circle cx="95" cy="300" r="130" fill="url(#stadiumGlow)" />
+          <circle cx="985" cy="300" r="130" fill="url(#stadiumGlow)" />
+          <path d={`M${460 + sweep * 45} 240 L${580 + sweep * 45} 980 L${320 + sweep * 45} 980Z`}
+            fill="#ffffff" opacity="0.045" />
+        </g>
+
+        <path d="M-80 1060 L1160 1060 L1390 1920 L-310 1920Z"
+          fill="url(#stadiumPitch)" />
+        {Array.from({ length: 8 }, (_, i) => (
+          <path key={`grass-${i}`}
+            d={`M${-280 + i * 220} 1920 L${420 + i * 35} 1060`}
+            stroke="#8ac9a1" strokeWidth="3" opacity="0.10" />
+        ))}
+        <path d="M540 1110 L540 1920" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
+        <ellipse cx="540" cy="1550" rx="205" ry="120"
+          fill="none" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
+        <path d="M330 1920 L390 1680 L690 1680 L750 1920"
+          fill="none" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
+      </svg>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(180deg, rgba(2,7,17,0.12), rgba(2,7,17,0.04) 45%, rgba(2,7,17,0.68))",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0,
+        background: `linear-gradient(${105 + sweep * 12}deg, rgba(247,217,0,0.08), transparent 42%, rgba(218,41,28,0.09))`,
+      }} />
+    </AbsoluteFill>
+  );
+};
+
+const PersistentHeader: React.FC = () => {
+  const frame = useCurrentFrame();
+  const glow = 0.72 + Math.sin(frame / 13) * 0.16;
+  const lift = Math.sin(frame / 30) * 3;
+
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(135deg, rgba(247,217,0,0.12), transparent 44%, rgba(218,41,28,0.12))",
+      }} />
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0,
+        height: 410, opacity: glow,
+        background: "linear-gradient(180deg, rgba(2,7,17,0.52), transparent)",
+      }} />
+      <div style={{ transform: `translateY(${lift}px)` }}>
+        <ScoreHeader />
+      </div>
+      <div style={{
+        position: "absolute", top: 260, left: 45, right: 45,
+        textAlign: "center", transform: `translateY(${lift * 0.5}px)`,
+      }}>
+        <Text size={26} color={gold} style={{
+          letterSpacing: 7, textShadow: "0 0 18px rgba(247,217,0,0.65)",
+        }}>PREMIER LEAGUE</Text>
+        <Text size={70} style={{
+          marginTop: 14, textShadow: "0 6px 24px #000, 0 0 22px rgba(247,217,0,0.24)",
+        }}>THE BIG MATCH</Text>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+
 const MatchGraphic: React.FC = () => {
   const frame = useCurrentFrame();
-  const pulse = 0.85 + Math.sin(frame / 8) * 0.15;
+  const pulse = 0.82 + Math.sin(frame / 8) * 0.18;
+  const enter = interpolate(frame, [0, 22, 45], [0, 1, 1], {
+    extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(180deg, rgba(3,7,16,0.48), rgba(3,7,16,0.10) 35%, rgba(3,7,16,0.72))",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "48%",
-          height: "100%",
-          background: "linear-gradient(135deg, rgba(247,217,0,0.22), transparent 62%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: "48%",
-          height: "100%",
-          background: "linear-gradient(225deg, rgba(218,41,28,0.24), transparent 62%)",
-        }}
-      />
-      <ScoreHeader />
-      <div style={{ position: "absolute", top: 260, left: 70, right: 70, textAlign: "center" }}>
-        <Text size={26} color={gold} style={{ letterSpacing: 7 }}>PREMIER LEAGUE</Text>
-        <Text size={70} style={{ marginTop: 14, textShadow: "0 6px 24px #000" }}>THE BIG MATCH</Text>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(180deg, transparent 25%, rgba(2,7,17,0.18) 55%, rgba(2,7,17,0.70))",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, opacity: enter,
+        transform: `scale(${1.03 - enter * 0.03})`,
+      }}>
+        <PlayerCard image="leeds-player-2.png" name="BRENDEN AARONSON" team="leeds" side="left" />
+        <PlayerCard image="bruno.png" name="BRUNO FERNANDES" team="united" side="right" />
       </div>
-      <PlayerCard image="leeds-player-2.png" name="BRENDEN AARONSON" team="leeds" side="left" />
-      <PlayerCard image="bruno.png" name="BRUNO FERNANDES" team="united" side="right" />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 120,
-          left: 60,
-          right: 60,
-          padding: "24px 20px",
-          borderRadius: 18,
-          border: `2px solid rgba(255,255,255,${pulse})`,
-          background: "rgba(3,7,16,0.84)",
-          textAlign: "center",
-        }}
-      >
-        <Text size={42} style={{ fontWeight: 800 }}>LEEDS UNITED <span style={{ color: gold }}>×</span> MANCHESTER UNITED</Text>
+      <div style={{
+        position: "absolute", bottom: 120, left: 60, right: 60,
+        padding: "24px 20px", borderRadius: 18,
+        border: `2px solid rgba(255,255,255,${pulse})`,
+        background: "rgba(3,7,16,0.84)", textAlign: "center",
+        opacity: enter,
+      }}>
+        <Text size={42} style={{ fontWeight: 800 }}>
+          LEEDS UNITED <span style={{ color: gold }}>×</span> MANCHESTER UNITED
+        </Text>
         <Text size={22} color="#D8DCE5" style={{ marginTop: 14, letterSpacing: 3 }}>
           18 OCTOBER 2026  •  MATCH PREVIEW
         </Text>
@@ -330,31 +420,12 @@ const MatchGraphic: React.FC = () => {
   );
 };
 
+
 export const LeedsManUtdComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
-      {clips.filter((clip) => !clip.file.startsWith("ot_fans_atmosphere/")).map((clip) => (
-        <Sequence
-          key={`${clip.file}-${clip.from}`}
-          from={clip.from}
-          durationInFrames={clip.duration}
-        >
-          <AbsoluteFill>
-            <OffthreadVideo
-              src={staticFile(`assets/backgrounds/${clip.file}`)}
-              startFrom={0}
-              endAt={clip.duration}
-              muted
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-            <AbsoluteFill
-              style={{
-                background: "linear-gradient(180deg, rgba(0,0,0,0.34), transparent 40%, rgba(0,0,0,0.54))",
-              }}
-            />
-          </AbsoluteFill>
-        </Sequence>
-      ))}
+      <StadiumBackground />
+      <PersistentHeader />
       <Sequence durationInFrames={240}>
         <MatchGraphic />
       </Sequence>
