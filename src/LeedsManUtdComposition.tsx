@@ -15,18 +15,18 @@ import {
 const clips = [
   { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part1.mp4", from: 0, duration: 120 },
   { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part2.mp4", from: 120, duration: 120 },
-  { file: "ot_fans_atmosphere/ot_fans_atmosphere_part1.mp4", from: 240, duration: 120 },
-  { file: "ot_fans_atmosphere/ot_fans_atmosphere_part2.mp4", from: 360, duration: 120 },
-  { file: "bruno_goal/bruno_goal_part1.mp4", from: 480, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 240, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 360, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 480, duration: 120 },
   { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 600, duration: 120 },
-  { file: "ot_fans_atmosphere/ot_fans_atmosphere_part3.mp4", from: 720, duration: 120 },
-  { file: "bruno_goal/bruno_goal_part2.mp4", from: 840, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 960, duration: 120 },
-  { file: "ot_fans_atmosphere/ot_fans_atmosphere_part4.mp4", from: 1080, duration: 120 },
-  { file: "bruno_goal/bruno_goal_part3.mp4", from: 1200, duration: 120 },
-  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 1320, duration: 120 },
-  { file: "ot_fans_atmosphere/ot_fans_atmosphere_part5.mp4", from: 1440, duration: 120 },
-  { file: "bruno_goal/bruno_goal_part4.mp4", from: 1560, duration: 100 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 720, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 840, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 960, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 1080, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 1200, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part3.mp4", from: 1320, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part4.mp4", from: 1440, duration: 120 },
+  { file: "2ot_stadium_intro_fixed/2ot_stadium_intro_part5.mp4", from: 1560, duration: 100 },
 ];
 
 const gold = "#F7D900";
@@ -158,11 +158,11 @@ const tacticalScenes: {
   title: string;
   subtitle: string;
 }[] = [
-  { from: 240, duration: 120, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
-  { from: 360, duration: 120, type: "press", title: "PRESSING TRAP", subtitle: "Compress space • contest second balls" },
-  { from: 720, duration: 120, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
+  { from: 480, duration: 120, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
+  { from: 600, duration: 120, type: "press", title: "PRESSING TRAP", subtitle: "Compress space • contest second balls" },
+  { from: 840, duration: 120, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
   { from: 1080, duration: 120, type: "counter", title: "UNITED COUNTER-ATTACK", subtitle: "Win possession • attack open space" },
-  { from: 1440, duration: 120, type: "attack", title: "ATTACKING PATTERNS", subtitle: "Wide overloads • forward runs" },
+  { from: 1320, duration: 120, type: "attack", title: "ATTACKING PATTERNS", subtitle: "Wide overloads • forward runs" },
 ];
 
 const TacticalGraphic: React.FC<{
@@ -335,7 +335,7 @@ export const LeedsManUtdComposition: React.FC = () => {
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
       {clips.filter((clip) => !clip.file.startsWith("ot_fans_atmosphere/")).map((clip) => (
         <Sequence
-          key={clip.file}
+          key={`${clip.file}-${clip.from}`}
           from={clip.from}
           durationInFrames={clip.duration}
         >
@@ -355,7 +355,9 @@ export const LeedsManUtdComposition: React.FC = () => {
           </AbsoluteFill>
         </Sequence>
       ))}
-      <MatchGraphic />
+      <Sequence durationInFrames={240}>
+        <MatchGraphic />
+      </Sequence>
       {tacticalScenes.map((scene) => (
         <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
           <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
