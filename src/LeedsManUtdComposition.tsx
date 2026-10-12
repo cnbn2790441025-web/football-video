@@ -122,8 +122,8 @@ const ScoreHeader: React.FC = () => (
     style={{
       position: "absolute",
       top: 70,
-      left: 50,
-      right: 50,
+      left: 65,
+      right: 65,
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
@@ -133,17 +133,17 @@ const ScoreHeader: React.FC = () => (
       borderRadius: 18,
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-      <Img src={staticFile("assets/logos/leeds.png")} style={{ width: 78, height: 78, objectFit: "contain" }} />
-      <Text size={30}>LEEDS</Text>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <Img src={staticFile("assets/logos/leeds.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
+      <Text size={30} style={{ fontWeight: 800 }}>LEEDS</Text>
     </div>
     <div style={{ textAlign: "center" }}>
       <Text size={34} color={gold}>VS</Text>
       <Text size={18} color="#D8DCE5" style={{ marginTop: 7, letterSpacing: 3 }}>MATCH PREVIEW</Text>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-      <Text size={30}>MAN UTD</Text>
-      <Img src={staticFile("assets/logos/manutd.png")} style={{ width: 78, height: 78, objectFit: "contain" }} />
+      <Text size={30} style={{ fontWeight: 800 }}>MAN UTD</Text>
+      <Img src={staticFile("assets/logos/manutd.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
     </div>
   </div>
 );
@@ -201,7 +201,7 @@ const MatchGraphic: React.FC = () => {
           textAlign: "center",
         }}
       >
-        <Text size={38}>LEEDS UNITED <span style={{ color: gold }}>×</span> MANCHESTER UNITED</Text>
+        <Text size={42} style={{ fontWeight: 800 }}>LEEDS UNITED <span style={{ color: gold }}>×</span> MANCHESTER UNITED</Text>
         <Text size={22} color="#D8DCE5" style={{ marginTop: 14, letterSpacing: 3 }}>
           18 OCTOBER 2026  •  MATCH PREVIEW
         </Text>
