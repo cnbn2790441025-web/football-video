@@ -1,4 +1,5 @@
 import { MyComposition } from "./Composition";
+import { PosterLightMotionV1Entry } from "./PosterLightMotionComposition";
 import {
   LeedsManUtdEntry,
 } from "./LeedsManUtdComposition";
@@ -10,6 +11,7 @@ export const RemotionRoot: React.FC = () => {
       <MyComposition />
       <LeedsManUtdEntry />
       <LeedsManUtdTikTokEntry />
+      <PosterLightMotionV1Entry />
     </>
   );
 };
