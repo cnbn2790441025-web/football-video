@@ -274,7 +274,7 @@ const StadiumBackground: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile("assets/stadium-light-motion-bg.png")}
         style={{
           position: "absolute",
           width: "100%",
@@ -292,7 +292,7 @@ const StadiumBackground: React.FC = () => {
         }}
       />
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile("assets/stadium-light-motion-bg.png")}
         style={{
           position: "absolute",
           width: "100%",
