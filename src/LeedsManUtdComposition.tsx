@@ -284,9 +284,10 @@ const StadiumBackground: React.FC = () => {
           </linearGradient>
           <linearGradient id="stadiumPitch" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#176c4b" stopOpacity="0" />
-            <stop offset="12%" stopColor="#176c4b" stopOpacity="0.3" />
-            <stop offset="25%" stopColor="#176c4b" stopOpacity="0.75" />
-            <stop offset="40%" stopColor="#176c4b" stopOpacity="1" />
+            <stop offset="22%" stopColor="#176c4b" stopOpacity="0.06" />
+            <stop offset="42%" stopColor="#176c4b" stopOpacity="0.2" />
+            <stop offset="62%" stopColor="#176c4b" stopOpacity="0.58" />
+            <stop offset="82%" stopColor="#176c4b" stopOpacity="0.95" />
             <stop offset="100%" stopColor="#062c24" />
           </linearGradient>
           <radialGradient id="stadiumGlow">
@@ -325,7 +326,7 @@ const StadiumBackground: React.FC = () => {
             fill="#ffffff" opacity="0.045" />
         </g>
 
-        <path d="M-80 1060 L1160 1060 L1390 1920 L-310 1920Z"
+        <path d="M-80 900 L1160 900 L1390 1920 L-310 1920Z"
           fill="url(#stadiumPitch)" />
         {Array.from({ length: 8 }, (_, i) => (
           <path key={`grass-${i}`}
