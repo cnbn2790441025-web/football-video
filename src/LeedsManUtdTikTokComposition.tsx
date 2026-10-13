@@ -10,6 +10,7 @@ import { LeedsManUtdComposition } from "./LeedsManUtdComposition";
 
 const OutroGraphic: React.FC = () => {
   const frame = useCurrentFrame();
+  const pulse = 0.82 + Math.sin(frame / 8) * 0.18;
   const opacity = interpolate(frame, [0, 15, 270, 290], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
