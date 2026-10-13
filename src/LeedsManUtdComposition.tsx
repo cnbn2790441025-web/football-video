@@ -255,98 +255,88 @@ const TacticalGraphic: React.FC<{
 
 const StadiumBackground: React.FC = () => {
   const frame = useCurrentFrame();
-  const cycle = frame % 180;
-  const reveal = interpolate(frame, [0, 75, 180], [0.18, 1, 1], {
-    extrapolateRight: "clamp",
-  });
-  const sweep = Math.sin(cycle / 180 * Math.PI * 2);
-  const lights = 0.62 + 0.28 * Math.sin(cycle / 12);
+  const cycle = frame % 300;
+  const blueX = interpolate(cycle, [0, 150, 300], [-1188, 1188, -1188]);
+  const redX = interpolate(cycle, [0, 150, 300], [1188, -1188, 1188]);
+  const pulse = interpolate(frame % 180, [0, 45, 90, 135, 180], [0.35, 0.75, 0.4, 0.7, 0.35]);
+
+  const beam: React.CSSProperties = {
+    position: "absolute",
+    left: 0,
+    width: "125%",
+    height: 12,
+    borderRadius: 999,
+    filter: "blur(7px)",
+    pointerEvents: "none",
+    mixBlendMode: "screen",
+  };
 
   return (
-    <AbsoluteFill style={{ overflow: "hidden", background: "#020711" }}>
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "radial-gradient(ellipse at 50% 35%, #17334b 0%, #071321 48%, #01040b 100%)",
-      }} />
-      <svg
-        viewBox="0 0 1080 1920"
-        preserveAspectRatio="xMidYMid slice"
+    <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
+      <Img
+        src={staticFile("assets/poster-light-motion-v1.png")}
         style={{
-          position: "absolute", width: "100%", height: "100%",
-          opacity: reveal,
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          filter: "blur(24px) brightness(0.38) saturate(1.25)",
+          transform: "scale(1.15)",
         }}
-      >
-        <defs>
-          <linearGradient id="stadiumStand" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#31475b" />
-            <stop offset="48%" stopColor="#111f31" />
-            <stop offset="100%" stopColor="#050b15" />
-          </linearGradient>
-          <linearGradient id="stadiumPitch" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#176c4b" stopOpacity="0" />
-            <stop offset="22%" stopColor="#176c4b" stopOpacity="0.06" />
-            <stop offset="42%" stopColor="#176c4b" stopOpacity="0.2" />
-            <stop offset="62%" stopColor="#176c4b" stopOpacity="0.58" />
-            <stop offset="82%" stopColor="#176c4b" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#062c24" />
-          </linearGradient>
-          <radialGradient id="stadiumGlow">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#8fd7ff" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        <path d="M-80 480 Q540 70 1160 480 L1160 1120 L-80 1120Z"
-          fill="url(#stadiumStand)" />
-        {Array.from({ length: 10 }, (_, i) => {
-          const y = 390 + i * 66;
-          return (
-            <path key={`tier-${i}`}
-              d={`M-80 ${y + 110} Q540 ${y - 170} 1160 ${y + 110}`}
-              fill="none" stroke={i % 2 ? "#7890a6" : "#263e55"}
-              strokeWidth="20" opacity="0.55" />
-          );
-        })}
-        {Array.from({ length: 150 }, (_, i) => {
-          const x = (i * 83) % 1100;
-          const y = 470 + ((i * 47) % 490);
-          const color = i % 7 === 0 ? "#f7d900" : i % 9 === 0 ? "#da291c" : "#d8e7f3";
-          return (
-            <circle key={`seat-${i}`} cx={x} cy={y} r={2 + (i % 3)}
-              fill={color} opacity={0.18 + 0.18 * Math.abs(Math.sin(cycle / 9 + i))} />
-          );
-        })}
-
-        <g opacity={lights}>
-          <path d="M80 300 L360 740 L245 740Z" fill="#d7efff" opacity="0.07" />
-          <path d="M1000 300 L720 740 L835 740Z" fill="#d7efff" opacity="0.07" />
-          <circle cx="95" cy="300" r="130" fill="url(#stadiumGlow)" />
-          <circle cx="985" cy="300" r="130" fill="url(#stadiumGlow)" />
-          <path d={`M${460 + sweep * 45} 240 L${580 + sweep * 45} 980 L${320 + sweep * 45} 980Z`}
-            fill="#ffffff" opacity="0.045" />
-        </g>
-
-        <path d="M-80 900 L1160 900 L1390 1920 L-310 1920Z"
-          fill="url(#stadiumPitch)" />
-        {Array.from({ length: 8 }, (_, i) => (
-          <path key={`grass-${i}`}
-            d={`M${-280 + i * 220} 1920 L${420 + i * 35} 1060`}
-            stroke="#8ac9a1" strokeWidth="3" opacity="0.10" />
-        ))}
-        <path d="M540 1110 L540 1920" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
-        <ellipse cx="540" cy="1550" rx="205" ry="120"
-          fill="none" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
-        <path d="M330 1920 L390 1680 L690 1680 L750 1920"
-          fill="none" stroke="#d7f3df" strokeWidth="4" opacity="0.65" />
-      </svg>
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "linear-gradient(180deg, rgba(2,7,17,0.12), rgba(2,7,17,0.04) 45%, rgba(2,7,17,0.68))",
-      }} />
-      <div style={{
-        position: "absolute", inset: 0,
-        background: `linear-gradient(${105 + sweep * 12}deg, rgba(247,217,0,0.08), transparent 42%, rgba(218,41,28,0.09))`,
-      }} />
+      />
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(ellipse at 12% 24%, rgba(0,105,255,${pulse * 0.65}), transparent 48%), radial-gradient(ellipse at 88% 72%, rgba(255,20,55,${pulse * 0.5}), transparent 48%)`,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <Img
+        src={staticFile("assets/poster-light-motion-v1.png")}
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+        }}
+      />
+      <div
+        style={{
+          ...beam,
+          top: "18%",
+          height: 10,
+          background: "linear-gradient(90deg, transparent 5%, rgba(0,90,255,0.1) 25%, rgba(45,145,255,0.95) 48%, rgba(100,190,255,0.65) 52%, transparent 78%)",
+          boxShadow: "0 0 24px 8px rgba(0,110,255,0.32)",
+          transform: `translateX(${blueX}px) rotate(-17deg)`,
+          opacity: 0.9,
+        }}
+      />
+      <div
+        style={{
+          ...beam,
+          top: "74%",
+          height: 9,
+          background: "linear-gradient(90deg, transparent 8%, rgba(255,25,55,0.12) 28%, rgba(255,40,65,0.95) 50%, rgba(255,125,135,0.6) 55%, transparent 82%)",
+          boxShadow: "0 0 24px 8px rgba(255,20,55,0.3)",
+          transform: `translateX(${redX}px) rotate(-17deg)`,
+          opacity: 0.85,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background: `linear-gradient(112deg, transparent 20%, rgba(25,115,255,${pulse * 0.16}) 43%, rgba(255,255,255,${pulse * 0.08}) 49%, transparent 67%)`,
+          transform: `translateX(${blueX * 0.55}px)`,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background: "linear-gradient(180deg, rgba(30,100,255,0.15), transparent 22%, transparent 72%, rgba(255,25,50,0.12))",
+          boxShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(35,105,255,0.12)",
+          pointerEvents: "none",
+        }}
+      />
     </AbsoluteFill>
   );
 };
