@@ -314,6 +314,17 @@ const StadiumBackground: React.FC = () => {
       <div
         style={{
           ...beam,
+          top: "46%",
+          height: 6,
+          background: "linear-gradient(90deg, transparent 8%, rgba(20,105,255,0.08) 30%, rgba(70,165,255,0.65) 48%, rgba(125,205,255,0.35) 54%, transparent 82%)",
+          boxShadow: "0 0 20px 5px rgba(0,115,255,0.18)",
+          transform: `translateX(${blueX * 0.65}px) rotate(-12deg)`,
+          opacity: 0.55,
+        }}
+      />
+      <div
+        style={{
+          ...beam,
           top: "74%",
           height: 9,
           background: "linear-gradient(90deg, transparent 8%, rgba(255,25,55,0.12) 28%, rgba(255,40,65,0.95) 50%, rgba(255,125,135,0.6) 55%, transparent 82%)",
@@ -370,6 +381,18 @@ const PersistentHeader: React.FC = () => {
         <Text size={70} style={{
           marginTop: 14, textShadow: "0 6px 24px #000, 0 0 22px rgba(247,217,0,0.24)",
         }}>THE BIG MATCH</Text>
+        <Text size={25} style={{
+          marginTop: 18,
+          letterSpacing: 3,
+          color: "#DCEBFF",
+          textShadow: "0 0 12px rgba(55,145,255,0.75)",
+        }}>OCTOBER 18 • SUNDAY</Text>
+        <Text size={30} style={{
+          marginTop: 8,
+          letterSpacing: 2,
+          color: "#FFFFFF",
+          textShadow: "0 0 14px rgba(55,145,255,0.8)",
+        }}>7:30 PM (MMT)</Text>
       </div>
     </AbsoluteFill>
   );
