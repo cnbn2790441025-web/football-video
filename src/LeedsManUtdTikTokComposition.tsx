@@ -102,7 +102,7 @@ const OutroGraphic: React.FC = () => {
           borderRadius: "50%",
           border: "7px solid #f7d46a",
           background: "radial-gradient(circle, #244c3d, #071610 72%)",
-          boxShadow: "0 0 45px rgba(247,212,106,0.45)",
+          boxShadow: `0 0 ${35 + pulse * 20}px rgba(247,212,106,${0.25 + pulse * 0.3})`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -126,7 +126,7 @@ const OutroGraphic: React.FC = () => {
           borderRadius: "50%",
           border: "7px solid #d9d9e2",
           background: "radial-gradient(circle, #7e1824, #19070b 72%)",
-          boxShadow: "0 0 45px rgba(220,35,55,0.45)",
+          boxShadow: `0 0 ${35 + pulse * 20}px rgba(220,35,55,${0.25 + pulse * 0.3})`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -158,17 +158,7 @@ const OutroGraphic: React.FC = () => {
         >
           MATCH PREDICTION
         </div>
-        <div
-          style={{
-            marginTop: 35,
-            fontSize: 44,
-            fontWeight: 900,
-            color: "#f7d46a",
-            textShadow: "0 4px 24px rgba(0,0,0,0.65)",
-          }}
-        >
-          LEEDS UNITED
-        </div>
+
         <div
           style={{
             fontSize: 100,
@@ -180,16 +170,7 @@ const OutroGraphic: React.FC = () => {
         >
           1 — 2
         </div>
-        <div
-          style={{
-            fontSize: 44,
-            fontWeight: 900,
-            color: "#e9e9ee",
-            marginTop: 8,
-          }}
-        >
-          MAN UNITED
-        </div>
+
         <div
           style={{
             marginTop: 55,

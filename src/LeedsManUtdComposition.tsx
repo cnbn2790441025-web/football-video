@@ -403,9 +403,7 @@ const MatchGraphic: React.FC = () => {
         background: "rgba(3,7,16,0.84)", textAlign: "center",
         opacity: enter,
       }}>
-        <Text size={42} style={{ fontWeight: 800 }}>
-          LEEDS UNITED <span style={{ color: gold }}>×</span> MANCHESTER UNITED
-        </Text>
+
         <Text size={22} color="#D8DCE5" style={{ marginTop: 14, letterSpacing: 3 }}>
           18 OCTOBER 2026  •  MATCH PREVIEW
         </Text>
