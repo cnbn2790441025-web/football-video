@@ -156,6 +156,8 @@ const TacticalGraphic: React.FC<{
 }> = ({ type, title, subtitle }) => {
   const frame = useCurrentFrame();
   const pulse = 0.88 + Math.sin(frame / 7) * 0.12;
+  const zoom = interpolate(frame, [0, 90], [1, 1.06], { extrapolateRight: "clamp" });
+  const zoomDrop = (zoom - 1) * 410;
 
   const dots: { x: number; y: number; team: "leeds" | "united"; label?: string }[] =
     type === "press"
@@ -203,6 +205,8 @@ const TacticalGraphic: React.FC<{
         background: "linear-gradient(145deg, rgba(3,12,24,0.96), rgba(7,29,35,0.94))",
         border: "2px solid rgba(247,217,0,0.72)",
         boxShadow: "0 0 36px rgba(0,0,0,0.42)",
+        transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+        transformOrigin: "center top",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ color: "#F7D900", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>TACTICAL BOARD</div>
