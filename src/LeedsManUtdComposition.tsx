@@ -440,6 +440,68 @@ const MatchGraphic: React.FC = () => {
 };
 
 
+
+const subtitleCues = [
+  [0, 3.5, "ဒီတစ်ပတ် ပရီးမီးယားလိဂ်မှာ"],
+  [3.5, 7, "ပြိုင်ဘက်ဟောင်းနှစ်သင်းဖြစ်တဲ့"],
+  [7, 10.5, "လိဒ်စ်ယူနိုက်တက်နဲ့ မန်ချက်စတာယူနိုက်တက်တို့"],
+  [10.5, 13.5, "အဲလန်ရိုးဒ်ကွင်းမှာ အရေးကြီးတဲ့"],
+  [13.5, 16, "သုံးမှတ်အတွက် ထိပ်တိုက်တွေ့ကြမှာပါ။"],
+  [16, 19, "ပွဲကို မြန်မာစံတော်ချိန်အရ"],
+  [19, 22, "အောက်တိုဘာ ၁၈ ရက်၊ တနင်္ဂနွေနေ့"],
+  [22, 24.5, "ည ၇ နာရီခွဲမှာ ကစားမှာဖြစ်ပါတယ်။"],
+  [24.5, 28, "အိမ်ရှင်လိဒ်စ်အနေနဲ့ ပရိသတ်အားကို အားကိုးပြီး"],
+  [28, 31, "ပွဲအစကတည်းက ဖိအားပေးဖို့ လိုပါတယ်။"],
+  [31, 35, "မန်ချက်စတာယူနိုက်တက်ကတော့ အဝေးကွင်းမှာလည်း"],
+  [35, 38, "တိုက်စစ်စွမ်းအားပြဖို့ အရေးကြီးပါတယ်။"],
+  [38, 41, "ဒီပွဲရဲ့ အဓိကတိုက်ပွဲက ကွင်းလယ်မှာပါ။"],
+  [41, 44.5, "ဘောလုံးပိုင်ဆိုင်မှုနဲ့ တန်ပြန်တိုက်စစ်တွေက"],
+  [44.5, 47, "ရလဒ်ကို ဆုံးဖြတ်ပါလိမ့်မယ်။"],
+  [47, 50, "ကျွန်တော့်ရဲ့ ခန့်မှန်းချက်ကတော့—"],
+  [50, 53, "လိဒ်စ်ယူနိုက်တက် ၁… မန်ချက်စတာယူနိုက်တက် ၂!"],
+  [53, 55.2, "ခင်ဗျားတို့ရဲ့ ခန့်မှန်းချက်ကရော ဘယ်လိုလဲဗျ?"],
+] as const;
+
+const SubtitleOverlay: React.FC = () => {
+  const frame = useCurrentFrame();
+  const cue = subtitleCues.find(
+    ([start, end]) => frame >= start * 30 && frame < end * 30
+  );
+
+  if (!cue) return null;
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: "flex-end",
+        alignItems: "center",
+        padding: "0 55px 175px",
+        pointerEvents: "none",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 970,
+          padding: "18px 28px",
+          backgroundColor: "rgba(0, 0, 0, 0.82)",
+          border: "3px solid #F7D900",
+          borderRadius: 18,
+          color: "#FFFFFF",
+          fontFamily: "Noto Sans Myanmar, Myanmar Text, sans-serif",
+          fontSize: 38,
+          fontWeight: 800,
+          lineHeight: 1.45,
+          textAlign: "center",
+          textShadow: "0 2px 5px #000000",
+        }}
+      >
+        {cue[2]}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 export const LeedsManUtdComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
@@ -453,6 +515,7 @@ export const LeedsManUtdComposition: React.FC = () => {
           <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
         </Sequence>
       ))}
+      <SubtitleOverlay />
       <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
     </AbsoluteFill>
   );
