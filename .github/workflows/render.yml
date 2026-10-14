@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 18
       - run: npm ci || npm install
-      - run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg
+      - run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
       - run: npx remotion render LeedsManUtd out/highlight_60s.mp4 --gl=swangle
       - run: npx remotion render LeedsManUtdTikTok out/tiktok_65s.mp4 --gl=swangle
       - run: npx remotion render PosterLightMotionV1 out/poster_light_motion_v1.mp4 --gl=swangle
