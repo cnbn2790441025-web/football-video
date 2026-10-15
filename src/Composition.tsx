@@ -27,6 +27,9 @@ const MyComponent: React.FC = () => {
         fontFamily: "Arial, sans-serif",
         overflow: "hidden",
       }}
+      from={57}
+      durationInFrames={1743}
+      trimBefore={57}
     >
       <Audio src={staticFile("narration-full.mp3")} />
       {Array.from({ length: 5 }, (_, i) => (
