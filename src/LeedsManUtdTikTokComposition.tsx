@@ -192,10 +192,10 @@ const OutroGraphic: React.FC = () => {
 
 export const LeedsManUtdTikTokComposition: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: "#020609" }}>
-    <Sequence  durationInFrames={1660}>
+    <Sequence  durationInFrames={1650}>
       <LeedsManUtdComposition />
     </Sequence>
-    <Sequence from={1660} durationInFrames={290}>
+    <Sequence from={1650} durationInFrames={300}>
       <OutroGraphic />
     </Sequence>
   </AbsoluteFill>

@@ -15,7 +15,6 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
       - run: npx remotion render LeedsManUtd out/highlight_60s.mp4 --gl=swangle
       - run: npx remotion render LeedsManUtdTikTok out/tiktok_65s.mp4 --gl=swangle
-      - run: npx remotion render PosterLightMotionV1 out/poster_light_motion_v1.mp4 --gl=swangle
       - uses: actions/upload-artifact@v4
         with:
           name: Football-Preview-Videos
