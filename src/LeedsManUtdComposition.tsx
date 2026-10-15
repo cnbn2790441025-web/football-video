@@ -227,11 +227,28 @@ const TacticalGraphic: React.FC<{
           <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
           <rect x="2" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
           <rect x="800" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
-          {arrows.map((a, i) => (
-            <line key={i} x1={a[0]} y1={a[1]} x2={a[2]} y2={a[3]}
-              stroke="#F7D900" strokeWidth="5" strokeLinecap="round"
-              markerEnd="url(#tacticalArrow)" opacity={pulse} />
-          ))}
+          {arrows.map((a, i) => {
+            const x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3];
+            const dx = x2 - x1, dy = y2 - y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const progress = ((frame * 1.8 + i * 24) % 100) / 100;
+            const ballX = x1 + dx * progress;
+            const ballY = y1 + dy * progress;
+            return (
+              <g key={i}>
+                <line x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke="#F7D900" strokeWidth="5" strokeLinecap="round"
+                  markerEnd="url(#tacticalArrow)" opacity={pulse} />
+                <line x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round"
+                  strokeDasharray={`${Math.max(18, length * 0.22)} ${length}`}
+                  strokeDashoffset={-frame * 2.8 + i * 12}
+                  opacity="0.95" />
+                <circle cx={ballX} cy={ballY} r="7"
+                  fill="#FFFFFF" stroke="#F7D900" strokeWidth="3" />
+              </g>
+            );
+          })}
           {dots.map((d, i) => (
             <g key={i}>
               <circle cx={d.x} cy={d.y} r="19"
