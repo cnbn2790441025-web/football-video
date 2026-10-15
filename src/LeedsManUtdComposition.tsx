@@ -142,11 +142,10 @@ const tacticalScenes: {
   title: string;
   subtitle: string;
 }[] = [
-  { from: 480, duration: 120, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
-  { from: 600, duration: 120, type: "press", title: "PRESSING TRAP", subtitle: "Compress space • contest second balls" },
-  { from: 840, duration: 120, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
-  { from: 1080, duration: 120, type: "counter", title: "UNITED COUNTER-ATTACK", subtitle: "Win possession • attack open space" },
-  { from: 1320, duration: 120, type: "attack", title: "ATTACKING PATTERNS", subtitle: "Wide overloads • forward runs" },
+  { from: 489, duration: 171, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
+  { from: 660, duration: 210, type: "attack", title: "MAN UTD ATTACK", subtitle: "Create chances • exploit attacking space" },
+  { from: 870, duration: 306, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
+  { from: 1176, duration: 249, type: "counter", title: "UNITED COUNTER-ATTACK", subtitle: "Win possession • attack open space" },
 ];
 
 const TacticalGraphic: React.FC<{
@@ -176,16 +175,16 @@ const TacticalGraphic: React.FC<{
         ]
       : type === "counter"
       ? [
-          { x: 100, y: 150, team: "united" }, { x: 230, y: 260, team: "united" },
-          { x: 390, y: 170, team: "united" }, { x: 550, y: 250, team: "united" },
-          { x: 680, y: 130, team: "united" }, { x: 300, y: 110, team: "leeds" },
-          { x: 470, y: 355, team: "leeds" }, { x: 680, y: 365, team: "leeds" },
+          { x: 700, y: 130, team: "united" }, { x: 620, y: 250, team: "united" },
+          { x: 500, y: 170, team: "united" }, { x: 380, y: 260, team: "united" },
+          { x: 250, y: 190, team: "united" }, { x: 520, y: 100, team: "leeds" },
+          { x: 390, y: 355, team: "leeds" }, { x: 230, y: 330, team: "leeds" },
         ]
       : [
-          { x: 100, y: 235, team: "leeds" }, { x: 230, y: 130, team: "leeds" },
-          { x: 360, y: 300, team: "leeds" }, { x: 520, y: 140, team: "leeds" },
-          { x: 680, y: 245, team: "leeds" }, { x: 280, y: 365, team: "united" },
-          { x: 460, y: 365, team: "united" }, { x: 650, y: 110, team: "united" },
+          { x: 700, y: 245, team: "united" }, { x: 600, y: 130, team: "united" },
+          { x: 500, y: 300, team: "united" }, { x: 390, y: 160, team: "united" },
+          { x: 260, y: 235, team: "united" }, { x: 560, y: 110, team: "leeds" },
+          { x: 430, y: 365, team: "leeds" }, { x: 300, y: 350, team: "leeds" },
         ];
 
   const arrows =
@@ -194,8 +193,8 @@ const TacticalGraphic: React.FC<{
       : type === "midfield"
       ? [[240,220,390,150],[390,150,440,235],[440,235,500,300]]
       : type === "counter"
-      ? [[100,150,230,260],[230,260,390,170],[390,170,550,250],[550,250,680,130]]
-      : [[100,235,230,130],[230,130,520,140],[520,140,680,245],[360,300,680,245]];
+      ? [[700,130,620,250],[620,250,500,170],[500,170,380,260],[380,260,180,220]]
+      : [[700,245,600,130],[600,130,390,160],[390,160,260,235],[500,300,260,235]];
 
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(3,7,16,0.16)" }}>
