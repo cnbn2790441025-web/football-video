@@ -383,6 +383,23 @@ const dateProgress = interpolate(frame, [336, 350, 475, 489], [0, 1, 1, 0], {
   extrapolateRight: "clamp",
 });
 const dateScale = 1 + dateProgress * 0.12;
+
+const dateColor = interpolate(
+  Math.sin(frame / 5),
+  [-1, 1],
+  [0, 1],
+);
+
+const dateSweepX = interpolate(
+  frame,
+  [336, 489],
+  [-180, 180],
+  {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  },
+);
+
 return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
       <div style={{
@@ -410,7 +427,7 @@ return (
         <Text size={25} style={{
         marginTop: 18,
         letterSpacing: 3,
-        color: "#DCEBFF",
+        color: `rgb(255, ${Math.round(190 - dateColor * 150)}, ${Math.round(35 + dateColor * 20)})`,
         textShadow: `0 0 ${12 + dateProgress * 24}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
         transform: `scale(${dateScale})`,
        }}>
@@ -419,13 +436,29 @@ return (
        <Text size={30} style={{
        marginTop: 8,
        letterSpacing: 2,
-       color: "#FFFFFF",
+       color: `rgb(255, ${Math.round(205 - dateColor * 165)}, ${Math.round(65 - dateColor * 30)})`,
        textShadow: `0 0 ${14 + dateProgress * 26}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
        transform: `scale(${dateScale})`,
        }}>
        7:30 PM (MMT)
        </Text>
        </div>
+     
+<div
+  style={{
+    position: "absolute",
+    top: 390,
+    left: `calc(50% + ${dateSweepX}px)`,
+    width: 100,
+    height: 100,
+    opacity: dateProgress * 0.8,
+    background:
+      "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), rgba(255,215,0,0.5), transparent)",
+    filter: "blur(8px)",
+    transform: "translateX(-50%) skewX(-20deg)",
+    pointerEvents: "none",
+  }}
+/>
     </AbsoluteFill>
   );
 };
