@@ -7,3 +7,10 @@ dist
 out
 
 build
+# Generated render outputs
+/highlight_60s.mp4
+/tiktok_65s.mp4
+/poster_light_motion_v1.mp4
+/rendered-video*/
+/latest-render/
+/tmp*.mp3
