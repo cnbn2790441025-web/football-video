@@ -375,9 +375,15 @@ const StadiumBackground: React.FC = () => {
 const PersistentHeader: React.FC = () => {
   const frame = useCurrentFrame();
   const glow = 0.72 + Math.sin(frame / 13) * 0.16;
-  const lift = Math.sin(frame / 30) * 3;
+const lift = Math.sin(frame / 30) * 3;
 
-  return (
+// Date and kickoff animation: narration around 11.2s–16.3s
+const dateProgress = interpolate(frame, [336, 350, 475, 489], [0, 1, 1, 0], {
+  extrapolateLeft: "clamp",
+  extrapolateRight: "clamp",
+});
+const dateScale = 1 + dateProgress * 0.12;
+return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
       <div style={{
         position: "absolute", inset: 0,
@@ -402,18 +408,24 @@ const PersistentHeader: React.FC = () => {
           marginTop: 14, textShadow: "0 6px 24px #000, 0 0 22px rgba(247,217,0,0.24)",
         }}>THE BIG MATCH</Text>
         <Text size={25} style={{
-          marginTop: 18,
-          letterSpacing: 3,
-          color: "#DCEBFF",
-          textShadow: "0 0 12px rgba(55,145,255,0.75)",
-        }}>OCTOBER 18 • SUNDAY</Text>
-        <Text size={30} style={{
-          marginTop: 8,
-          letterSpacing: 2,
-          color: "#FFFFFF",
-          textShadow: "0 0 14px rgba(55,145,255,0.8)",
-        }}>7:30 PM (MMT)</Text>
-      </div>
+        marginTop: 18,
+        letterSpacing: 3,
+        color: "#DCEBFF",
+        textShadow: `0 0 ${12 + dateProgress * 24}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
+        transform: `scale(${dateScale})`,
+       }}>
+       OCTOBER 18 • SUNDAY
+       </Text>
+       <Text size={30} style={{
+       marginTop: 8,
+       letterSpacing: 2,
+       color: "#FFFFFF",
+       textShadow: `0 0 ${14 + dateProgress * 26}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
+       transform: `scale(${dateScale})`,
+       }}>
+       7:30 PM (MMT)
+       </Text>
+       </div>
     </AbsoluteFill>
   );
 };
@@ -456,6 +468,80 @@ const MatchGraphic: React.FC = () => {
 };
 
 
+const PredictionGraphic: React.FC = () => {
+const frame = useCurrentFrame();
+
+const progress = interpolate(frame, [0, 12, 75, 84], [0, 1, 1, 0], {
+extrapolateLeft: "clamp",
+extrapolateRight: "clamp",
+});
+
+const scale = interpolate(frame, [0, 12], [0.7, 1], {
+extrapolateLeft: "clamp",
+extrapolateRight: "clamp",
+});
+
+const sweep = ((frame * 14) % 700) - 350;
+
+return (
+<AbsoluteFill
+style={{
+justifyContent: "center",
+alignItems: "center",
+opacity: progress,
+transform: `scale(${scale})`,
+}}
+>
+<div
+style={{
+width: "86%",
+padding: "38px 20px",
+borderRadius: 24,
+border: "2px solid rgba(255,190,60,0.9)",
+background: "linear-gradient(135deg, rgba(20,4,10,0.96), rgba(3,7,16,0.96))",
+textAlign: "center",
+boxShadow: "0 0 35px rgba(255,50,35,0.45)",
+overflow: "hidden",
+}}
+>
+<Text
+size={32}
+style={{
+color: "#FFD36A",
+letterSpacing: 5,
+textShadow: "0 0 20px rgba(255,190,60,0.9)",
+}}
+>
+MATCH PREDICTION
+</Text>
+
+    <div
+      style={{
+        height: 4,
+        margin: "26px auto",
+        width: "75%",
+        background: `linear-gradient(90deg, transparent, #FF3434, #FFD36A, transparent)`,
+        transform: `translateX(${sweep}px)`,
+      }}
+    />
+
+    <Text
+      size={42}
+      style={{
+        color: "#FFFFFF",
+        fontWeight: 900,
+        letterSpacing: 2,
+        textShadow: "0 0 22px rgba(255,45,45,0.95)",
+      }}
+    >
+      MANCHESTER UNITED WIN
+    </Text>
+  </div>
+</AbsoluteFill>
+
+);
+};
+
 export const LeedsManUtdComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
@@ -469,11 +555,13 @@ export const LeedsManUtdComposition: React.FC = () => {
           <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
         </Sequence>
       ))}
+      <Sequence from={1425} durationInFrames={84}>
+        <PredictionGraphic />
+      </Sequence>
       <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
     </AbsoluteFill>
   );
 };
-
 export const LeedsManUtdEntry: React.FC = () => (
   <Composition
     id="LeedsManUtd"
