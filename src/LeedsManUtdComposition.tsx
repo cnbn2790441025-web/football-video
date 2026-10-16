@@ -575,61 +575,6 @@ MATCH PREDICTION
 );
 };
 
-
-const voiceSubtitleCues = [
-  { from: 0, to: 174, text: "ဒီတစ်ပတ် ပရီးမီးယားလိဂ်မှာ ပြိုင်ဘက်ဟောင်းနှစ်သင်းဖြစ်တဲ့" },
-  { from: 174, to: 336, text: "လိဒ်စ်ယူနိုက်တက်နဲ့ မန်ချက်စတာယူနိုက်တက်တို့ အဲလန်ရိုးဒ်ကွင်းမှာ အရေးကြီးတဲ့ သုံးမှတ်အတွက် ထိပ်တိုက်တွေ့ကြမှာပါ။" },
-  { from: 336, to: 489, text: "ပွဲကို မြန်မာစံတော်ချိန်အရ အောက်တိုဘာ ၁၈ ရက်၊ တနင်္ဂနွေနေ့ ည ၇ နာရီခွဲမှာ ကစားမှာ ဖြစ်ပါတယ်။" },
-  { from: 489, to: 660, text: "အိမ်ရှင်လိဒ်စ်အနေနဲ့ ပရိသတ်အားကို အားကိုးပြီး ပွဲအစကတည်းက ဖိအားပေးဖို့ လိုပါတယ်။" },
-  { from: 660, to: 870, text: "မန်ချက်စတာယူနိုက်တက်ကတော့ အဝေးကွင်းမှာလည်း တိုက်စစ်စွမ်းအားပြကာ ရလာတဲ့အခွင့်အရေးတွေကို" },
-  { from: 870, to: 1014, text: "ဂိုးအဖြစ် ပြောင်းလဲနိုင်ဖို့ အရေးကြီးပါတယ်။ ဒီပွဲရဲ့ အဓိကတိုက်ပွဲက ကွင်းလယ်မှာ ဖြစ်လာနိုင်ပါတယ်။" },
-  { from: 1014, to: 1176, text: "ဘောလုံးပိုင်ဆိုင်မှု၊ ဖိအားပေးမှုနဲ့ တန်ပြန်တိုက်စစ်တွေက ရလဒ်ကို ဆုံးဖြတ်ပါလိမ့်မယ်။" },
-  { from: 1176, to: 1326, text: "လိဒ်စ်က အိမ်ကွင်းအရှိန်နဲ့ တက်လာနိုင်ပေမဲ့ ယူနိုက်တက်က နေရာလွတ်တွေကို အသုံးချပြီး" },
-  { from: 1326, to: 1425, text: "ထိုးဖောက်လာနိုင်ပါတယ်။ ကျွန်တော့်ရဲ့ ခန့်မှန်းချက်ကတော့—" },
-  { from: 1425, to: 1509, text: "လိဒ်စ်ယူနိုက်တက် ၁… မန်ချက်စတာယူနိုက်တက် ၂!" },
-  { from: 1509, to: 1650, text: "ယူနိုက်တက် အနိုင်ရနိုင်ခြေ ပိုများပေမဲ့ ဘောလုံးမှာ ဘာမဆို ဖြစ်နိုင်ပါတယ်။ ခင်ဗျားတို့ရဲ့ ခန့်မှန်းချက်ကရော ဘယ်လိုလဲဗျ? မှတ်ချက်မှာ ရေးခဲ့ကြပါဦး။" },
-];
-
-const VoiceSubtitles: React.FC = () => {
-  const frame = useCurrentFrame();
-  const cue = voiceSubtitleCues.find(
-    (item) => frame >= item.from && frame < item.to,
-  );
-
-  if (!cue) return null;
-
-  return (
-    <AbsoluteFill
-      style={{
-        pointerEvents: "none",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        padding: "0 40px 150px",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "100%",
-          padding: "18px 24px",
-          borderRadius: 16,
-          backgroundColor: "rgba(0, 0, 0, 0.82)",
-          color: "#FFFFFF",
-          fontFamily: "Arial, sans-serif",
-          fontSize: 36,
-          fontWeight: 700,
-          lineHeight: 1.4,
-          textAlign: "center",
-          textShadow: "0 2px 5px rgba(0,0,0,0.8)",
-          overflowWrap: "anywhere",
-          boxSizing: "border-box",
-        }}
-      >
-        {cue.text}
-      </div>
-    </AbsoluteFill>
-  );
-};
-
 export const LeedsManUtdComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
@@ -646,7 +591,6 @@ export const LeedsManUtdComposition: React.FC = () => {
       <Sequence from={1425} durationInFrames={84}>
         <PredictionGraphic />
       </Sequence>
-      <VoiceSubtitles />
       <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
     </AbsoluteFill>
   );
