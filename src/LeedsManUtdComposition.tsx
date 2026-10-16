@@ -572,8 +572,10 @@ const MatchGraphic: React.FC = () => {
           style={{
             marginTop: 26,
             transform: `translateX(${leedsX}px)`,
-            color: interpolate(frame % 90, [0, 22, 45, 67, 90],
-              ["#FFFFFF", "#4CB8FF", "#FFFFFF", "#4CB8FF", "#FFFFFF"]),
+            color: frame % 90 < 22 ? "#FFFFFF"
+              : frame % 90 < 45 ? "#4CB8FF"
+              : frame % 90 < 67 ? "#FFFFFF"
+              : "#4CB8FF",
             textShadow: `0 0 ${glowPulse}px rgba(40,150,255,0.9)`,
           }}
         >
@@ -612,8 +614,10 @@ const MatchGraphic: React.FC = () => {
         <div
           style={{
             transform: `translateX(${unitedX}px)`,
-            color: interpolate(frame % 90, [0, 22, 45, 67, 90],
-              ["#FFFFFF", "#FF5148", "#FFFFFF", "#FF5148", "#FFFFFF"]),
+            color: frame % 90 < 22 ? "#FFFFFF"
+              : frame % 90 < 45 ? "#FF5148"
+              : frame % 90 < 67 ? "#FFFFFF"
+              : "#FF5148",
             textShadow: `0 0 ${glowPulse}px rgba(218,41,28,0.9)`,
           }}
         >
