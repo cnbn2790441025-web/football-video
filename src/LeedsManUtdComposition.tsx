@@ -477,6 +477,7 @@ return (
 };
 
 
+
 const MatchGraphic: React.FC = () => {
   const frame = useCurrentFrame();
 
@@ -496,6 +497,23 @@ const MatchGraphic: React.FC = () => {
   });
 
   const sweepX = interpolate(frame, [0, 45], [-900, 1100], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const leedsX = interpolate(frame, [0, 18, 32], [-180, 12, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const unitedX = interpolate(frame, [0, 18, 32], [180, -12, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const logoPulse = 1 + Math.sin(frame / 5) * 0.035;
+  const glowPulse = 20 + (Math.sin(frame / 4) + 1) * 12;
+  const vsGlow = interpolate(frame, [8, 17, 25], [0, 1, 0.65], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -524,24 +542,22 @@ const MatchGraphic: React.FC = () => {
         }}
       />
 
-      <div
+      <AbsoluteFill
         style={{
-          position: "absolute",
-          inset: 0,
           background: `rgba(255,255,255,${flash})`,
           mixBlendMode: "screen",
+          pointerEvents: "none",
         }}
       />
 
       <div
         style={{
           position: "absolute",
-          top: 500,
-          left: 0,
-          right: 0,
+          top: 450,
+          left: 30,
+          right: 30,
           textAlign: "center",
           opacity: enter,
-          transform: `scale(${0.94 + enter * 0.06})`,
         }}
       >
         <Text
@@ -552,43 +568,76 @@ const MatchGraphic: React.FC = () => {
           PREMIER LEAGUE
         </Text>
 
-        <Text
-          size={68}
+        <div
+          style={{
+            marginTop: 26,
+            transform: `translateX(${leedsX}px)`,
+            color: "#FFFFFF",
+            textShadow: `0 0 ${glowPulse}px rgba(40,150,255,0.9)`,
+          }}
+        >
+          <Text
+            size={64}
+            style={{ fontWeight: 900, letterSpacing: 2 }}
+          >
+            LEEDS UNITED
+          </Text>
+          <div
+            style={{
+              height: 4,
+              width: 300,
+              margin: "12px auto 0",
+              background:
+                "linear-gradient(90deg, transparent, #4CB8FF, #FFFFFF, transparent)",
+              boxShadow: "0 0 18px rgba(76,184,255,0.8)",
+            }}
+          />
+        </div>
+
+        <div
           style={{
             marginTop: 18,
-            letterSpacing: 2,
-            textShadow: "0 5px 25px #000, 0 0 24px rgba(255,255,255,0.25)",
+            marginBottom: 18,
+            transform: `scale(${vsScale})`,
+            color: gold,
+            textShadow: `0 0 ${28 * vsGlow}px rgba(247,217,0,${vsGlow})`,
           }}
         >
-          LEEDS UNITED
-        </Text>
+          <Text size={58} style={{ fontStyle: "italic", fontWeight: 900 }}>
+            VS
+          </Text>
+        </div>
 
-        <Text
-          size={54}
-          color={gold}
+        <div
           style={{
-            marginTop: 12,
-            textShadow: "0 0 25px rgba(247,217,0,0.7)",
+            transform: `translateX(${unitedX}px)`,
+            color: "#FFFFFF",
+            textShadow: `0 0 ${glowPulse}px rgba(218,41,28,0.9)`,
           }}
         >
-          VS
-        </Text>
-
-        <Text
-          size={68}
-          style={{
-            marginTop: 12,
-            textShadow: "0 5px 25px #000, 0 0 24px rgba(218,41,28,0.4)",
-          }}
-        >
-          MANCHESTER UNITED
-        </Text>
+          <Text
+            size={58}
+            style={{ fontWeight: 900, letterSpacing: 1 }}
+          >
+            MANCHESTER UNITED
+          </Text>
+          <div
+            style={{
+              height: 4,
+              width: 380,
+              margin: "12px auto 0",
+              background:
+                "linear-gradient(90deg, transparent, #FF5148, #FFFFFF, transparent)",
+              boxShadow: "0 0 18px rgba(218,41,28,0.8)",
+            }}
+          />
+        </div>
       </div>
 
       <div
         style={{
           position: "absolute",
-          top: 940,
+          top: 900,
           left: 0,
           right: 0,
           display: "flex",
@@ -604,20 +653,22 @@ const MatchGraphic: React.FC = () => {
             width: 210,
             height: 210,
             objectFit: "contain",
-            filter: "drop-shadow(0 0 28px rgba(247,217,0,0.55))",
+            transform: `scale(${logoPulse})`,
+            filter: `drop-shadow(0 0 ${glowPulse}px rgba(76,184,255,0.85))`,
           }}
         />
 
-        <Text
-          size={74}
-          color="#FFFFFF"
+        <div
           style={{
-            fontStyle: "italic",
-            textShadow: "0 0 28px rgba(255,255,255,0.75)",
+            color: "#FFFFFF",
+            textShadow: `0 0 ${glowPulse}px rgba(255,255,255,0.9)`,
+            transform: `scale(${1 + Math.sin(frame / 3) * 0.04})`,
           }}
         >
-          VS
-        </Text>
+          <Text size={70} style={{ fontStyle: "italic", fontWeight: 900 }}>
+            VS
+          </Text>
+        </div>
 
         <Img
           src={staticFile("assets/logos/manutd.png")}
@@ -625,7 +676,8 @@ const MatchGraphic: React.FC = () => {
             width: 210,
             height: 210,
             objectFit: "contain",
-            filter: "drop-shadow(0 0 28px rgba(218,41,28,0.65))",
+            transform: `scale(${2 - logoPulse})`,
+            filter: `drop-shadow(0 0 ${glowPulse}px rgba(218,41,28,0.9))`,
           }}
         />
       </div>
@@ -662,7 +714,6 @@ const MatchGraphic: React.FC = () => {
     </AbsoluteFill>
   );
 };
-
 
 const PredictionGraphic: React.FC = () => {
 const frame = useCurrentFrame();
