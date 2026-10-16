@@ -376,7 +376,15 @@ const PersistentHeader: React.FC = () => {
   const frame = useCurrentFrame();
   const glow = 0.72 + Math.sin(frame / 13) * 0.16;
 const lift = Math.sin(frame / 30) * 3;
-
+const headerOpacity = interpolate(
+  frame,
+  [0, 18, 222, 240],
+  [0, 0, 0, 1],
+  {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  },
+);
 // Date and kickoff animation: narration around 11.2s–16.3s
 const dateProgress = interpolate(frame, [336, 350, 475, 489], [0, 1, 1, 0], {
   extrapolateLeft: "clamp",
@@ -401,7 +409,12 @@ const dateSweepX = interpolate(
 );
 
 return (
-    <AbsoluteFill style={{ pointerEvents: "none" }}>
+    <AbsoluteFill
+  style={{
+    pointerEvents: "none",
+    opacity: headerOpacity,
+  }}
+>
       <div style={{
         position: "absolute", inset: 0,
         background: "linear-gradient(135deg, rgba(247,217,0,0.12), transparent 44%, rgba(218,41,28,0.12))",
@@ -424,7 +437,7 @@ return (
         <Text size={70} style={{
           marginTop: 14, textShadow: "0 6px 24px #000, 0 0 22px rgba(247,217,0,0.24)",
         }}>THE BIG MATCH</Text>
-        <Text size={25} style={{
+        <Text size={34} style={{
         marginTop: 18,
         letterSpacing: 3,
         color: `rgb(255, ${Math.round(190 - dateColor * 150)}, ${Math.round(35 + dateColor * 20)})`,
@@ -433,7 +446,7 @@ return (
        }}>
        OCTOBER 18 • SUNDAY
        </Text>
-       <Text size={30} style={{
+       <Text size={42} style={{
        marginTop: 8,
        letterSpacing: 2,
        color: `rgb(255, ${Math.round(205 - dateColor * 165)}, ${Math.round(65 - dateColor * 30)})`,
