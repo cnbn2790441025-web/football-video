@@ -721,6 +721,110 @@ const MatchGraphic: React.FC = () => {
   );
 };
 
+const BrunoSpotlight: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  const opacity = interpolate(frame, [0, 12, 135, 150], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const slideX = interpolate(frame, [0, 20], [180, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const glow = 18 + (Math.sin(frame / 5) + 1) * 12;
+
+  return (
+    <AbsoluteFill
+      style={{
+        opacity,
+        overflow: "hidden",
+        background:
+          "radial-gradient(ellipse at 70% 45%, rgba(218,41,28,0.24), transparent 48%), linear-gradient(145deg, rgba(3,7,16,0.97), rgba(15,5,12,0.94))",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: 54,
+          top: 300,
+          width: 8,
+          height: 520,
+          borderRadius: 8,
+          background: "linear-gradient(180deg, #F7D900, #FFFFFF, #DA291C)",
+          boxShadow: "0 0 24px rgba(218,41,28,0.6)",
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          left: 88,
+          top: 340,
+          width: 570,
+          transform: `translateX(${-slideX * 0.35}px)`,
+        }}
+      >
+        <Text size={27} color="#F7D900" style={{ letterSpacing: 5 }}>
+          KEY PLAYER
+        </Text>
+        <div style={{ marginTop: 28 }}>
+          <Text size={76} style={{ fontStyle: "italic", lineHeight: 0.98 }}>
+            BRUNO
+          </Text>
+          <Text size={76} style={{ fontStyle: "italic", lineHeight: 0.98 }}>
+            FERNANDES
+          </Text>
+        </div>
+        <div
+          style={{
+            marginTop: 24,
+            width: 300,
+            height: 4,
+            background: "linear-gradient(90deg, #F7D900, #DA291C, transparent)",
+          }}
+        />
+        <Text size={27} color="#E0E5EF" style={{ marginTop: 24, letterSpacing: 2 }}>
+          CAPTAIN • PLAYMAKER
+        </Text>
+        <Text size={22} color="#AEB8C9" style={{ marginTop: 18, letterSpacing: 1 }}>
+          VISION  /  PASSING  /  LEADERSHIP
+        </Text>
+      </div>
+
+      <Img
+        src={staticFile("assets/players/bruno.png")}
+        style={{
+          position: "absolute",
+          height: "73%",
+          width: "auto",
+          maxWidth: "72%",
+          objectFit: "contain",
+          objectPosition: "bottom right",
+          right: -18,
+          bottom: 0,
+          transform: `translateX(${slideX}px)`,
+          filter: `drop-shadow(0 0 ${glow}px rgba(218,41,28,0.55))`,
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 180,
+          left: 60,
+          right: 60,
+          height: 2,
+          background: "linear-gradient(90deg, transparent, #F7D900, #DA291C, transparent)",
+          opacity: 0.8,
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
 const PredictionGraphic: React.FC = () => {
 const frame = useCurrentFrame();
 
@@ -802,6 +906,9 @@ export const LeedsManUtdComposition: React.FC = () => {
       <PersistentHeader />
       <Sequence durationInFrames={240}>
         <MatchGraphic />
+      </Sequence>
+      <Sequence from={240} durationInFrames={150}>
+        <BrunoSpotlight />
       </Sequence>
       {tacticalScenes.map((scene) => (
         <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
