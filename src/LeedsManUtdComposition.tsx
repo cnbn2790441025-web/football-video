@@ -199,7 +199,7 @@ const TacticalGraphic: React.FC<{
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(3,7,16,0.16)" }}>
       <div style={{
-        position: "absolute", top: 465, width: 900, height: 820, padding: 28,
+        position: "absolute", top: 520, width: 900, height: 820, padding: 28,
         boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
         background: "linear-gradient(145deg, rgba(3,12,24,0.96), rgba(7,29,35,0.94))",
         border: "2px solid rgba(247,217,0,0.72)",
@@ -572,7 +572,8 @@ const MatchGraphic: React.FC = () => {
           style={{
             marginTop: 26,
             transform: `translateX(${leedsX}px)`,
-            color: "#FFFFFF",
+            color: interpolate(frame % 90, [0, 22, 45, 67, 90],
+              ["#FFFFFF", "#4CB8FF", "#FFFFFF", "#4CB8FF", "#FFFFFF"]),
             textShadow: `0 0 ${glowPulse}px rgba(40,150,255,0.9)`,
           }}
         >
@@ -611,7 +612,8 @@ const MatchGraphic: React.FC = () => {
         <div
           style={{
             transform: `translateX(${unitedX}px)`,
-            color: "#FFFFFF",
+            color: interpolate(frame % 90, [0, 22, 45, 67, 90],
+              ["#FFFFFF", "#FF5148", "#FFFFFF", "#FF5148", "#FFFFFF"]),
             textShadow: `0 0 ${glowPulse}px rgba(218,41,28,0.9)`,
           }}
         >
