@@ -466,34 +466,184 @@ return (
 
 const MatchGraphic: React.FC = () => {
   const frame = useCurrentFrame();
-  const pulse = 0.82 + Math.sin(frame / 8) * 0.18;
-  const enter = interpolate(frame, [0, 22, 45], [0, 1, 1], {
+
+  const enter = interpolate(frame, [0, 12, 28], [0, 1.08, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const flash = interpolate(frame, [0, 2, 7, 13], [0, 0.9, 0.2, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const vsScale = interpolate(frame, [8, 17, 25], [0.2, 1.2, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const sweepX = interpolate(frame, [0, 45], [-900, 1100], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   return (
     <AbsoluteFill>
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "linear-gradient(180deg, transparent 25%, rgba(2,7,17,0.18) 55%, rgba(2,7,17,0.70))",
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, opacity: enter,
-        transform: `scale(${1.03 - enter * 0.03})`,
-      }}>
-        <PlayerCard image="leeds-player-2.png" name="BRENDEN AARONSON" team="leeds" side="left" />
-        <PlayerCard image="bruno.png" name="BRUNO FERNANDES" team="united" side="right" />
-      </div>
-      <div style={{
-        position: "absolute", bottom: 120, left: 60, right: 60,
-        padding: "24px 20px", borderRadius: 18,
-        border: `2px solid rgba(255,255,255,${pulse})`,
-        background: "rgba(3,7,16,0.84)", textAlign: "center",
-        opacity: enter,
-      }}>
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 42%, rgba(30,50,85,0.42), transparent 62%), linear-gradient(180deg, transparent 20%, rgba(2,7,17,0.25) 55%, rgba(2,7,17,0.82))",
+        }}
+      />
 
-        <Text size={22} color="#D8DCE5" style={{ marginTop: 14, letterSpacing: 3 }}>
-          18 OCTOBER 2026  •  MATCH PREVIEW
+      <div
+        style={{
+          position: "absolute",
+          top: 500,
+          left: 0,
+          right: 0,
+          height: 8,
+          opacity: 0.8,
+          background:
+            "linear-gradient(90deg, transparent, #F7D900, #FFFFFF, #DA291C, transparent)",
+          transform: `translateX(${sweepX}px)`,
+          boxShadow: "0 0 28px rgba(255,255,255,0.7)",
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `rgba(255,255,255,${flash})`,
+          mixBlendMode: "screen",
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: 500,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          opacity: enter,
+          transform: `scale(${0.94 + enter * 0.06})`,
+        }}
+      >
+        <Text
+          size={32}
+          color="#D8DCE5"
+          style={{ letterSpacing: 8, textShadow: "0 0 18px #000" }}
+        >
+          PREMIER LEAGUE
+        </Text>
+
+        <Text
+          size={68}
+          style={{
+            marginTop: 18,
+            letterSpacing: 2,
+            textShadow: "0 5px 25px #000, 0 0 24px rgba(255,255,255,0.25)",
+          }}
+        >
+          LEEDS UNITED
+        </Text>
+
+        <Text
+          size={54}
+          color={gold}
+          style={{
+            marginTop: 12,
+            textShadow: "0 0 25px rgba(247,217,0,0.7)",
+          }}
+        >
+          VS
+        </Text>
+
+        <Text
+          size={68}
+          style={{
+            marginTop: 12,
+            textShadow: "0 5px 25px #000, 0 0 24px rgba(218,41,28,0.4)",
+          }}
+        >
+          MANCHESTER UNITED
+        </Text>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          top: 940,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 44,
+          transform: `scale(${vsScale})`,
+        }}
+      >
+        <Img
+          src={staticFile("assets/logos/leeds.png")}
+          style={{
+            width: 210,
+            height: 210,
+            objectFit: "contain",
+            filter: "drop-shadow(0 0 28px rgba(247,217,0,0.55))",
+          }}
+        />
+
+        <Text
+          size={74}
+          color="#FFFFFF"
+          style={{
+            fontStyle: "italic",
+            textShadow: "0 0 28px rgba(255,255,255,0.75)",
+          }}
+        >
+          VS
+        </Text>
+
+        <Img
+          src={staticFile("assets/logos/manutd.png")}
+          style={{
+            width: 210,
+            height: 210,
+            objectFit: "contain",
+            filter: "drop-shadow(0 0 28px rgba(218,41,28,0.65))",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 260,
+          left: 50,
+          right: 50,
+          padding: "22px 18px",
+          borderRadius: 18,
+          border: "2px solid rgba(255,255,255,0.5)",
+          background: "rgba(3,7,16,0.82)",
+          textAlign: "center",
+          opacity: interpolate(frame, [18, 30], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+          boxShadow: "0 0 32px rgba(0,0,0,0.5)",
+        }}
+      >
+        <Text size={28} color="#FFD36A" style={{ letterSpacing: 4 }}>
+          MATCHDAY PREVIEW
+        </Text>
+        <Text
+          size={23}
+          color="#D8DCE5"
+          style={{ marginTop: 14, letterSpacing: 2 }}
+        >
+          18 OCTOBER 2026
         </Text>
       </div>
     </AbsoluteFill>
