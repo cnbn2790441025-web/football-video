@@ -277,6 +277,19 @@ const TacticalGraphic: React.FC<{
 const StadiumBackground: React.FC = () => {
   const frame = useCurrentFrame();
   const cycle = frame % 300;
+
+  const seed = `${matchData.homeTeam}-${matchData.awayTeam}`.split("").reduce(
+    (sum, char) => sum + char.charCodeAt(0), 0
+  );
+  const palettes = [
+    { a: "#2585ff", b: "#ff354f" },
+    { a: "#28d9c5", b: "#ff9b32" },
+    { a: "#a36bff", b: "#ff4f91" },
+    { a: "#f4c542", b: "#38a6ff" },
+    { a: "#54e06e", b: "#ff654f" },
+    { a: "#52c7ff", b: "#e4e8ff" },
+  ];
+  const palette = palettes[seed % palettes.length];
   const blueX = interpolate(cycle, [0, 150, 300], [-1188, 1188, -1188]);
   const redX = interpolate(cycle, [0, 150, 300], [1188, -1188, 1188]);
   const pulse = interpolate(frame % 180, [0, 45, 90, 135, 180], [0.35, 0.75, 0.4, 0.7, 0.35]);
@@ -296,24 +309,22 @@ const StadiumBackground: React.FC = () => {
     left: `${4 + i * 5.4}%`,
     size: i % 3 === 0 ? 8 : 5,
     delay: i * 7,
-    color: i % 2 === 0 ? "#8acbff" : "#ff7187",
+    color: i % 2 === 0 ? palette.a : palette.b,
   }));
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse at 12% 24%, rgba(0,105,255,${pulse * 0.65}), transparent 48%), radial-gradient(ellipse at 88% 72%, rgba(255,20,55,${pulse * 0.5}), transparent 48%), linear-gradient(180deg, #071226 0%, #030712 52%, #10040b 100%)`,
+          background: `radial-gradient(ellipse at 12% 24%, ${palette.a}66, transparent 48%), radial-gradient(ellipse at 88% 72%, ${palette.b}55, transparent 48%), linear-gradient(180deg, #071226 0%, #030712 52%, #10040b 100%)`,
         }}
       />
-
       <AbsoluteFill
         style={{
           background: "radial-gradient(ellipse at 50% 45%, transparent 5%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.7) 100%)",
           pointerEvents: "none",
         }}
       />
-
       {lights.map((light, i) => (
         <div
           key={i}
@@ -331,54 +342,49 @@ const StadiumBackground: React.FC = () => {
           }}
         />
       ))}
-
       <div
         style={{
           ...beam,
           top: "18%",
-          background: "linear-gradient(90deg, transparent 5%, rgba(0,90,255,0.1) 25%, rgba(45,145,255,0.95) 48%, rgba(100,190,255,0.65) 52%, transparent 78%)",
-          boxShadow: "0 0 24px 8px rgba(0,110,255,0.32)",
+          background: `linear-gradient(90deg, transparent 5%, ${palette.a}22 25%, ${palette.a} 48%, ${palette.a}aa 52%, transparent 78%)`,
+          boxShadow: `0 0 24px 8px ${palette.a}55`,
           transform: `translateX(${blueX}px) rotate(-17deg)`,
           opacity: 0.9,
         }}
       />
-
       <div
         style={{
           ...beam,
           top: "46%",
           height: 6,
-          background: "linear-gradient(90deg, transparent 8%, rgba(20,105,255,0.08) 30%, rgba(70,165,255,0.65) 48%, rgba(125,205,255,0.35) 54%, transparent 82%)",
-          boxShadow: "0 0 20px 5px rgba(0,115,255,0.18)",
+          background: `linear-gradient(90deg, transparent 8%, ${palette.a}15 30%, ${palette.a}aa 48%, ${palette.a}66 54%, transparent 82%)`,
+          boxShadow: `0 0 20px 5px ${palette.a}33`,
           transform: `translateX(${blueX * 0.65}px) rotate(-12deg)`,
           opacity: 0.55,
         }}
       />
-
       <div
         style={{
           ...beam,
           top: "74%",
           height: 9,
-          background: "linear-gradient(90deg, transparent 8%, rgba(255,25,55,0.12) 28%, rgba(255,40,65,0.95) 50%, rgba(255,125,135,0.6) 55%, transparent 82%)",
-          boxShadow: "0 0 24px 8px rgba(255,20,55,0.3)",
+          background: `linear-gradient(90deg, transparent 8%, ${palette.b}22 28%, ${palette.b} 50%, ${palette.b}aa 55%, transparent 82%)`,
+          boxShadow: `0 0 24px 8px ${palette.b}55`,
           transform: `translateX(${redX}px) rotate(-17deg)`,
           opacity: 0.85,
         }}
       />
-
       <AbsoluteFill
         style={{
-          background: `linear-gradient(112deg, transparent 20%, rgba(25,115,255,${pulse * 0.16}) 43%, rgba(255,255,255,${pulse * 0.08}) 49%, transparent 67%)`,
+          background: `linear-gradient(112deg, transparent 20%, ${palette.a}29 43%, rgba(255,255,255,0.08) 49%, transparent 67%)`,
           transform: `translateX(${blueX * 0.55}px)`,
           mixBlendMode: "screen",
           pointerEvents: "none",
         }}
       />
-
       <AbsoluteFill
         style={{
-          background: "linear-gradient(180deg, rgba(30,100,255,0.15), transparent 22%, transparent 72%, rgba(255,25,50,0.12))",
+          background: `linear-gradient(180deg, ${palette.a}22, transparent 22%, transparent 72%, ${palette.b}22)`,
           boxShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(35,105,255,0.12)",
           pointerEvents: "none",
         }}
