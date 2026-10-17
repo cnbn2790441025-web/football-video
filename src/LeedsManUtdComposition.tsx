@@ -285,9 +285,10 @@ const StadiumBackground: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
+      <Img src={staticFile("assets/stadium-light-motion-bg.png")} style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scale(0.94)" }} />
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse at 12% 24%, ${palette.a}66, transparent 48%), radial-gradient(ellipse at 88% 72%, ${palette.b}55, transparent 48%), linear-gradient(180deg, #071226 0%, #030712 52%, #10040b 100%)`,
+          background: `radial-gradient(ellipse at 12% 24%, ${palette.a}66, transparent 48%), radial-gradient(ellipse at 88% 72%, ${palette.b}55, transparent 48%), linear-gradient(180deg, rgba(7,18,38,0.35) 0%, rgba(3,7,18,0.18) 52%, rgba(16,4,11,0.38) 100%)`,
         }}
       />
       <AbsoluteFill
