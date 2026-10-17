@@ -281,15 +281,36 @@ const StadiumBackground: React.FC = () => {
   const seed = `${matchData.homeTeam}-${matchData.awayTeam}`.split("").reduce(
     (sum, char) => sum + char.charCodeAt(0), 0
   );
-  const palettes = [
-    { a: "#2585ff", b: "#ff354f" },
-    { a: "#28d9c5", b: "#ff9b32" },
-    { a: "#a36bff", b: "#ff4f91" },
-    { a: "#f4c542", b: "#38a6ff" },
-    { a: "#54e06e", b: "#ff654f" },
-    { a: "#52c7ff", b: "#e4e8ff" },
-  ];
-  const palette = palettes[seed % palettes.length];
+  const getTeamColor = (team: string): string => {
+    const name = team.toLowerCase();
+
+    if (name.includes("manchester united")) return "#DA291C";
+    if (name.includes("arsenal")) return "#EF0107";
+    if (name.includes("chelsea")) return "#034694";
+    if (name.includes("liverpool")) return "#C8102E";
+    if (name.includes("manchester city")) return "#6CABDD";
+    if (name.includes("leeds")) return "#FFCD00";
+    if (name.includes("tottenham")) return "#132257";
+    if (name.includes("newcastle")) return "#241F20";
+    if (name.includes("aston villa")) return "#670E36";
+    if (name.includes("brighton")) return "#0057B8";
+    if (name.includes("west ham")) return "#7A263A";
+    if (name.includes("everton")) return "#003399";
+    if (name.includes("crystal palace")) return "#1B458F";
+    if (name.includes("nottingham forest")) return "#DD0000";
+    if (name.includes("brentford")) return "#E30613";
+    if (name.includes("fulham")) return "#CC0000";
+    if (name.includes("bournemouth")) return "#DA291C";
+    if (name.includes("wolves")) return "#FDB913";
+    if (name.includes("sunderland")) return "#EB172B";
+
+    return "#52C7FF";
+  };
+
+  const palette = {
+    a: getTeamColor(matchData.homeTeam),
+    b: getTeamColor(matchData.awayTeam),
+  };
   const blueX = interpolate(cycle, [0, 150, 300], [-1188, 1188, -1188]);
   const redX = interpolate(cycle, [0, 150, 300], [1188, -1188, 1188]);
   const pulse = interpolate(frame % 180, [0, 45, 90, 135, 180], [0.35, 0.75, 0.4, 0.7, 0.35]);
