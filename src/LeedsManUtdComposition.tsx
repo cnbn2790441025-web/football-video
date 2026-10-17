@@ -214,6 +214,16 @@ const TacticalGraphic: React.FC<{
 const StadiumBackground: React.FC = () => {
   const frame = useCurrentFrame();
   const cycle = frame % 300;
+  const motionMode = Math.floor(frame / 300) % 4;
+  const beamAngles = [-17, 12, -28, 20];
+  const beam2Angles = [-12, 22, -8, 30];
+  const beam3Angles = [-17, -24, 16, -10];
+  const beamTops = [
+    ["18%", "46%", "74%"],
+    ["12%", "42%", "70%"],
+    ["24%", "52%", "78%"],
+    ["15%", "58%", "80%"],
+  ][motionMode];
   const getTeamColor = (team: string): string => {
     const name = team.toLowerCase();
 
@@ -306,32 +316,32 @@ const StadiumBackground: React.FC = () => {
       <div
         style={{
           ...beam,
-          top: "18%",
+          top: beamTops[0],
           background: `linear-gradient(90deg, transparent 5%, ${palette.a}22 25%, ${palette.a} 48%, ${palette.a}aa 52%, transparent 78%)`,
           boxShadow: `0 0 24px 8px ${palette.a}55`,
-          transform: `translateX(${blueX}px) rotate(-17deg)`,
+          transform: `translateX(${blueX}px) rotate(${beamAngles[motionMode]}deg)`,
           opacity: 0.9,
         }}
       />
       <div
         style={{
           ...beam,
-          top: "46%",
+          top: beamTops[1],
           height: 6,
           background: `linear-gradient(90deg, transparent 8%, ${palette.a}15 30%, ${palette.a}aa 48%, ${palette.a}66 54%, transparent 82%)`,
           boxShadow: `0 0 20px 5px ${palette.a}33`,
-          transform: `translateX(${blueX * 0.65}px) rotate(-12deg)`,
+          transform: `translateX(${blueX * 0.65}px) rotate(${beam2Angles[motionMode]}deg)`,
           opacity: 0.55,
         }}
       />
       <div
         style={{
           ...beam,
-          top: "74%",
+          top: beamTops[2],
           height: 9,
           background: `linear-gradient(90deg, transparent 8%, ${palette.b}22 28%, ${palette.b} 50%, ${palette.b}aa 55%, transparent 82%)`,
           boxShadow: `0 0 24px 8px ${palette.b}55`,
-          transform: `translateX(${redX}px) rotate(-17deg)`,
+          transform: `translateX(${redX}px) rotate(${beam3Angles[motionMode]}deg)`,
           opacity: 0.85,
         }}
       />
