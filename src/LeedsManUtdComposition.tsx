@@ -285,53 +285,64 @@ const StadiumBackground: React.FC = () => {
     position: "absolute",
     left: 0,
     width: "125%",
-    height: 12,
+    height: 10,
     borderRadius: 999,
     filter: "blur(7px)",
     pointerEvents: "none",
     mixBlendMode: "screen",
   };
 
+  const lights = Array.from({ length: 18 }, (_, i) => ({
+    left: `${4 + i * 5.4}%`,
+    size: i % 3 === 0 ? 8 : 5,
+    delay: i * 7,
+    color: i % 2 === 0 ? "#8acbff" : "#ff7187",
+  }));
+
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
-      <Img
-        src={staticFile("assets/stadium-light-motion-bg.png")}
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "blur(24px) brightness(0.38) saturate(1.25)",
-          transform: "scale(1.15)",
-        }}
-      />
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse at 12% 24%, rgba(0,105,255,${pulse * 0.65}), transparent 48%), radial-gradient(ellipse at 88% 72%, rgba(255,20,55,${pulse * 0.5}), transparent 48%)`,
-          mixBlendMode: "screen",
+          background: `radial-gradient(ellipse at 12% 24%, rgba(0,105,255,${pulse * 0.65}), transparent 48%), radial-gradient(ellipse at 88% 72%, rgba(255,20,55,${pulse * 0.5}), transparent 48%), linear-gradient(180deg, #071226 0%, #030712 52%, #10040b 100%)`,
+        }}
+      />
+
+      <AbsoluteFill
+        style={{
+          background: "radial-gradient(ellipse at 50% 45%, transparent 5%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.7) 100%)",
           pointerEvents: "none",
         }}
       />
-      <Img
-        src={staticFile("assets/stadium-light-motion-bg.png")}
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-        }}
-      />
+
+      {lights.map((light, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            top: `${9 + (i % 2) * 4}%`,
+            left: light.left,
+            width: light.size,
+            height: light.size,
+            borderRadius: "50%",
+            background: light.color,
+            boxShadow: `0 0 12px 4px ${light.color}`,
+            opacity: 0.4 + pulse * 0.6,
+            transform: `translateY(${Math.sin((frame + light.delay) / 12) * 3}px)`,
+          }}
+        />
+      ))}
+
       <div
         style={{
           ...beam,
           top: "18%",
-          height: 10,
           background: "linear-gradient(90deg, transparent 5%, rgba(0,90,255,0.1) 25%, rgba(45,145,255,0.95) 48%, rgba(100,190,255,0.65) 52%, transparent 78%)",
           boxShadow: "0 0 24px 8px rgba(0,110,255,0.32)",
           transform: `translateX(${blueX}px) rotate(-17deg)`,
           opacity: 0.9,
         }}
       />
+
       <div
         style={{
           ...beam,
@@ -343,6 +354,7 @@ const StadiumBackground: React.FC = () => {
           opacity: 0.55,
         }}
       />
+
       <div
         style={{
           ...beam,
@@ -354,6 +366,7 @@ const StadiumBackground: React.FC = () => {
           opacity: 0.85,
         }}
       />
+
       <AbsoluteFill
         style={{
           background: `linear-gradient(112deg, transparent 20%, rgba(25,115,255,${pulse * 0.16}) 43%, rgba(255,255,255,${pulse * 0.08}) 49%, transparent 67%)`,
@@ -362,6 +375,7 @@ const StadiumBackground: React.FC = () => {
           pointerEvents: "none",
         }}
       />
+
       <AbsoluteFill
         style={{
           background: "linear-gradient(180deg, rgba(30,100,255,0.15), transparent 22%, transparent 72%, rgba(255,25,50,0.12))",
