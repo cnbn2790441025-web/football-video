@@ -1,4 +1,5 @@
 import React from "react";
+import matchData from "./matchData.json";
 import {
   AbsoluteFill,
   Audio,
@@ -119,14 +120,14 @@ const ScoreHeader: React.FC = () => (
   >
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <Img src={staticFile("assets/logos/leeds.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
-      <Text size={30} style={{ fontWeight: 800 }}>LEEDS</Text>
+      <Text size={30} style={{ fontWeight: 800 }}>{matchData.homeShort}</Text>
     </div>
     <div style={{ textAlign: "center" }}>
       <Text size={34} color={gold}>VS</Text>
       <Text size={18} color="#D8DCE5" style={{ marginTop: 7, letterSpacing: 3 }}>MATCH PREVIEW</Text>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-      <Text size={30} style={{ fontWeight: 800 }}>MAN UTD</Text>
+      <Text size={30} style={{ fontWeight: 800 }}>{matchData.awayShort}</Text>
       <Img src={staticFile("assets/logos/manutd.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
     </div>
   </div>
@@ -444,7 +445,7 @@ return (
         textShadow: `0 0 ${12 + dateProgress * 24}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
         transform: `scale(${dateScale})`,
        }}>
-       OCTOBER 18 • SUNDAY
+       {`${matchData.matchDate.split(" ")[1].toUpperCase()} ${matchData.matchDate.split(" ")[0]} • ${matchData.matchDay.toUpperCase()}`}
        </Text>
        <Text size={42} style={{
        marginTop: 8,
@@ -453,7 +454,7 @@ return (
        textShadow: `0 0 ${14 + dateProgress * 26}px rgba(255,215,0,${0.6 + dateProgress * 0.4})`,
        transform: `scale(${dateScale})`,
        }}>
-       7:30 PM (MMT)
+       {(() => { const [h, m] = matchData.kickoffMyanmar.split(":").map(Number); return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"} (MMT)`; })()}
        </Text>
        </div>
      
@@ -714,7 +715,7 @@ const MatchGraphic: React.FC = () => {
           color="#D8DCE5"
           style={{ marginTop: 14, letterSpacing: 2 }}
         >
-          18 OCTOBER 2026
+          {matchData.matchDate.toUpperCase()}
         </Text>
       </div>
     </AbsoluteFill>
