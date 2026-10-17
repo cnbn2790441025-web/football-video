@@ -15,7 +15,6 @@ import {
 
 
 const gold = "#F7D900";
-const red = "#DA291C";
 
 const Text: React.FC<{
   children: React.ReactNode;
@@ -39,68 +38,6 @@ const Text: React.FC<{
   </div>
 );
 
-const PlayerCard: React.FC<{
-  image: string;
-  name: string;
-  team: "leeds" | "united";
-  side: "left" | "right";
-}> = ({ image, name, team, side }) => {
-  const frame = useCurrentFrame();
-  const enter = interpolate(frame, [0, 18], [70, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const accent = team === "leeds" ? gold : red;
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: 260,
-        [side]: 10,
-        width: 510,
-        height: 790,
-        transform: `translateY(${enter}px)`,
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: "8% 4% 0",
-          background: `linear-gradient(180deg, ${accent}00 0%, ${accent}30 65%, ${accent}A0 100%)`,
-          clipPath: "polygon(16% 0,100% 8%,86% 100%,0 88%)",
-        }}
-      />
-      <Img
-        src={staticFile(`assets/players/${image}`)}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          objectPosition: "bottom center",
-          filter: `drop-shadow(0 0 18px ${accent}55)`,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 18,
-          right: 18,
-          padding: "16px 12px",
-          textAlign: "center",
-          background: `linear-gradient(90deg, ${accent}00, ${accent}E8, ${accent}00)`,
-        }}
-      >
-        <Text size={32} color={team === "leeds" ? "#111111" : "#FFFFFF"}>
-          {name}
-        </Text>
-      </div>
-    </div>
-  );
-};
 
 const ScoreHeader: React.FC = () => (
   <div
@@ -277,10 +214,6 @@ const TacticalGraphic: React.FC<{
 const StadiumBackground: React.FC = () => {
   const frame = useCurrentFrame();
   const cycle = frame % 300;
-
-  const seed = `${matchData.homeTeam}-${matchData.awayTeam}`.split("").reduce(
-    (sum, char) => sum + char.charCodeAt(0), 0
-  );
   const getTeamColor = (team: string): string => {
     const name = team.toLowerCase();
 
@@ -307,10 +240,17 @@ const StadiumBackground: React.FC = () => {
     return "#52C7FF";
   };
 
-  const palette = {
+  const teamPalette = {
     a: getTeamColor(matchData.homeTeam),
     b: getTeamColor(matchData.awayTeam),
   };
+  const palettes = [
+    teamPalette,
+    { a: "#2585FF", b: "#FF354F" },
+    { a: "#F4C542", b: "#F8FAFC" },
+    { a: "#8B5CF6", b: "#22D3EE" },
+  ];
+  const palette = palettes[Math.floor(frame / 150) % palettes.length];
   const blueX = interpolate(cycle, [0, 150, 300], [-1188, 1188, -1188]);
   const redX = interpolate(cycle, [0, 150, 300], [1188, -1188, 1188]);
   const pulse = interpolate(frame % 180, [0, 45, 90, 135, 180], [0.35, 0.75, 0.4, 0.7, 0.35]);
