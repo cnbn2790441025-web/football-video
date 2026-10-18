@@ -283,9 +283,34 @@ const StadiumBackground: React.FC = () => {
     color: i % 2 === 0 ? palette.a : palette.b,
   }));
 
+  const stadiumImages = [
+    "assets/stadiums/stadium_1_blue_night.png",
+    "assets/stadiums/stadium_2_red_night.png",
+    "assets/stadiums/stadium_3_neutral_moonlit.png",
+    "assets/stadiums/stadium_4_deep_blue_electric.png",
+    "assets/stadiums/stadium_5_red_purple_cinematic.png",
+  ];
+  const matchKey = `${matchData.homeTeam}-${matchData.awayTeam}`;
+  const matchHash = Array.from(matchKey).reduce(
+    (sum, char) => sum + char.charCodeAt(0),
+    0,
+  );
+  const stadiumImage = stadiumImages[matchHash % stadiumImages.length];
+  const zoomLevels = [0.98, 1.05, 1.12];
+  const stadiumZoom =
+    zoomLevels[Math.floor(matchHash / stadiumImages.length) % zoomLevels.length];
+
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
-      <Img src={staticFile("assets/stadium-light-motion-bg.png")} style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scale(0.94)" }} />
+      <Img
+        src={staticFile(stadiumImage)}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: `scale(${stadiumZoom})`,
+        }}
+      />
       <AbsoluteFill
         style={{
           background: `radial-gradient(ellipse at 12% 24%, ${palette.a}66, transparent 48%), radial-gradient(ellipse at 88% 72%, ${palette.b}55, transparent 48%), linear-gradient(180deg, rgba(7,18,38,0.35) 0%, rgba(3,7,18,0.18) 52%, rgba(16,4,11,0.38) 100%)`,
