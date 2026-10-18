@@ -710,7 +710,7 @@ const MatchGraphic: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          bottom: 260,
+          bottom: 200,
           left: 50,
           right: 50,
           padding: "22px 18px",
