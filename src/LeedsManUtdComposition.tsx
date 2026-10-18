@@ -1,4 +1,5 @@
 import React from "react";
+import { SubtitleOverlay } from "./SubtitleOverlay";
 import matchData from "./matchData.json";
 import {
   AbsoluteFill,
@@ -936,6 +937,7 @@ export const LeedsManUtdComposition: React.FC = () => {
       <Sequence from={1425} durationInFrames={84}>
         <PredictionGraphic />
       </Sequence>
+      <SubtitleOverlay />
       <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
     </AbsoluteFill>
   );
