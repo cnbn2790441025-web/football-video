@@ -5,6 +5,7 @@ import {
   staticFile,
   useCurrentFrame,
   interpolate,
+  interpolateColors,
   Easing,
 } from "remotion";
 
@@ -74,7 +75,7 @@ const SubtitleStyle: React.FC<{ text: string }> = ({ text }) => {
         backgroundColor: "rgba(5, 8, 18, 0.86)",
         borderRadius: 14,
         border: `2px solid ${borderColor}`,
-        color: "#FFD84D",
+        color: interpolateColors(frame % 120, [0, 40, 80, 120], ["#FFFFFF", "#FFD84D", "#55C8FF", "#FFFFFF"]),
         fontFamily: "Noto Sans Myanmar",
         fontSize: 42,
         fontWeight: 700,
