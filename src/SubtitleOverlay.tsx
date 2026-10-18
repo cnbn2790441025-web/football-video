@@ -74,7 +74,7 @@ const SubtitleStyle: React.FC<{ text: string }> = ({ text }) => {
         backgroundColor: "rgba(5, 8, 18, 0.86)",
         borderRadius: 14,
         border: `2px solid ${borderColor}`,
-        color: "#FFFFFF",
+        color: "#FFD84D",
         fontFamily: "Noto Sans Myanmar",
         fontSize: 42,
         fontWeight: 700,
