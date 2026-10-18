@@ -103,7 +103,7 @@ export const SubtitleOverlay: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                bottom: 190,
+                bottom: 340,
                 left: 65,
                 right: 65,
                 padding: "16px 22px",
@@ -112,7 +112,7 @@ export const SubtitleOverlay: React.FC = () => {
                 border: "1px solid rgba(255,255,255,0.25)",
                 color: "#FFFFFF",
                 fontFamily: "Arial, sans-serif",
-                fontSize: 31,
+                fontSize: 38,
                 fontWeight: 700,
                 lineHeight: 1.35,
                 textAlign: "center",
