@@ -946,7 +946,7 @@ export const LeedsManUtdEntry: React.FC = () => (
   <Composition
     id="LeedsManUtd"
     component={LeedsManUtdComposition}
-    durationInFrames={1650}
+    durationInFrames={1655}
     fps={30}
     width={1080}
     height={1920}
