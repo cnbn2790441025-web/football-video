@@ -9,5 +9,9 @@
   "kickoffMyanmar": "19:30",
   "utcDate": "2026-10-18T13:00:00Z",
   "status": "TIMED",
-  "stadium": "Elland Road"
+  "stadium": "Elland Road",
+  "homeLogo": "assets/logos/leeds.png",
+  "awayLogo": "assets/logos/manutd.png",
+  "homePlayer": "assets/players/leeds-player-2.png",
+  "awayPlayer": "assets/players/bruno.png"
 }

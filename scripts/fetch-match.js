@@ -39,6 +39,39 @@ function shortName(name = "") {
   return names[key] || name.toUpperCase();
 }
 
+function teamAssets(name = "") {
+  const key = normalizeTeam(name);
+  const map = {
+    "manchester united": {
+      logo: "assets/logos/manutd.png",
+      player: "assets/players/bruno.png"
+    },
+    "leeds united": {
+      logo: "assets/logos/leeds.png",
+      player: "assets/players/leeds-player-2.png"
+    },
+    "arsenal": {
+      logo: "assets/logos/arsenal.png",
+      player: "assets/players/saka.png"
+    },
+    "chelsea": {
+      logo: "assets/logos/chelsea.png",
+      player: null
+    }
+  };
+
+  const assets = map[key] || {};
+  const existing = (asset) =>
+    asset && fs.existsSync(path.join(__dirname, "..", "public", asset))
+      ? asset
+      : null;
+
+  return {
+    logo: existing(assets.logo),
+    player: existing(assets.player)
+  };
+}
+
 async function main() {
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
   if (!apiKey) {
@@ -93,7 +126,14 @@ async function main() {
       ...options
     }).format(dateTime);
 
+  const homeAssets = teamAssets(match.homeTeam.name);
+  const awayAssets = teamAssets(match.awayTeam.name);
+
   const result = {
+    homeLogo: homeAssets.logo,
+    awayLogo: awayAssets.logo,
+    homePlayer: homeAssets.player,
+    awayPlayer: awayAssets.player,
     homeTeam: match.homeTeam.name,
     awayTeam: match.awayTeam.name,
     homeShort: shortName(match.homeTeam.name),

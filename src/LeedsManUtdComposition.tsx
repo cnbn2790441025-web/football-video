@@ -57,7 +57,7 @@ const ScoreHeader: React.FC = () => (
     }}
   >
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <Img src={staticFile("assets/logos/leeds.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
+      <Img src={staticFile(matchData.homeLogo || "assets/logos/leeds.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
       <Text size={30} style={{ fontWeight: 800 }}>{matchData.homeShort}</Text>
     </div>
     <div style={{ textAlign: "center" }}>
@@ -66,7 +66,7 @@ const ScoreHeader: React.FC = () => (
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
       <Text size={30} style={{ fontWeight: 800 }}>{matchData.awayShort}</Text>
-      <Img src={staticFile("assets/logos/manutd.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
+      <Img src={staticFile(matchData.awayLogo || "assets/logos/manutd.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
     </div>
   </div>
 );
@@ -673,7 +673,7 @@ const MatchGraphic: React.FC = () => {
         }}
       >
         <Img
-          src={staticFile("assets/logos/leeds.png")}
+          src={staticFile(matchData.homeLogo || "assets/logos/leeds.png")}
           style={{
             width: 210,
             height: 210,
@@ -696,7 +696,7 @@ const MatchGraphic: React.FC = () => {
         </div>
 
         <Img
-          src={staticFile("assets/logos/manutd.png")}
+          src={staticFile(matchData.awayLogo || "assets/logos/manutd.png")}
           style={{
             width: 210,
             height: 210,
@@ -951,7 +951,7 @@ const BrunoSpotlight: React.FC = () => {
       </div>
 
       <Img
-        src={staticFile("assets/players/leeds-player-2.png")}
+        src={staticFile(matchData.homePlayer || "assets/players/leeds-player-2.png")}
         style={{
           position: "absolute",
           height: "43%",
@@ -966,7 +966,7 @@ const BrunoSpotlight: React.FC = () => {
       />
 
       <Img
-        src={staticFile("assets/players/bruno.png")}
+        src={staticFile(matchData.awayPlayer || "assets/players/bruno.png")}
         style={{
           position: "absolute",
           height: "43%",
