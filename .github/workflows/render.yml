@@ -10,6 +10,16 @@ on:
         required: true
         default: "2026-10-18"
         type: string
+      home_team:
+        description: "Home team name"
+        required: true
+        default: "Manchester United"
+        type: string
+      away_team:
+        description: "Away team name"
+        required: true
+        default: "Leeds United"
+        type: string
 
 jobs:
   render:
@@ -27,13 +37,18 @@ jobs:
         env:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
           MATCH_DATE: ${{ inputs.match_date || '2026-10-18' }}
+          HOME_TEAM: ${{ inputs.home_team || 'Manchester United' }}
+          AWAY_TEAM: ${{ inputs.away_team || 'Leeds United' }}
         run: node scripts/fetch-match.js
 
-      - run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
+      - name: Install render dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
 
-      - run: npx remotion render LeedsManUtd out/highlight_60s.mp4 --gl=swangle
+      - name: Render landscape video
+        run: npx remotion render LeedsManUtd out/highlight_60s.mp4 --gl=swangle
 
-      - run: npx remotion render LeedsManUtdTikTok out/tiktok_65s.mp4 --gl=swangle
+      - name: Render TikTok video
+        run: npx remotion render LeedsManUtdTikTok out/tiktok_65s.mp4 --gl=swangle
 
       - uses: actions/upload-artifact@v4
         with:
