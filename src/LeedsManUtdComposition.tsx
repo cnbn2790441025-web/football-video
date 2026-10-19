@@ -754,6 +754,12 @@ const BrunoSpotlight: React.FC = () => {
   });
 
   const glow = 14 + (Math.sin(frame / 5) + 1) * 8;
+  const dateZoom = interpolate(frame, [0, 18, 36, 60], [0.72, 1.12, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const dateColor =
+    frame % 72 < 24 ? "#F7D900" : frame % 72 < 48 ? "#FFFFFF" : "#DA291C";
 
   return (
     <AbsoluteFill
@@ -906,6 +912,41 @@ const BrunoSpotlight: React.FC = () => {
           style={{ marginTop: 12, letterSpacing: 1 }}
         >
           VISION / PASSING
+        </Text>
+      </div>
+
+      {/* MATCH DATE AND TIME — animated in the space above the players */}
+      <div
+        style={{
+          position: "absolute",
+          top: 735,
+          left: 0,
+          right: 0,
+          zIndex: 5,
+          textAlign: "center",
+          transform: `scale(${dateZoom})`,
+          transformOrigin: "center center",
+          textShadow: `0 0 ${glow}px ${dateColor}`,
+        }}
+      >
+        <Text
+          size={52}
+          color={dateColor}
+          style={{ fontWeight: 900, letterSpacing: 3, lineHeight: 1.1 }}
+        >
+          OCTOBER 18 • SUNDAY
+        </Text>
+        <Text
+          size={62}
+          color="#FFFFFF"
+          style={{
+            marginTop: 14,
+            fontWeight: 900,
+            letterSpacing: 2,
+            lineHeight: 1.1,
+          }}
+        >
+          7:30 PM (MMT)
         </Text>
       </div>
 
