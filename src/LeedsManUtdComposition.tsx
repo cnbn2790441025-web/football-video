@@ -748,12 +748,12 @@ const BrunoSpotlight: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  const slideX = interpolate(frame, [0, 20], [180, 0], {
+  const slideX = interpolate(frame, [0, 20], [100, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const glow = 18 + (Math.sin(frame / 5) + 1) * 12;
+  const glow = 14 + (Math.sin(frame / 5) + 1) * 8;
 
   return (
     <AbsoluteFill
@@ -761,70 +761,180 @@ const BrunoSpotlight: React.FC = () => {
         opacity,
         overflow: "hidden",
         background:
-          "radial-gradient(ellipse at 70% 45%, rgba(218,41,28,0.24), transparent 48%), linear-gradient(145deg, rgba(3,7,16,0.97), rgba(15,5,12,0.94))",
+          "radial-gradient(ellipse at 24% 45%, rgba(247,217,0,0.19), transparent 48%), radial-gradient(ellipse at 76% 45%, rgba(218,41,28,0.24), transparent 48%), linear-gradient(145deg, #030710, #10050C)",
       }}
     >
-      <div
+      <Text
+        size={27}
+        color="#FFFFFF"
         style={{
           position: "absolute",
-          left: 54,
-          top: 300,
-          width: 8,
-          height: 520,
-          borderRadius: 8,
-          background: "linear-gradient(180deg, #F7D900, #FFFFFF, #DA291C)",
-          boxShadow: "0 0 24px rgba(218,41,28,0.6)",
+          top: 210,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          letterSpacing: 6,
         }}
-      />
+      >
+        KEY PLAYERS
+      </Text>
 
       <div
         style={{
           position: "absolute",
-          left: 88,
-          top: 340,
-          width: 570,
-          transform: `translateX(${-slideX * 0.35}px)`,
+          top: 285,
+          left: "50%",
+          width: 3,
+          height: 900,
+          transform: "translateX(-50%)",
+          background:
+            "linear-gradient(180deg, transparent, #FFFFFF, transparent)",
+          opacity: 0.35,
+        }}
+      />
+
+      {/* LEEDS UNITED — BRENDEN AARONSON */}
+      <div
+        style={{
+          position: "absolute",
+          left: 45,
+          top: 350,
+          width: 470,
+          transform: `translateX(${-slideX}px)`,
         }}
       >
-        <Text size={27} color="#F7D900" style={{ letterSpacing: 5 }}>
-          KEY PLAYER
+        <Text
+          size={25}
+          color="#F7D900"
+          style={{ letterSpacing: 2, lineHeight: 1.2 }}
+        >
+          LEEDS UNITED
         </Text>
-        <div style={{ marginTop: 28 }}>
-          <Text size={76} style={{ fontStyle: "italic", lineHeight: 0.98 }}>
+        <div style={{ marginTop: 18 }}>
+          <Text
+            size={53}
+            color="#FFFFFF"
+            style={{ fontStyle: "italic", lineHeight: 0.98 }}
+          >
+            BRENDEN
+          </Text>
+          <Text
+            size={53}
+            color="#FFFFFF"
+            style={{ fontStyle: "italic", lineHeight: 0.98 }}
+          >
+            AARONSON
+          </Text>
+        </div>
+        <div
+          style={{
+            marginTop: 22,
+            width: 260,
+            height: 4,
+            background: "linear-gradient(90deg, #F7D900, transparent)",
+          }}
+        />
+        <Text
+          size={21}
+          color="#DCE2ED"
+          style={{ marginTop: 18, letterSpacing: 1 }}
+        >
+          ATTACKING MIDFIELDER
+        </Text>
+        <Text
+          size={18}
+          color="#AEB8C9"
+          style={{ marginTop: 12, letterSpacing: 1 }}
+        >
+          ENERGY / PRESSING
+        </Text>
+      </div>
+
+      {/* MANCHESTER UNITED — BRUNO FERNANDES */}
+      <div
+        style={{
+          position: "absolute",
+          right: 40,
+          top: 350,
+          width: 470,
+          textAlign: "right",
+          transform: `translateX(${slideX}px)`,
+        }}
+      >
+        <Text
+          size={25}
+          color="#DA291C"
+          style={{ letterSpacing: 2, lineHeight: 1.2 }}
+        >
+          MANCHESTER UNITED
+        </Text>
+        <div style={{ marginTop: 18 }}>
+          <Text
+            size={53}
+            color="#FFFFFF"
+            style={{ fontStyle: "italic", lineHeight: 0.98 }}
+          >
             BRUNO
           </Text>
-          <Text size={76} style={{ fontStyle: "italic", lineHeight: 0.98 }}>
+          <Text
+            size={53}
+            color="#FFFFFF"
+            style={{ fontStyle: "italic", lineHeight: 0.98 }}
+          >
             FERNANDES
           </Text>
         </div>
         <div
           style={{
-            marginTop: 24,
-            width: 300,
+            marginTop: 22,
+            marginLeft: "auto",
+            width: 260,
             height: 4,
-            background: "linear-gradient(90deg, #F7D900, #DA291C, transparent)",
+            background: "linear-gradient(90deg, transparent, #DA291C)",
           }}
         />
-        <Text size={27} color="#E0E5EF" style={{ marginTop: 24, letterSpacing: 2 }}>
-          CAPTAIN • PLAYMAKER
+        <Text
+          size={21}
+          color="#DCE2ED"
+          style={{ marginTop: 18, letterSpacing: 1 }}
+        >
+          CAPTAIN / PLAYMAKER
         </Text>
-        <Text size={22} color="#AEB8C9" style={{ marginTop: 18, letterSpacing: 1 }}>
-          VISION  /  PASSING  /  LEADERSHIP
+        <Text
+          size={18}
+          color="#AEB8C9"
+          style={{ marginTop: 12, letterSpacing: 1 }}
+        >
+          VISION / PASSING
         </Text>
       </div>
+
+      <Img
+        src={staticFile("assets/players/leeds-player-2.png")}
+        style={{
+          position: "absolute",
+          height: "43%",
+          width: "48%",
+          objectFit: "contain",
+          objectPosition: "bottom center",
+          left: 0,
+          bottom: 0,
+          transform: `translateX(${-slideX * 0.35}px)`,
+          filter: `drop-shadow(0 0 ${glow}px rgba(247,217,0,0.45))`,
+        }}
+      />
 
       <Img
         src={staticFile("assets/players/bruno.png")}
         style={{
           position: "absolute",
-          height: "73%",
-          width: "auto",
-          maxWidth: "72%",
+          height: "43%",
+          width: "48%",
           objectFit: "contain",
-          objectPosition: "bottom right",
-          right: -18,
+          objectPosition: "bottom center",
+          right: 0,
           bottom: 0,
-          transform: `translateX(${slideX}px)`,
+          transform: `translateX(${slideX * 0.35}px)`,
           filter: `drop-shadow(0 0 ${glow}px rgba(218,41,28,0.55))`,
         }}
       />
@@ -832,12 +942,13 @@ const BrunoSpotlight: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          bottom: 180,
+          bottom: 175,
           left: 60,
           right: 60,
-          height: 2,
-          background: "linear-gradient(90deg, transparent, #F7D900, #DA291C, transparent)",
-          opacity: 0.8,
+          height: 3,
+          background:
+            "linear-gradient(90deg, transparent, #F7D900, #FFFFFF, #DA291C, transparent)",
+          opacity: 0.85,
         }}
       />
     </AbsoluteFill>
