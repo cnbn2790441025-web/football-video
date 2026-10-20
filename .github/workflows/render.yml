@@ -8,7 +8,7 @@ on:
       match_date:
         description: "Match date (YYYY-MM-DD)"
         required: true
-        default: "2026-10-18"
+        default: "2026-10-25"
         type: string
       home_team:
         description: "Home team name"
@@ -18,7 +18,7 @@ on:
       away_team:
         description: "Away team name"
         required: true
-        default: "Leeds United"
+        default: "AFC Bournemouth"
         type: string
 
 jobs:
@@ -36,9 +36,9 @@ jobs:
       - name: Fetch Match Data
         env:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
-          MATCH_DATE: ${{ inputs.match_date || '2026-10-18' }}
+          MATCH_DATE: ${{ inputs.match_date || '2026-10-25' }}
           HOME_TEAM: ${{ inputs.home_team || 'Manchester United' }}
-          AWAY_TEAM: ${{ inputs.away_team || 'Leeds United' }}
+          AWAY_TEAM: ${{ inputs.away_team || 'AFC Bournemouth' }}
         run: node scripts/fetch-match.js
 
       - name: Install render dependencies
