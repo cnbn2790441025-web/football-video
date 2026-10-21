@@ -44,19 +44,45 @@ function teamAssets(name = "") {
   const map = {
     "manchester united": {
       logo: "assets/logos/manutd.png",
-      player: "assets/players/bruno.png"
+      player: "assets/players/bruno.png",
+      playerName: "Bruno Fernandes",
+      playerRole: "CAPTAIN / PLAYMAKER",
+      playerTrait: "VISION / PASSING"
     },
     "leeds united": {
       logo: "assets/logos/leeds.png",
-      player: "assets/players/leeds-player-2.png"
+      player: "assets/players/leeds-player-2.png",
+      playerName: "Brenden Aaronson",
+      playerRole: "ATTACKING MIDFIELDER",
+      playerTrait: "ENERGY / PRESSING"
     },
     "arsenal": {
       logo: "assets/logos/arsenal.png",
-      player: "assets/players/saka.png"
+      player: "assets/players/saka.png",
+      playerName: "Bukayo Saka",
+      playerRole: "WINGER",
+      playerTrait: "PACE / CREATIVITY"
     },
     "chelsea": {
       logo: "assets/logos/chelsea.png",
-      player: null
+      player: null,
+      playerName: null,
+      playerRole: null,
+      playerTrait: null
+    },
+    "liverpool": {
+      logo: "assets/logos/liverpool.png",
+      player: "assets/players/virgil.png",
+      playerName: "Virgil van Dijk",
+      playerRole: "CAPTAIN / DEFENDER",
+      playerTrait: "LEADERSHIP / DEFENSIVE STRENGTH"
+    },
+    "brighton hove albion": {
+      logo: "assets/logos/brighton.png",
+      player: "assets/players/grob.png",
+      playerName: "Pascal Groß",
+      playerRole: "MIDFIELDER / PLAYMAKER",
+      playerTrait: "VISION / PASSING"
     }
   };
 
@@ -68,7 +94,10 @@ function teamAssets(name = "") {
 
   return {
     logo: existing(assets.logo),
-    player: existing(assets.player)
+    player: existing(assets.player),
+    playerName: assets.playerName || null,
+    playerRole: assets.playerRole || null,
+    playerTrait: assets.playerTrait || null
   };
 }
 
@@ -134,6 +163,12 @@ async function main() {
     awayLogo: awayAssets.logo,
     homePlayer: homeAssets.player,
     awayPlayer: awayAssets.player,
+    homePlayerName: homeAssets.playerName,
+    awayPlayerName: awayAssets.playerName,
+    homePlayerRole: homeAssets.playerRole,
+    awayPlayerRole: awayAssets.playerRole,
+    homePlayerTrait: homeAssets.playerTrait,
+    awayPlayerTrait: awayAssets.playerTrait,
     homeTeam: match.homeTeam.name,
     awayTeam: match.awayTeam.name,
     homeShort: shortName(match.homeTeam.name),
@@ -159,7 +194,13 @@ async function main() {
     stadium: match.venue || "Stadium TBC"
   };
 
-  const outputPath = path.join(__dirname, "..", "src", "matchData.json");
+  const isLiverpoolBrighton =
+    homeWanted === "liverpool" &&
+    awayWanted === "brighton hove albion";
+  const outputFile = isLiverpoolBrighton
+    ? "liverpoolBrightonData.json"
+    : "matchData.json";
+  const outputPath = path.join(__dirname, "..", "src", outputFile);
   fs.writeFileSync(outputPath, JSON.stringify(result, null, 2) + "\n");
 
   console.log("Fixture data ရယူပြီးပါပြီ။");

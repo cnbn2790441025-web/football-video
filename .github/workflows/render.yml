@@ -1,8 +1,6 @@
 name: Render Video
 
 on:
-  push:
-    branches: [main, master]
   workflow_dispatch:
     inputs:
       match_date:
@@ -13,50 +11,15 @@ on:
       home_team:
         description: "Home team name"
         required: true
-        default: "Manchester United"
+        default: "Liverpool"
         type: string
       away_team:
         description: "Away team name"
         required: true
-        default: "AFC Bournemouth"
+        default: "Brighton & Hove Albion"
         type: string
 
 jobs:
-  render:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - run: npm ci || npm install
-
-      - name: Fetch Match Data
-        continue-on-error: true
-        env:
-          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
-          MATCH_DATE: ${{ inputs.match_date || '2026-10-25' }}
-          HOME_TEAM: ${{ inputs.home_team || 'Manchester United' }}
-          AWAY_TEAM: ${{ inputs.away_team || 'AFC Bournemouth' }}
-        run: node scripts/fetch-match.js
-
-      - name: Install render dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
-
-      - name: Render landscape video
-        run: npx remotion render LeedsManUtd out/highlight_60s.mp4 --gl=swangle
-
-      - name: Render TikTok video
-        run: npx remotion render LeedsManUtdTikTok out/tiktok_65s.mp4 --gl=swangle
-
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Football-Preview-Videos
-          path: out/*.mp4
-
   render_liverpool_brighton:
     runs-on: ubuntu-latest
     steps:
@@ -64,12 +27,25 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: npm
 
-      - run: npm ci || npm install
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch Match Data
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          MATCH_DATE: ${{ inputs.match_date }}
+          HOME_TEAM: ${{ inputs.home_team }}
+          AWAY_TEAM: ${{ inputs.away_team }}
+        run: node scripts/fetch-match.js
 
       - name: Install render dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig && fc-cache -f
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
+          fc-cache -f
 
       - name: Render Liverpool vs Brighton
         run: npx remotion render LiverpoolBrighton out/liverpool_brighton_60s.mp4 --gl=swangle
