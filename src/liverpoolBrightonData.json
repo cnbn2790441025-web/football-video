@@ -1,0 +1,23 @@
+{
+  "homeTeam": "Liverpool FC",
+  "awayTeam": "Brighton & Hove Albion",
+  "homeShort": "LIVERPOOL",
+  "awayShort": "BRIGHTON",
+  "matchDate": "25 October 2026",
+  "matchDay": "Sunday",
+  "kickoffUK": "14:00",
+  "kickoffMyanmar": "20:30",
+  "utcDate": "2026-10-25T14:00:00Z",
+  "status": "TIMED",
+  "stadium": "Anfield",
+  "homeLogo": "assets/logos/liverpool.png",
+  "awayLogo": "assets/logos/brighton.png",
+  "homePlayer": "assets/players/virgil.png",
+  "awayPlayer": "assets/players/grob.png",
+  "homePlayerName": "Virgil van Dijk",
+  "awayPlayerName": "Pascal Groß",
+  "homePlayerRole": "CAPTAIN / DEFENDER",
+  "awayPlayerRole": "MIDFIELDER / PLAYMAKER",
+  "homePlayerTrait": "LEADERSHIP / DEFENSIVE STRENGTH",
+  "awayPlayerTrait": "VISION / PASSING"
+}
