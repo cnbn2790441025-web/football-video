@@ -1089,6 +1089,7 @@ export const LiverpoolBrightonComposition: React.FC = () => {
       <Sequence from={1425} durationInFrames={84}>
         <PredictionGraphic />
       </Sequence>
+      <Audio src={staticFile("narration.mp3")} />
       <SubtitleOverlay />
 
     </AbsoluteFill>
