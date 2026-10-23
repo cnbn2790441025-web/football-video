@@ -69,8 +69,8 @@ jobs:
 
           cp "matches/${MATCH_KEY}.json" src/liverpoolBrightonData.json
           if [[ "$AUDIO_SOURCE" != "public/narration.mp3" ]]; then
-  cp "$AUDIO_SOURCE" public/narration.mp3
-fi
+            cp "$AUDIO_SOURCE" public/narration.mp3
+          fi
           node scripts/srt-to-json.mjs "$SRT_SOURCE" src/activeCaptions.json
 
           echo "Selected match: $MATCH_KEY"
