@@ -3,20 +3,10 @@ name: Render Video
 on:
   workflow_dispatch:
     inputs:
-      match_date:
-        description: "Match date (YYYY-MM-DD)"
+      match_key:
+        description: "Match key from the matches folder"
         required: true
-        default: "2026-10-25"
-        type: string
-      home_team:
-        description: "Home team name"
-        required: true
-        default: "Liverpool"
-        type: string
-      away_team:
-        description: "Away team name"
-        required: true
-        default: "Brighton & Hove Albion"
+        default: "liverpool-brighton"
         type: string
 
 jobs:
@@ -38,43 +28,52 @@ jobs:
 
       - name: Select match assets
         env:
-          MATCH_DATE: ${{ inputs.match_date }}
-          HOME_TEAM: ${{ inputs.home_team }}
-          AWAY_TEAM: ${{ inputs.away_team }}
+          MATCH_KEY: ${{ inputs.match_key }}
         run: |
           set -euo pipefail
 
-          HOME_NORMAL=$(echo "$HOME_TEAM" | tr '[:upper:]' '[:lower:]' | xargs)
-          AWAY_NORMAL=$(echo "$AWAY_TEAM" | tr '[:upper:]' '[:lower:]' | xargs)
-
-          if [[ "$HOME_NORMAL" == "liverpool" || "$HOME_NORMAL" == "liverpool fc" ]] && \
-             [[ "$AWAY_NORMAL" == "brighton" || "$AWAY_NORMAL" == "brighton & hove albion" ]]; then
-            MATCH_KEY="liverpool-brighton"
-            AUDIO_SOURCE="public/narration.mp3"
-            SRT_SOURCE="public/liverpool-brighton.srt"
-          elif [[ "$HOME_NORMAL" == "manchester united" || "$HOME_NORMAL" == "manchester united fc" || "$HOME_NORMAL" == "man utd" ]] && \
-               [[ "$AWAY_NORMAL" == "afc bournemouth" || "$AWAY_NORMAL" == "bournemouth" ]]; then
-            MATCH_KEY="manutd-bournemouth"
-            AUDIO_SOURCE="public/manutdvsbournemouth.mp3"
-            SRT_SOURCE="public/manutdvsbournemouth.srt"
-          else
-            echo "Unsupported match: $HOME_TEAM vs $AWAY_TEAM"
-            echo "Supported matches: Liverpool vs Brighton; Manchester United vs AFC Bournemouth"
+          if [[ ! "$MATCH_KEY" =~ ^[a-z0-9-]+$ ]]; then
+            echo "Invalid match key: $MATCH_KEY"
             exit 1
           fi
 
-          test -f "matches/${MATCH_KEY}.json"
-          test -f "$AUDIO_SOURCE"
-          test -f "$SRT_SOURCE"
+          MATCH_FILE="matches/${MATCH_KEY}.json"
 
-          cp "matches/${MATCH_KEY}.json" src/liverpoolBrightonData.json
+          if [[ ! -f "$MATCH_FILE" ]]; then
+            echo "Match JSON not found: $MATCH_FILE"
+            exit 1
+          fi
+
+          AUDIO_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).audioFile || ""' "$MATCH_FILE")"
+          SRT_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).subtitleFile || ""' "$MATCH_FILE")"
+
+          if [[ -z "$AUDIO_SOURCE" || ! -f "$AUDIO_SOURCE" ]]; then
+            echo "Audio file missing: $AUDIO_SOURCE"
+            exit 1
+          fi
+
+          if [[ -z "$SRT_SOURCE" || ! -f "$SRT_SOURCE" ]]; then
+            echo "Subtitle file missing: $SRT_SOURCE"
+            exit 1
+          fi
+
+          cp "$MATCH_FILE" src/liverpoolBrightonData.json
+
           if [[ "$AUDIO_SOURCE" != "public/narration.mp3" ]]; then
             cp "$AUDIO_SOURCE" public/narration.mp3
           fi
+
           node scripts/srt-to-json.mjs "$SRT_SOURCE" src/activeCaptions.json
 
-          echo "Selected match: $MATCH_KEY"
-          echo "Requested date: $MATCH_DATE"
+          node -e '
+            const d = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+            console.log("Match:", d.homeTeam, "vs", d.awayTeam);
+            console.log("Date:", d.matchDate);
+            console.log("Kick-off (Myanmar):", d.kickoffMyanmar);
+            console.log("Prediction:", d.prediction);
+          ' "$MATCH_FILE"
+
+          echo "Selected match key: $MATCH_KEY"
 
       - name: Install render dependencies
         run: |

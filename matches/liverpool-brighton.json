@@ -20,5 +20,7 @@
   "awayPlayerRole": "MIDFIELDER / PLAYMAKER",
   "homePlayerTrait": "LEADERSHIP / DEFENSIVE STRENGTH",
   "awayPlayerTrait": "VISION / PASSING",
-  "prediction": "LIVERPOOL WIN"
+  "prediction": "LIVERPOOL WIN",
+  "audioFile": "public/narration.mp3",
+  "subtitleFile": "public/liverpool-brighton.srt"
 }

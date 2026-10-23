@@ -20,5 +20,7 @@
   "awayPlayerRole": "FORWARD",
   "homePlayerTrait": "VISION / PASSING",
   "awayPlayerTrait": "MOVEMENT / FINISHING",
-  "prediction": "MANCHESTER UNITED WIN"
+  "prediction": "MANCHESTER UNITED WIN",
+  "audioFile": "public/manutdvsbournemouth.mp3",
+  "subtitleFile": "public/manutdvsbournemouth.srt"
 }
