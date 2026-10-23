@@ -1,0 +1,51 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+
+if [ "$#" -ne 3 ] || ! [[ "$1" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+  echo 'အသုံးပြုပုံ: ./render-match.sh YYYY-MM-DD "Home Team" "Away Team"'
+  exit 1
+fi
+
+MATCH_DATE="$1"
+HOME_TEAM="$2"
+AWAY_TEAM="$3"
+WORKFLOW="render.yml"
+BRANCH="main"
+
+echo "Match date: $MATCH_DATE"
+echo "Home team: $HOME_TEAM"
+echo "Away team: $AWAY_TEAM"
+
+OLD_RUN_ID=$(gh run list --workflow "$WORKFLOW" --branch "$BRANCH" --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+
+echo "GitHub Actions ကို စတင်နေပါပြီ..."
+gh workflow run "$WORKFLOW" --ref "$BRANCH" \
+  -f match_date="$MATCH_DATE" \
+  -f home_team="$HOME_TEAM" \
+  -f away_team="$AWAY_TEAM"
+
+RUN_ID=""
+for i in $(seq 1 30); do
+  LATEST_RUN_ID=$(gh run list --workflow "$WORKFLOW" --branch "$BRANCH" --event workflow_dispatch --limit 10 --json databaseId --jq '.[0].databaseId // empty')
+  if [ -n "$LATEST_RUN_ID" ] && [ "$LATEST_RUN_ID" != "$OLD_RUN_ID" ]; then
+    RUN_ID="$LATEST_RUN_ID"
+    break
+  fi
+  sleep 2
+done
+
+if [ -z "$RUN_ID" ]; then
+  echo "Run ID အသစ် မတွေ့ပါ။ GitHub Actions ကို စစ်ကြည့်ပါ။"
+  exit 1
+fi
+
+echo "Run ID: $RUN_ID"
+gh run watch "$RUN_ID" --exit-status
+
+OUT_DIR="$HOME/storage/downloads/football-preview-$MATCH_DATE-run-$RUN_ID"
+mkdir -p "$OUT_DIR"
+gh run download "$RUN_ID" --name Football-Preview-Videos --dir "$OUT_DIR"
+
+echo "ပြီးပါပြီ။ Download ဖိုင်များ:"
+echo "$OUT_DIR"
+ls -lh "$OUT_DIR"

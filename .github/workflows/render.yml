@@ -20,12 +20,15 @@ on:
         type: string
 
 jobs:
-  render_liverpool_brighton:
+  render_football_preview:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
@@ -33,13 +36,45 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Fetch Match Data
+      - name: Select match assets
         env:
-          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
           MATCH_DATE: ${{ inputs.match_date }}
           HOME_TEAM: ${{ inputs.home_team }}
           AWAY_TEAM: ${{ inputs.away_team }}
-        run: node scripts/fetch-match.js
+        run: |
+          set -euo pipefail
+
+          HOME_NORMAL=$(echo "$HOME_TEAM" | tr '[:upper:]' '[:lower:]' | xargs)
+          AWAY_NORMAL=$(echo "$AWAY_TEAM" | tr '[:upper:]' '[:lower:]' | xargs)
+
+          if [[ "$HOME_NORMAL" == "liverpool" || "$HOME_NORMAL" == "liverpool fc" ]] && \
+             [[ "$AWAY_NORMAL" == "brighton" || "$AWAY_NORMAL" == "brighton & hove albion" ]]; then
+            MATCH_KEY="liverpool-brighton"
+            AUDIO_SOURCE="public/narration.mp3"
+            SRT_SOURCE="public/liverpool-brighton.srt"
+          elif [[ "$HOME_NORMAL" == "manchester united" || "$HOME_NORMAL" == "manchester united fc" || "$HOME_NORMAL" == "man utd" ]] && \
+               [[ "$AWAY_NORMAL" == "afc bournemouth" || "$AWAY_NORMAL" == "bournemouth" ]]; then
+            MATCH_KEY="manutd-bournemouth"
+            AUDIO_SOURCE="public/manutdvsbournemouth.mp3"
+            SRT_SOURCE="public/manutdvsbournemouth.srt"
+          else
+            echo "Unsupported match: $HOME_TEAM vs $AWAY_TEAM"
+            echo "Supported matches: Liverpool vs Brighton; Manchester United vs AFC Bournemouth"
+            exit 1
+          fi
+
+          test -f "matches/${MATCH_KEY}.json"
+          test -f "$AUDIO_SOURCE"
+          test -f "$SRT_SOURCE"
+
+          cp "matches/${MATCH_KEY}.json" src/liverpoolBrightonData.json
+          if [[ "$AUDIO_SOURCE" != "public/narration.mp3" ]]; then
+  cp "$AUDIO_SOURCE" public/narration.mp3
+fi
+          node scripts/srt-to-json.mjs "$SRT_SOURCE" src/activeCaptions.json
+
+          echo "Selected match: $MATCH_KEY"
+          echo "Requested date: $MATCH_DATE"
 
       - name: Install render dependencies
         run: |
@@ -47,10 +82,13 @@ jobs:
           sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
           fc-cache -f
 
-      - name: Render Liverpool vs Brighton
-        run: npx remotion render LiverpoolBrighton out/liverpool_brighton_60s.mp4 --gl=swangle
+      - name: Render video
+        run: |
+          mkdir -p out
+          npx remotion render LiverpoolBrighton out/football_preview_60s.mp4 --gl=swangle
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload video
+        uses: actions/upload-artifact@v4
         with:
-          name: Liverpool-Brighton-Preview
-          path: out/liverpool_brighton_60s.mp4
+          name: Football-Preview-Videos
+          path: out/football_preview_60s.mp4

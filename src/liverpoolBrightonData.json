@@ -19,5 +19,6 @@
   "homePlayerRole": "CAPTAIN / DEFENDER",
   "awayPlayerRole": "MIDFIELDER / PLAYMAKER",
   "homePlayerTrait": "LEADERSHIP / DEFENSIVE STRENGTH",
-  "awayPlayerTrait": "VISION / PASSING"
+  "awayPlayerTrait": "VISION / PASSING",
+  "prediction": "LIVERPOOL WIN"
 }

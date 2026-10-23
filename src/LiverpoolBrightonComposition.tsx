@@ -1062,7 +1062,7 @@ MATCH PREDICTION
         textShadow: "0 0 22px rgba(255,45,45,0.95)",
       }}
     >
-      LIVERPOOL WIN
+      {matchData.prediction || "LIVERPOOL WIN"}
     </Text>
   </div>
 </AbsoluteFill>
