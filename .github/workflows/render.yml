@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       match_key:
-        description: "Match key from the matches folder"
+        description: "Match key from the matches"
         required: true
         default: "liverpool-brighton"
         type: string
