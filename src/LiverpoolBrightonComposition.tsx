@@ -1,6 +1,6 @@
 import React from "react";
 import { SubtitleOverlay } from "./SubtitleOverlay";
-import matchData from "./liverpoolBrightonData.json";
+import matchData from "./matchData.json";
 import {
   AbsoluteFill,
   Audio,

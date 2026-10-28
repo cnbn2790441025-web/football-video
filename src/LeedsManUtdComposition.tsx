@@ -57,7 +57,7 @@ const ScoreHeader: React.FC = () => (
     }}
   >
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <Img src={staticFile(matchData.homeLogo || "assets/logos/leeds.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
+      {matchData.homeLogo ? <Img src={staticFile(matchData.homeLogo)} style={{ width: 92, height: 92, objectFit: "contain" }} /> : <Text size={24}>{matchData.homeShort}</Text>}
       <Text size={30} style={{ fontWeight: 800 }}>{matchData.homeShort}</Text>
     </div>
     <div style={{ textAlign: "center" }}>
@@ -66,7 +66,7 @@ const ScoreHeader: React.FC = () => (
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
       <Text size={30} style={{ fontWeight: 800 }}>{matchData.awayShort}</Text>
-      <Img src={staticFile(matchData.awayLogo || "assets/logos/manutd.png")} style={{ width: 92, height: 92, objectFit: "contain" }} />
+      {matchData.awayLogo ? <Img src={staticFile(matchData.awayLogo)} style={{ width: 92, height: 92, objectFit: "contain" }} /> : <Text size={24}>{matchData.awayShort}</Text>}
     </div>
   </div>
 );
@@ -81,10 +81,10 @@ const tacticalScenes: {
   title: string;
   subtitle: string;
 }[] = [
-  { from: 489, duration: 171, type: "press", title: "LEEDS PRESSING", subtitle: "Close passing lanes • force play wide" },
-  { from: 660, duration: 210, type: "attack", title: "MAN UTD ATTACK", subtitle: "Create chances • exploit attacking space" },
+  { from: 489, duration: 171, type: "press", title: `${matchData.homeShort} PRESSING`, subtitle: "Close passing lanes • force play wide" },
+  { from: 660, duration: 210, type: "attack", title: `${matchData.awayShort} ATTACK`, subtitle: "Create chances • exploit attacking space" },
   { from: 870, duration: 306, type: "midfield", title: "MIDFIELD BATTLE", subtitle: "Possession • pressure • transitions" },
-  { from: 1176, duration: 249, type: "counter", title: "UNITED COUNTER-ATTACK", subtitle: "Win possession • attack open space" },
+  { from: 1176, duration: 249, type: "counter", title: `${matchData.awayShort} COUNTER-ATTACK`, subtitle: "Win possession • attack open space" },
 ];
 
 const TacticalGraphic: React.FC<{
@@ -97,33 +97,33 @@ const TacticalGraphic: React.FC<{
   const zoom = interpolate(frame, [0, 90], [1, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
 
-  const dots: { x: number; y: number; team: "leeds" | "united"; label?: string }[] =
+  const dots: { x: number; y: number; team: "home" | "away"; label?: string }[] =
     type === "press"
       ? [
-          { x: 130, y: 130, team: "leeds" }, { x: 240, y: 205, team: "leeds" },
-          { x: 350, y: 115, team: "leeds" }, { x: 470, y: 210, team: "leeds" },
-          { x: 610, y: 135, team: "united" }, { x: 700, y: 240, team: "united" },
-          { x: 555, y: 340, team: "united" }, { x: 720, y: 395, team: "united" },
+          { x: 130, y: 130, team: "home" }, { x: 240, y: 205, team: "home" },
+          { x: 350, y: 115, team: "home" }, { x: 470, y: 210, team: "home" },
+          { x: 610, y: 135, team: "away" }, { x: 700, y: 240, team: "away" },
+          { x: 555, y: 340, team: "away" }, { x: 720, y: 395, team: "away" },
         ]
       : type === "midfield"
       ? [
-          { x: 130, y: 110, team: "leeds" }, { x: 240, y: 220, team: "leeds" },
-          { x: 390, y: 150, team: "leeds" }, { x: 500, y: 300, team: "leeds" },
-          { x: 300, y: 340, team: "united" }, { x: 440, y: 235, team: "united" },
-          { x: 600, y: 160, team: "united" }, { x: 710, y: 340, team: "united" },
+          { x: 130, y: 110, team: "home" }, { x: 240, y: 220, team: "home" },
+          { x: 390, y: 150, team: "home" }, { x: 500, y: 300, team: "home" },
+          { x: 300, y: 340, team: "away" }, { x: 440, y: 235, team: "away" },
+          { x: 600, y: 160, team: "away" }, { x: 710, y: 340, team: "away" },
         ]
       : type === "counter"
       ? [
-          { x: 700, y: 130, team: "united" }, { x: 620, y: 250, team: "united" },
-          { x: 500, y: 170, team: "united" }, { x: 380, y: 260, team: "united" },
-          { x: 250, y: 190, team: "united" }, { x: 520, y: 100, team: "leeds" },
-          { x: 390, y: 355, team: "leeds" }, { x: 230, y: 330, team: "leeds" },
+          { x: 700, y: 130, team: "away" }, { x: 620, y: 250, team: "away" },
+          { x: 500, y: 170, team: "away" }, { x: 380, y: 260, team: "away" },
+          { x: 250, y: 190, team: "away" }, { x: 520, y: 100, team: "home" },
+          { x: 390, y: 355, team: "home" }, { x: 230, y: 330, team: "home" },
         ]
       : [
-          { x: 700, y: 245, team: "united" }, { x: 600, y: 130, team: "united" },
-          { x: 500, y: 300, team: "united" }, { x: 390, y: 160, team: "united" },
-          { x: 260, y: 235, team: "united" }, { x: 560, y: 110, team: "leeds" },
-          { x: 430, y: 365, team: "leeds" }, { x: 300, y: 350, team: "leeds" },
+          { x: 700, y: 245, team: "away" }, { x: 600, y: 130, team: "away" },
+          { x: 500, y: 300, team: "away" }, { x: 390, y: 160, team: "away" },
+          { x: 260, y: 235, team: "away" }, { x: 560, y: 110, team: "home" },
+          { x: 430, y: 365, team: "home" }, { x: 300, y: 350, team: "home" },
         ];
 
   const arrows =
@@ -148,7 +148,7 @@ const TacticalGraphic: React.FC<{
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ color: "#F7D900", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>TACTICAL BOARD</div>
-          <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>LEEDS · MAN UTD</div>
+          <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>{matchData.homeShort} · {matchData.awayShort}</div>
         </div>
         <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>{title}</div>
         <div style={{ color: "#D8E2EA", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
@@ -191,17 +191,17 @@ const TacticalGraphic: React.FC<{
           {dots.map((d, i) => (
             <g key={i}>
               <circle cx={d.x} cy={d.y} r="19"
-                fill={d.team === "leeds" ? "#F7D900" : "#DA291C"}
+                fill={d.team === "home" ? "#F7D900" : "#DA291C"}
                 stroke="#FFFFFF" strokeWidth="3" />
-              <circle cx={d.x} cy={d.y} r="5" fill={d.team === "leeds" ? "#17212B" : "#FFFFFF"} />
+              <circle cx={d.x} cy={d.y} r="5" fill={d.team === "home" ? "#17212B" : "#FFFFFF"} />
             </g>
           ))}
-          <text x="26" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">LEEDS</text>
-          <text x="690" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">UNITED</text>
+          <text x="26" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">{matchData.homeShort}</text>
+          <text x="690" y="40" fill="#FFFFFF" fontSize="18" fontWeight="800">{matchData.awayShort}</text>
         </svg>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, color: "#D8E2EA", fontSize: 17 }}>
-          <span><span style={{ color: "#F7D900" }}>●</span> Leeds United</span>
-          <span><span style={{ color: "#DA291C" }}>●</span> Manchester United</span>
+          <span><span style={{ color: "#F7D900" }}>●</span> {matchData.homeTeam}</span>
+          <span><span style={{ color: "#DA291C" }}>●</span> {matchData.awayTeam}</span>
         </div>
         <div style={{ marginTop: 14, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
           ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
@@ -602,7 +602,7 @@ const MatchGraphic: React.FC = () => {
             size={64}
             style={{ fontWeight: 900, letterSpacing: 2 }}
           >
-            LEEDS UNITED
+            {matchData.homeTeam.toUpperCase()}
           </Text>
           <div
             style={{
@@ -644,7 +644,7 @@ const MatchGraphic: React.FC = () => {
             size={58}
             style={{ fontWeight: 900, letterSpacing: 1 }}
           >
-            MANCHESTER UNITED
+            {matchData.awayTeam.toUpperCase()}
           </Text>
           <div
             style={{
@@ -672,8 +672,8 @@ const MatchGraphic: React.FC = () => {
           transform: `scale(${vsScale})`,
         }}
       >
-        <Img
-          src={staticFile(matchData.homeLogo || "assets/logos/leeds.png")}
+        {matchData.homeLogo ? <Img
+          src={staticFile(matchData.homeLogo)}
           style={{
             width: 210,
             height: 210,
@@ -681,7 +681,7 @@ const MatchGraphic: React.FC = () => {
             transform: `scale(${logoPulse})`,
             filter: `drop-shadow(0 0 ${glowPulse}px rgba(76,184,255,0.85))`,
           }}
-        />
+        /> : <Text size={42}>{matchData.homeShort}</Text>}
 
         <div
           style={{
@@ -695,8 +695,8 @@ const MatchGraphic: React.FC = () => {
           </Text>
         </div>
 
-        <Img
-          src={staticFile(matchData.awayLogo || "assets/logos/manutd.png")}
+        {matchData.awayLogo ? <Img
+          src={staticFile(matchData.awayLogo)}
           style={{
             width: 210,
             height: 210,
@@ -704,7 +704,7 @@ const MatchGraphic: React.FC = () => {
             transform: `scale(${2 - logoPulse})`,
             filter: `drop-shadow(0 0 ${glowPulse}px rgba(218,41,28,0.9))`,
           }}
-        />
+        /> : <Text size={42}>{matchData.awayShort}</Text>}
       </div>
 
       <div
@@ -814,7 +814,7 @@ const BrunoSpotlight: React.FC = () => {
           color="#F7D900"
           style={{ letterSpacing: 2, lineHeight: 1.2 }}
         >
-          LEEDS UNITED
+          {matchData.homeTeam.toUpperCase()}
         </Text>
         <div style={{ marginTop: 18 }}>
           <Text
@@ -822,14 +822,14 @@ const BrunoSpotlight: React.FC = () => {
             color="#FFFFFF"
             style={{ fontStyle: "italic", lineHeight: 0.98 }}
           >
-            BRENDEN
+            {matchData.homePlayerName ? matchData.homePlayerName.toUpperCase().split(" ").slice(0, -1).join(" ") || matchData.homePlayerName.toUpperCase() : "PLAYER PROFILE"}
           </Text>
           <Text
             size={53}
             color="#FFFFFF"
             style={{ fontStyle: "italic", lineHeight: 0.98 }}
           >
-            AARONSON
+            {matchData.homePlayerName ? matchData.homePlayerName.toUpperCase().split(" ").slice(-1)[0] : "UNAVAILABLE"}
           </Text>
         </div>
         <div
@@ -845,14 +845,14 @@ const BrunoSpotlight: React.FC = () => {
           color="#DCE2ED"
           style={{ marginTop: 18, letterSpacing: 1 }}
         >
-          ATTACKING MIDFIELDER
+          {matchData.homePlayerRole || "PROFILE UNAVAILABLE"}
         </Text>
         <Text
           size={18}
           color="#AEB8C9"
           style={{ marginTop: 12, letterSpacing: 1 }}
         >
-          ENERGY / PRESSING
+          {matchData.homePlayerTrait || ""}
         </Text>
       </div>
 
@@ -872,7 +872,7 @@ const BrunoSpotlight: React.FC = () => {
           color="#DA291C"
           style={{ letterSpacing: 2, lineHeight: 1.2 }}
         >
-          MANCHESTER UNITED
+          {matchData.awayTeam.toUpperCase()}
         </Text>
         <div style={{ marginTop: 18 }}>
           <Text
@@ -880,14 +880,14 @@ const BrunoSpotlight: React.FC = () => {
             color="#FFFFFF"
             style={{ fontStyle: "italic", lineHeight: 0.98 }}
           >
-            BRUNO
+            {matchData.awayPlayerName ? matchData.awayPlayerName.toUpperCase().split(" ").slice(0, -1).join(" ") || matchData.awayPlayerName.toUpperCase() : "PLAYER PROFILE"}
           </Text>
           <Text
             size={53}
             color="#FFFFFF"
             style={{ fontStyle: "italic", lineHeight: 0.98 }}
           >
-            FERNANDES
+            {matchData.awayPlayerName ? matchData.awayPlayerName.toUpperCase().split(" ").slice(-1)[0] : "UNAVAILABLE"}
           </Text>
         </div>
         <div
@@ -904,14 +904,14 @@ const BrunoSpotlight: React.FC = () => {
           color="#DCE2ED"
           style={{ marginTop: 18, letterSpacing: 1 }}
         >
-          CAPTAIN / PLAYMAKER
+          {matchData.awayPlayerRole || "PROFILE UNAVAILABLE"}
         </Text>
         <Text
           size={18}
           color="#AEB8C9"
           style={{ marginTop: 12, letterSpacing: 1 }}
         >
-          VISION / PASSING
+          {matchData.awayPlayerTrait || ""}
         </Text>
       </div>
 
@@ -934,7 +934,7 @@ const BrunoSpotlight: React.FC = () => {
           color={dateColor}
           style={{ fontWeight: 900, letterSpacing: 3, lineHeight: 1.1 }}
         >
-          OCTOBER 18 • SUNDAY
+          {`${matchData.matchDate.split(" ")[1].toUpperCase()} ${matchData.matchDate.split(" ")[0]} • ${matchData.matchDay.toUpperCase()}`}
         </Text>
         <Text
           size={62}
@@ -946,12 +946,12 @@ const BrunoSpotlight: React.FC = () => {
             lineHeight: 1.1,
           }}
         >
-          7:30 PM (MMT)
+          {`${Number(matchData.kickoffMyanmar.split(":")[0]) % 12 || 12}:${matchData.kickoffMyanmar.split(":")[1]} ${Number(matchData.kickoffMyanmar.split(":")[0]) >= 12 ? "PM" : "AM"} (MMT)`}
         </Text>
       </div>
 
-      <Img
-        src={staticFile(matchData.homePlayer || "assets/players/leeds-player-2.png")}
+      {matchData.homePlayer && <Img
+        src={staticFile(matchData.homePlayer)}
         style={{
           position: "absolute",
           height: "43%",
@@ -963,10 +963,10 @@ const BrunoSpotlight: React.FC = () => {
           transform: `translateX(${-slideX * 0.35}px)`,
           filter: `drop-shadow(0 0 ${glow}px rgba(247,217,0,0.45))`,
         }}
-      />
+      />}
 
-      <Img
-        src={staticFile(matchData.awayPlayer || "assets/players/bruno.png")}
+      {matchData.awayPlayer && <Img
+        src={staticFile(matchData.awayPlayer)}
         style={{
           position: "absolute",
           height: "43%",
@@ -978,7 +978,7 @@ const BrunoSpotlight: React.FC = () => {
           transform: `translateX(${slideX * 0.35}px)`,
           filter: `drop-shadow(0 0 ${glow}px rgba(218,41,28,0.55))`,
         }}
-      />
+      />}
 
       <div
         style={{
@@ -1090,7 +1090,7 @@ export const LeedsManUtdComposition: React.FC = () => {
         <PredictionGraphic />
       </Sequence>
       <SubtitleOverlay />
-      <Audio src={staticFile("leeds-man-utd-narration.mp3")} />
+      <Audio src={staticFile("narration.mp3")} />
     </AbsoluteFill>
   );
 };
