@@ -22,5 +22,5 @@
   "awayPlayerTrait": "MOVEMENT / FINISHING",
   "prediction": "ARSENAL WIN",
   "audioFile": "public/liverpool-arsenal.mp3",
-  "subtitleFile": "public/liverpool-arsenal.srt"
+  "subtitleFile": "public/assets/srt/liverpool-arsenal.srt"
 }
