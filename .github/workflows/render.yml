@@ -57,7 +57,7 @@ jobs:
             exit 1
           fi
 
-          cp "$MATCH_FILE" src/liverpoolBrightonData.json
+          cp "$MATCH_FILE" src/matchData.json
 
           if [[ "$AUDIO_SOURCE" != "public/narration.mp3" ]]; then
             cp "$AUDIO_SOURCE" public/narration.mp3

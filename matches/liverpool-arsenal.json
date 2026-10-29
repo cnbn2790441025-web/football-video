@@ -21,6 +21,6 @@
   "homePlayerTrait": "Anticipation / Tackle",
   "awayPlayerTrait": "MOVEMENT / FINISHING",
   "prediction": "ARSENAL WIN",
-  "audioFile": "liverpool-arsenal.mp3",
-  "subtitleFile": "assets/srt/liverpool-arsenal.srt"
+  "audioFile": "public/assets/mp3/Liverpool-arsenal.mp3",
+  "subtitleFile": "public/assets/srt/liverpool-arsenal.srt"
 }
