@@ -1105,3 +1105,15 @@ export const LiverpoolBrightonEntry: React.FC = () => (
     height={1920}
   />
 );
+
+
+export const MatchPreviewEntry: React.FC = () => (
+  <Composition
+    id="MatchPreview"
+    component={LiverpoolBrightonComposition}
+    durationInFrames={1655}
+    fps={30}
+    width={1080}
+    height={1920}
+  />
+);

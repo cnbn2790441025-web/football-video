@@ -4,7 +4,7 @@ import {
   LeedsManUtdEntry,
 } from "./LeedsManUtdComposition";
 import { LeedsManUtdTikTokEntry } from "./LeedsManUtdTikTokComposition";
-import { LiverpoolBrightonEntry } from "./LiverpoolBrightonComposition";
+import { LiverpoolBrightonEntry, MatchPreviewEntry } from "./LiverpoolBrightonComposition";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -12,6 +12,7 @@ export const RemotionRoot: React.FC = () => {
       <MyComposition />
       <LeedsManUtdEntry />
       <LiverpoolBrightonEntry />
+      <MatchPreviewEntry />
       <LeedsManUtdTikTokEntry />
       <PosterLightMotionV1Entry />
     </>
