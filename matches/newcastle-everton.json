@@ -12,7 +12,7 @@
   "stadium": "Stadium TBC",
   "homeLogo": "assets/logos/newcastle-united.png",
   "awayLogo": "assets/logos/everton.png",
-  "homePlayer": "",
+  "homePlayer": "assets/players/anthony-gordon.png",
   "awayPlayer": "assets/players/thierno.png",
   "homePlayerName": "",
   "awayPlayerName": "Thierno Barry",
