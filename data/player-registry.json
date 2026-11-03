@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "players": {
+    "thierno-barry__everton": {
+      "name": "Thierno Barry",
+      "team": "everton",
+      "image": "players/thierno-barry__everton.png",
+      "role": "FORWARD",
+      "trait": "MOVEMENT / FINISHING"
+    },
+    "brenden-aaronson__leeds-united": {
+      "name": "Brenden Aaronson",
+      "team": "leeds-united",
+      "image": "players/brenden-aaronson__leeds-united.png",
+      "role": "ATTACKING MIDFIELDER",
+      "trait": "ENERGY / PRESSING"
+    },
+    "bukayo-saka__arsenal": {
+      "name": "Bukayo Saka",
+      "team": "arsenal",
+      "image": "players/bukayo-saka__arsenal.png",
+      "role": "WINGER / ATTACKER",
+      "trait": "DRIBBLING / CHANCE CREATION"
+    },
+    "virgil-van-dijk__liverpool": {
+      "name": "Virgil van Dijk",
+      "team": "liverpool",
+      "image": "players/virgil-van-dijk__liverpool.png",
+      "role": "CAPTAIN / DEFENDER",
+      "trait": "LEADERSHIP / DEFENSIVE STRENGTH"
+    },
+    "erling-haaland__manchester-city": {
+      "name": "Erling Haaland",
+      "team": "manchester-city",
+      "image": "players/erling-haaland__manchester-city.png",
+      "role": "FORWARD",
+      "trait": "POWER / FINISHING"
+    },
+    "pascal-gross__brighton": {
+      "name": "Pascal Groß",
+      "team": "brighton",
+      "image": "players/pascal-gross__brighton.png",
+      "role": "MIDFIELDER / PLAYMAKER",
+      "trait": "VISION / PASSING"
+    },
+    "bruno-fernandes__manchester-united": {
+      "name": "Bruno Fernandes",
+      "team": "manchester-united",
+      "image": "players/bruno-fernandes__manchester-united.png",
+      "role": "CAPTAIN / PLAYMAKER",
+      "trait": "VISION / PASSING"
+    },
+    "cole-palmer__chelsea": {
+      "name": "Cole Palmer",
+      "team": "chelsea",
+      "image": "players/cole-palmer__chelsea.png",
+      "role": "ATTACKING MIDFIELDER",
+      "trait": "CREATIVITY / FINISHING"
+    },
+    "evanilson__bournemouth": {
+      "name": "Evanilson",
+      "team": "bournemouth",
+      "image": "players/evanilson__bournemouth.png",
+      "role": "FORWARD",
+      "trait": "MOVEMENT / FINISHING"
+    },
+    "anthony-gordon__newcastle-united": {
+      "name": "Anthony Gordon",
+      "team": "newcastle-united",
+      "image": "players/anthony-gordon__newcastle-united.png",
+      "role": "WINGER / ATTACKER",
+      "trait": "PACE / DRIBBLING"
+    },
+    "antonee-robinson__fulham": {
+      "name": "Antonee Robinson",
+      "team": "fulham",
+      "image": "players/antonee-robinson__fulham.png",
+      "role": "DEFENDER"
+    },
+    "dominic-calvert-lewin__leeds-united": {
+      "name": "Dominic Calvert Lewin",
+      "team": "leeds-united",
+      "image": "players/dominic-calvert-lewin__leeds-united.png",
+      "role": "FORWARD"
+    },
+    "nicolas-jackson__aston-villa": {
+      "name": "Nicolas Jackson",
+      "team": "aston-villa",
+      "image": "players/nicolas-jackson__aston-villa.png",
+      "role": "FORWARD"
+    },
+    "harvey-barnes__newcastle-united": {
+      "name": "Harvey Barnes",
+      "team": "newcastle-united",
+      "image": "players/harvey-barnes__newcastle-united.png"
+    }
+  },
+  "teamDefaults": {
+    "arsenal": "bukayo-saka__arsenal",
+    "everton": "thierno-barry__everton",
+    "liverpool": "virgil-van-dijk__liverpool",
+    "manchester-city": "erling-haaland__manchester-city",
+    "brighton": "pascal-gross__brighton",
+    "manchester-united": "bruno-fernandes__manchester-united",
+    "chelsea": "cole-palmer__chelsea",
+    "bournemouth": "evanilson__bournemouth",
+    "leeds-united": "dominic-calvert-lewin__leeds-united",
+    "newcastle-united": "harvey-barnes__newcastle-united",
+    "fulham": "antonee-robinson__fulham",
+    "aston-villa": "nicolas-jackson__aston-villa"
+  }
+}

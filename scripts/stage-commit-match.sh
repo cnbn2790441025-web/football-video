@@ -35,7 +35,7 @@ const data = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 const found = new Set();
 
 function scan(value) {
-  if (typeof value === "string") {
+  if (typeof value === "string" && value.trim()) {
     if (/\.(png|jpe?g|webp|mp3|wav|srt)$/i.test(value)) {
       let p = value.replace(/\\/g, "/");
       if (p.startsWith("assets/")) p = `public/${p}`;
@@ -47,34 +47,53 @@ function scan(value) {
     Object.values(value).forEach(scan);
   }
 }
-
 scan(data);
-for (const path of [...found].sort()) console.log(path);
+for (const asset of [...found].sort()) console.log(asset);
 NODE
 )
 
 FILES=("$MATCH_FILE")
 
+add_existing_file() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  FILES+=("$file")
+}
+
 for asset in "${ASSETS[@]}"; do
-  if [[ "$asset" = /* || "$asset" == *".."* ]]; then
+  [[ "$asset" = /* || "$asset" == *".."* ]] && {
     echo "ERROR: မလုံခြုံသော asset path: $asset"
     exit 1
+  }
+  if [ -f "$asset" ]; then
+    FILES+=("$asset")
+  else
+    echo "WARNING: Asset မတွေ့ပါ၊ ကျော်ထားသည်: $asset"
   fi
-
-  if [ ! -f "$asset" ]; then
-    echo "ERROR: Asset မတွေ့ပါ: $asset"
-    exit 1
-  fi
-
-  FILES+=("$asset")
 done
 
-echo "စစ်ဆေးပြီးသော ဖိုင်များ:"
+# Player registry and only the approved automation files.
+for file in \
+  data/player-registry.json \
+  scripts/team-resolver.js \
+  scripts/create-match-json.js \
+  scripts/new-match.sh \
+  scripts/stage-commit-match.sh \
+  scripts/sync-player-registry.js \
+  scripts/sync-player-roles.js
+do
+  add_existing_file "$file"
+done
+
+# Deduplicate and stage only existing, explicitly approved paths.
+mapfile -t FILES < <(printf '%s\n' "${FILES[@]}" | awk '!seen[$0]++')
+
+echo "Stage လုပ်မည့် သက်ဆိုင်ရာဖိုင်များ:"
 printf '  %s\n' "${FILES[@]}"
 
-read -r -p "ဒီဖိုင်များကိုသာ Stage လုပ်မလား? (y/N): " answer
-if [[ ! "$answer" =~ ^[Yy]$ ]]; then
-  echo "မလုပ်တော့ပါ။"
+if [ "${DRY_RUN:-0}" = "1" ]; then
+  echo
+  echo "DRY RUN: Stage / Commit / Push မလုပ်ပါ။"
   exit 0
 fi
 
@@ -84,11 +103,6 @@ echo
 echo "Stage လုပ်ပြီးသောဖိုင်များ:"
 git diff --cached --name-only
 
-read -r -p "Commit လုပ်မလား? (y/N): " answer
-if [[ ! "$answer" =~ ^[Yy]$ ]]; then
-  git restore --staged -- "${FILES[@]}"
-  echo "Stage ကို ပြန်ဖြုတ်ပြီးပါပြီ။"
-  exit 0
-fi
-
 git commit -m "Add match: $MATCH_KEY"
+
+echo "Commit ပြီးပါပြီ။ Push ကို သီးခြားလုပ်နိုင်ပါပြီ။"

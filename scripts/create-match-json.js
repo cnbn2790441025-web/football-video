@@ -4,50 +4,13 @@ const path = require("node:path");
 const ROOT = path.resolve(__dirname, "..");
 const TEMPLATE_FILE = path.join(ROOT, "templates/match-template.json");
 const MATCH_DIR = path.join(ROOT, "matches");
+const REGISTRY_FILE = path.join(ROOT, "data/player-registry.json");
+const playerRegistry = JSON.parse(fs.readFileSync(REGISTRY_FILE, "utf8"));
 
-function normalize(name = "") {
-  return name.toLowerCase()
-    .replace(/\b(afc|fc)\b/g, "")
-    .replace(/\band\b/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
-const aliases = {
-  "brighton": "brighton hove albion",
-  "brighton hove albion": "brighton hove albion",
-  "man utd": "manchester united",
-  "man united": "manchester united",
-  "manchester united": "manchester united",
-  "bournemouth": "bournemouth",
-  "afc bournemouth": "bournemouth",
-  "spurs": "tottenham hotspur",
-  "tottenham": "tottenham hotspur",
-  "west ham": "west ham united",
-  "wolves": "wolverhampton wanderers",
-  "palace": "crystal palace"
-};
-
-function canonical(name) {
-  const n = normalize(name);
-  return aliases[n] || n;
-}
+const { teamSlug, assetSlug, sameTeam } = require("./team-resolver");
 
 function slug(name) {
-  const n = canonical(name);
-  const slugs = {
-    "manchester united": "manutd",
-    "brighton hove albion": "brighton",
-    "tottenham hotspur": "tottenham",
-    "newcastle united": "newcastle",
-    "west ham united": "west-ham",
-    "nottingham forest": "nottingham-forest",
-    "crystal palace": "crystal-palace",
-    "wolverhampton wanderers": "wolves",
-    "bournemouth": "bournemouth"
-  };
-  return slugs[n] || n.replace(/\s+/g, "-");
+  return teamSlug(name);
 }
 
 function existingAsset(relative) {
@@ -58,98 +21,72 @@ function existingAsset(relative) {
     : null;
 }
 
-const teamMap = {
-  "arsenal": {
-    logo: "logos/arsenal.png",
-    player: "players/saka.png",
-    name: "Bukayo Saka",
-    role: "WINGER / ATTACKER",
-    trait: "DRIBBLING / CHANCE CREATION"
-  },
-  "everton": {
-    logo: "logos/everton.png",
-    player: "players/thierno.png",
-    name: "Thierno Barry",
-    role: "FORWARD",
-    trait: "MOVEMENT / FINISHING"
-  },
-  "liverpool": {
-    logo: "logos/liverpool.png",
-    player: "players/virgil.png",
-    name: "Virgil van Dijk",
-    role: "CAPTAIN / DEFENDER",
-    trait: "LEADERSHIP / DEFENSIVE STRENGTH"
-  },
-  "brighton hove albion": {
-    logo: "logos/brighton.png",
-    player: "players/grob.png",
-    name: "Pascal Groß",
-    role: "MIDFIELDER / PLAYMAKER",
-    trait: "VISION / PASSING"
-  },
-  "manchester united": {
-    logo: "logos/manutd.png",
-    player: "players/bruno.png",
-    name: "Bruno Fernandes",
-    role: "CAPTAIN / PLAYMAKER",
-    trait: "VISION / PASSING"
-  },
-  "chelsea": {
-    logo: "logos/chelsea.png",
-    player: "players/palmer.png",
-    name: "Cole Palmer",
-    role: "ATTACKING MIDFIELDER",
-    trait: "CREATIVITY / FINISHING"
-  },
-  "bournemouth": {
-    logo: "logos/bournemouth.png",
-    player: "players/evanilson.png",
-    name: "Evanilson",
-    role: "FORWARD",
-    trait: "MOVEMENT / FINISHING"
-  },
-  "leeds united": {
-    logo: "logos/leeds.png",
-    player: "players/leeds-player-2.png",
-    name: "Brenden Aaronson",
-    role: "ATTACKING MIDFIELDER",
-    trait: "ENERGY / PRESSING"
-  }
-};
-
 function findTeamAsset(directory, teamName) {
-  const wanted = canonical(teamName);
   const dir = path.join(ROOT, "public", "assets", directory);
-
   if (!fs.existsSync(dir)) return null;
 
+  const extensions = new Set([".png", ".jpg", ".jpeg", ".webp"]);
+  const target = assetSlug(teamName);
   const files = fs.readdirSync(dir)
-    .filter(file => /\.png$/i.test(file))
+    .filter(file => extensions.has(path.extname(file).toLowerCase()))
     .sort();
 
   const match = files.find(file => {
     const base = path.basename(file, path.extname(file));
-    return canonical(base) === wanted;
+    return assetSlug(base) === target;
   });
 
-  return match ? existingAsset(directory + "/" + match) : null;
+  return match ? existingAsset(`${directory}/${match}`) : null;
+}
+
+
+function findPlayerEntry(teamName) {
+  const players = playerRegistry.players || {};
+  const defaults = playerRegistry.teamDefaults || {};
+
+  const defaultId = Object.entries(defaults)
+    .find(([teamKey]) => sameTeam(teamKey, teamName))?.[1];
+
+  if (defaultId) {
+    const entry = players[defaultId];
+    if (!entry) {
+      throw new Error(`Player registry default မတွေ့ပါ: ${defaultId}`);
+    }
+    if (!sameTeam(entry.team || "", teamName)) {
+      throw new Error(`Player default Team မကိုက်ညီပါ: ${defaultId}`);
+    }
+    if (!entry.image || !existingAsset(entry.image)) {
+      throw new Error(`Default Player ပုံမတွေ့ပါ: ${defaultId}`);
+    }
+    return { id: defaultId, ...entry };
+  }
+
+  const matches = Object.entries(players)
+    .filter(([, entry]) => sameTeam(entry.team || "", teamName))
+    .filter(([, entry]) => entry.image && existingAsset(entry.image))
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  if (matches.length > 1) {
+    throw new Error(
+      `Player အများကြီးရှိပြီး teamDefaults မသတ်မှတ်ရသေးပါ: ${teamName} — ${matches.map(([id]) => id).join(", ")}`
+    );
+  }
+
+  if (matches.length === 0) return null;
+  const [id, entry] = matches[0];
+  return { id, ...entry };
 }
 
 function teamAssets(teamName) {
-  const key = canonical(teamName);
-  const entry = teamMap[key];
-
-  const logo = (entry && existingAsset(entry.logo))
-    || findTeamAsset("logos", teamName);
-
-  const player = entry ? existingAsset(entry.player) : null;
+  const logo = findTeamAsset("logos", teamName);
+  const playerEntry = findPlayerEntry(teamName);
 
   return {
     logo,
-    player,
-    name: entry && existingAsset(entry.player) ? entry.name : "",
-    role: entry && existingAsset(entry.player) ? entry.role : "",
-    trait: entry && existingAsset(entry.player) ? entry.trait : ""
+    player: playerEntry ? existingAsset(playerEntry.image) : null,
+    name: playerEntry?.name || "",
+    role: playerEntry?.role || "",
+    trait: playerEntry?.trait || ""
   };
 }
 
@@ -160,8 +97,8 @@ function findExistingMatch(home, away) {
         fs.readFileSync(path.join(MATCH_DIR, file), "utf8")
       );
       if (
-        canonical(data.homeTeam) === canonical(home) &&
-        canonical(data.awayTeam) === canonical(away)
+        sameTeam(data.homeTeam, home) &&
+        sameTeam(data.awayTeam, away)
       ) return data;
     } catch {}
   }
@@ -215,12 +152,9 @@ async function main() {
   }
 
   const result = await response.json();
-  const homeWanted = canonical(homeInput);
-  const awayWanted = canonical(awayInput);
-
   const match = (result.matches || []).find(m =>
-    canonical(m.homeTeam.name) === homeWanted &&
-    canonical(m.awayTeam.name) === awayWanted
+    sameTeam(m.homeTeam.name, homeInput) &&
+    sameTeam(m.awayTeam.name, awayInput)
   );
 
   if (!match) {
@@ -259,28 +193,8 @@ async function main() {
     ...template,
     homeTeam: home,
     awayTeam: away,
-    homeShort: ({
-        "arsenal": "ARS", "everton": "EVE", "liverpool": "LIV",
-        "brighton hove albion": "BHA", "manchester united": "MUN",
-        "bournemouth": "BOU", "leeds united": "LEE",
-        "crystal palace": "CRY", "newcastle united": "NEW",
-        "brentford": "BRE", "sunderland": "SUN", "hull city": "HUL",
-        "chelsea": "CHE", "aston villa": "AVL", "fulham": "FUL",
-        "ipswich town": "IPS", "nottingham forest": "NFO",
-        "tottenham hotspur": "TOT", "west ham united": "WHU",
-        "wolverhampton wanderers": "WOL", "coventry city": "COV"
-      })[canonical(home)] || "",
-    awayShort: ({
-        "arsenal": "ARS", "everton": "EVE", "liverpool": "LIV",
-        "brighton hove albion": "BHA", "manchester united": "MUN",
-        "bournemouth": "BOU", "leeds united": "LEE",
-        "crystal palace": "CRY", "newcastle united": "NEW",
-        "brentford": "BRE", "sunderland": "SUN", "hull city": "HUL",
-        "chelsea": "CHE", "aston villa": "AVL", "fulham": "FUL",
-        "ipswich town": "IPS", "nottingham forest": "NFO",
-        "tottenham hotspur": "TOT", "west ham united": "WHU",
-        "wolverhampton wanderers": "WOL", "coventry city": "COV"
-      })[canonical(away)] || "",
+    homeShort: match.homeTeam.tla || "",
+    awayShort: match.awayTeam.tla || "",
     matchDate: format("Europe/London", {
       day: "2-digit", month: "long", year: "numeric"
     }),
@@ -309,17 +223,17 @@ async function main() {
     subtitleFile
   };
 
-  const required = [
+  const optionalAssets = [
     ["homeLogo", data.homeLogo],
     ["awayLogo", data.awayLogo],
+    ["homePlayer", data.homePlayer],
+    ["awayPlayer", data.awayPlayer],
     ["audioFile", data.audioFile],
     ["subtitleFile", data.subtitleFile]
   ];
 
-  const missing = [];
   console.log("\nAsset စစ်ဆေးချက်:");
-
-  for (const [key, value] of required) {
+  for (const [key, value] of optionalAssets) {
     const full = value
       ? (value.startsWith("assets/")
           ? path.join(ROOT, "public", value)
@@ -327,18 +241,11 @@ async function main() {
       : "";
     const ok = Boolean(value) && fs.existsSync(full) && fs.statSync(full).isFile();
     console.log(`${ok ? "OK" : "MISSING"} ${key}: ${value || "(မရွေးရသေးပါ)"}`);
-    if (!ok) missing.push(key);
+    if (!ok) data[key] = "";
   }
 
   if (!data.prediction) {
-    missing.push("prediction");
-    console.log("MISSING prediction: ကိုယ်တိုင်စစ်ဆေးပြီး ဖြည့်ရန်လိုပါသည်။");
-  }
-
-  if (missing.length) {
-    throw new Error(
-      `လိုအပ်ချက်မပြည့်စုံပါ (${missing.join(", ")}). JSON ဖိုင်အသစ် မရေးထားပါ။`
-    );
+    console.log("WARNING prediction: ကိုယ်တိုင်ဖြည့်ရန်လိုပါသည်။");
   }
 
   fs.writeFileSync(outputFile, JSON.stringify(data, null, 2) + "\n");
