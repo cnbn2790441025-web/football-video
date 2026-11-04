@@ -105,4 +105,14 @@ git diff --cached --name-only
 
 git commit -m "Add match: $MATCH_KEY"
 
-echo "Commit ပြီးပါပြီ။ Push ကို သီးခြားလုပ်နိုင်ပါပြီ။"
+BRANCH="$(git branch --show-current)"
+if [ "$BRANCH" != "main" ]; then
+  echo "ERROR: လက်ရှိ branch သည် main မဟုတ်ပါ: $BRANCH"
+  exit 1
+fi
+
+git push origin main
+echo "GitHub သို့ Push အောင်မြင်ပါပြီ။"
+
+gh workflow run render.yml -f match_key="$MATCH_KEY"
+echo "GitHub Actions Render ကို စတင်ရန် Dispatch လုပ်ပြီးပါပြီ။"
