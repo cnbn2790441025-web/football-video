@@ -92,7 +92,18 @@
     "harvey-barnes__newcastle-united": {
       "name": "Harvey Barnes",
       "team": "newcastle-united",
-      "image": "players/harvey-barnes__newcastle-united.png"
+      "image": "players/harvey-barnes__newcastle-united.png",
+      "role": "FORWARD"
+    },
+    "antonee-robinson__fulham-old": {
+      "name": "Antonee Robinson",
+      "team": "fulham-old",
+      "image": "players/antonee-robinson__fulham-old.png"
+    },
+    "harvey-barnes__newcastle-united-old": {
+      "name": "Harvey Barnes",
+      "team": "newcastle-united-old",
+      "image": "players/harvey-barnes__newcastle-united-old.png"
     }
   },
   "teamDefaults": {
@@ -107,6 +118,8 @@
     "leeds-united": "dominic-calvert-lewin__leeds-united",
     "newcastle-united": "harvey-barnes__newcastle-united",
     "fulham": "antonee-robinson__fulham",
-    "aston-villa": "nicolas-jackson__aston-villa"
+    "aston-villa": "nicolas-jackson__aston-villa",
+    "fulham-old": "antonee-robinson__fulham-old",
+    "newcastle-united-old": "harvey-barnes__newcastle-united-old"
   }
 }

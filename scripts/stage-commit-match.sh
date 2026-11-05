@@ -87,6 +87,7 @@ done
 for file in \
   .github/workflows/render.yml \
   data/player-registry.json \
+  templates/match-template.json \
   scripts/team-resolver.js \
   scripts/create-match-json.js \
   scripts/new-match.sh \
