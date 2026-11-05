@@ -1,6 +1,6 @@
 name: Render Video
 
-on:
+"on":
   workflow_dispatch:
     inputs:
       match_key:
