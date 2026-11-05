@@ -22,6 +22,12 @@ if [ ! -f "$MATCH_FILE" ]; then
   exit 1
 fi
 
+BRANCH="$(git branch --show-current)"
+if [ "$BRANCH" != "main" ]; then
+  echo "ERROR: လက်ရှိ branch သည် main မဟုတ်ပါ: $BRANCH"
+  exit 1
+fi
+
 if [ -n "$(git diff --cached --name-only)" ]; then
   echo "ERROR: Git မှာ staged files ရှိနေပါတယ်။ အရင်စစ်ဆေးပါ။"
   git diff --cached --name-only
@@ -47,6 +53,7 @@ function scan(value) {
     Object.values(value).forEach(scan);
   }
 }
+
 scan(data);
 for (const asset of [...found].sort()) console.log(asset);
 NODE
@@ -61,19 +68,24 @@ add_existing_file() {
 }
 
 for asset in "${ASSETS[@]}"; do
-  [[ "$asset" = /* || "$asset" == *".."* ]] && {
+  if [[ "$asset" = /* || "$asset" == *".."* ]]; then
     echo "ERROR: မလုံခြုံသော asset path: $asset"
     exit 1
-  }
-  if [ -f "$asset" ]; then
-    FILES+=("$asset")
-  else
-    echo "WARNING: Asset မတွေ့ပါ၊ ကျော်ထားသည်: $asset"
   fi
+
+  if [ ! -f "$asset" ]; then
+    echo "ERROR: Required asset မတွေ့ပါ: $asset"
+    echo "Commit / Push / Render မလုပ်ပါ။"
+    exit 1
+  fi
+
+  echo "OK asset: $asset"
+  FILES+=("$asset")
 done
 
 # Player registry and only the approved automation files.
 for file in \
+  .github/workflows/render.yml \
   data/player-registry.json \
   scripts/team-resolver.js \
   scripts/create-match-json.js \
@@ -88,6 +100,7 @@ done
 # Deduplicate and stage only existing, explicitly approved paths.
 mapfile -t FILES < <(printf '%s\n' "${FILES[@]}" | awk '!seen[$0]++')
 
+echo
 echo "Stage လုပ်မည့် သက်ဆိုင်ရာဖိုင်များ:"
 printf '  %s\n' "${FILES[@]}"
 
@@ -104,15 +117,9 @@ echo "Stage လုပ်ပြီးသောဖိုင်များ:"
 git diff --cached --name-only
 
 git commit -m "Add match: $MATCH_KEY"
-
-BRANCH="$(git branch --show-current)"
-if [ "$BRANCH" != "main" ]; then
-  echo "ERROR: လက်ရှိ branch သည် main မဟုတ်ပါ: $BRANCH"
-  exit 1
-fi
-
 git push origin main
+
 echo "GitHub သို့ Push အောင်မြင်ပါပြီ။"
 
 gh workflow run render.yml -f match_key="$MATCH_KEY"
-echo "GitHub Actions Render ကို စတင်ရန် Dispatch လုပ်ပြီးပါပြီ။"
+echo "GitHub Actions Render ကို Dispatch လုပ်ပြီးပါပြီ။"
