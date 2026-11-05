@@ -47,17 +47,17 @@ jobs:
           AUDIO_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).audioFile || ""' "$MATCH_FILE")"
           SRT_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).subtitleFile || ""' "$MATCH_FILE")"
 
-for SOURCE in "$AUDIO_SOURCE" "$SRT_SOURCE"; do
-  if [[ "$SOURCE" = /* || "$SOURCE" != public/* || "$SOURCE" == *".."* || "$SOURCE" == *"\\"* ]]; then
-    echo "Unsafe media path: $SOURCE (must be inside public/)"
-    exit 1
-  fi
-done
+          for SOURCE in "$AUDIO_SOURCE" "$SRT_SOURCE"; do
+            if [[ "$SOURCE" = /* || "$SOURCE" != public/* || "$SOURCE" == *".."* || "$SOURCE" == *"\\"* ]]; then
+              echo "Unsafe media path: $SOURCE (must be inside public/)"
+              exit 1
+            fi
+          done
 
-if [[ "$AUDIO_SOURCE" != *.mp3 || "$SRT_SOURCE" != *.srt ]]; then
-  echo "Invalid media extension: MP3 and SRT are required."
-  exit 1
-fi
+          if [[ "$AUDIO_SOURCE" != *.mp3 || "$SRT_SOURCE" != *.srt ]]; then
+            echo "Invalid media extension: MP3 and SRT are required."
+            exit 1
+          fi
 
           if [[ -z "$AUDIO_SOURCE" || ! -f "$AUDIO_SOURCE" ]]; then
             echo "Audio file missing: $AUDIO_SOURCE"
