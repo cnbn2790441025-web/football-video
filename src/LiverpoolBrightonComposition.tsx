@@ -264,7 +264,8 @@ const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; du
   );
   const image = cue.image || (cue.team === "home" ? matchData.homePlayer : matchData.awayPlayer);
   const role = cue.team === "home" ? matchData.homePlayerRole : matchData.awayPlayerRole;
-  const zoom = interpolate(frame, [0, 24, duration], [0.82, 1.04, 1.04], { extrapolateRight: "clamp" });
+  const zoom = interpolate(frame, [0, 24, duration], [1, 1.04, 1.04], { extrapolateRight: "clamp" });
+  const zoomDrop = (zoom - 1) * 410;
 
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", background: "rgba(2,6,16,0.32)", opacity }}>
@@ -275,8 +276,8 @@ const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; du
         background: "linear-gradient(135deg, rgba(3,12,24,0.97), rgba(12,31,48,0.94))",
         border: "2px solid rgba(247,217,0,0.75)",
         boxShadow: "0 0 38px rgba(0,0,0,0.45)",
-        transform: `scale(${zoom})`,
-        transformOrigin: "center center"
+        transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+        transformOrigin: "center top"
       }}>
         {image ? <Img src={staticFile(image)} style={{ width: 420, height: 650, objectFit: "contain", alignSelf: "flex-end" }} /> : null}
         <div style={{ flex: 1 }}>
