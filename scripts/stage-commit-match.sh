@@ -11,6 +11,7 @@ fi
 
 MATCH_KEY="$1"
 MATCH_FILE="matches/${MATCH_KEY}.json"
+CUE_FILE="matches/${MATCH_KEY}.cues.json"
 
 if [[ ! "$MATCH_KEY" =~ ^[a-z0-9-]+$ ]]; then
   echo "ERROR: Match key ပုံစံ မမှန်ပါ။"
@@ -35,7 +36,7 @@ if [ -n "$(git diff --cached --name-only)" ]; then
 fi
 
 mapfile -t ASSETS < <(
-  node - "$MATCH_FILE" <<'NODE'
+  node - "$MATCH_FILE" "$CUE_FILE" <<'NODE'
 const fs = require("fs");
 const data = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 const found = new Set();
@@ -55,6 +56,11 @@ function scan(value) {
 }
 
 scan(data);
+const cueFile = process.argv[3];
+if (fs.existsSync(cueFile)) {
+  const cues = JSON.parse(fs.readFileSync(cueFile, "utf8"));
+  scan(cues);
+}
 for (const asset of [...found].sort()) console.log(asset);
 NODE
 )
@@ -66,6 +72,8 @@ add_existing_file() {
   [ -f "$file" ] || return 0
   FILES+=("$file")
 }
+
+add_existing_file "$CUE_FILE"
 
 for asset in "${ASSETS[@]}"; do
   if [[ "$asset" = /* || "$asset" == *".."* ]]; then
