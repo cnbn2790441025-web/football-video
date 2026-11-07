@@ -217,7 +217,7 @@ export const TacticalGraphic: React.FC<{
 
 type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
-  | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image?: string };
+  | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image?: string; offsetSeconds?: number; durationSeconds?: number };
 
 const CueTimeline: React.FC = () => {
   const captions = activeCaptions as { start: number; end: number; text: string }[];
@@ -229,8 +229,11 @@ const CueTimeline: React.FC = () => {
         const caption = captions[cue.captionIndex - 1];
         if (!caption || caption.end <= caption.start) return null;
 
-        const from = Math.round(caption.start * 30);
-        const duration = Math.max(1, Math.round((caption.end - caption.start) * 30));
+        const isPlayer = cue.kind === "player";
+        const from = Math.round((caption.start + (isPlayer ? cue.offsetSeconds ?? 4 : 0)) * 30);
+        const duration = Math.max(1, Math.round(
+          (isPlayer ? cue.durationSeconds ?? 6 : caption.end - caption.start) * 30
+        ));
 
         return (
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
