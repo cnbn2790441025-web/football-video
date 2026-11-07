@@ -1075,7 +1075,7 @@ const BrunoSpotlight: React.FC = () => {
 const PredictionGraphic: React.FC = () => {
 const frame = useCurrentFrame();
 
-const progress = interpolate(frame, [0, 12, 75, 84], [0, 1, 1, 0], {
+const progress = interpolate(frame, [0, 12, 171, 180], [0, 1, 1, 0], {
 extrapolateLeft: "clamp",
 extrapolateRight: "clamp",
 });
@@ -1168,7 +1168,7 @@ export const LiverpoolBrightonComposition: React.FC = () => {
           ))}
         </>
       )}
-      <Sequence from={1425} durationInFrames={84}>
+      <Sequence from={1425} durationInFrames={180}>
         <PredictionGraphic />
       </Sequence>
       <Audio src={staticFile("narration.mp3")} />
