@@ -1,6 +1,8 @@
 import React from "react";
 import { SubtitleOverlay } from "./SubtitleOverlay";
 import matchData from "./matchData.json";
+import activeCaptions from "./activeCaptions.json";
+import activeCues from "./activeCues.json";
 import {
   AbsoluteFill,
   Audio,
@@ -87,7 +89,7 @@ const tacticalScenes: {
   { from: 1176, duration: 249, type: "counter", title: `${matchData.awayShort} COUNTER-ATTACK`, subtitle: "Win possession • attack open space" },
 ];
 
-const TacticalGraphic: React.FC<{
+export const TacticalGraphic: React.FC<{
   type: TacticalType;
   title: string;
   subtitle: string;
@@ -212,6 +214,76 @@ const TacticalGraphic: React.FC<{
 };
 
 
+
+type CueItem =
+  | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
+  | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image?: string };
+
+const CueTimeline: React.FC = () => {
+  const captions = activeCaptions as { start: number; end: number; text: string }[];
+  const cues = activeCues as CueItem[];
+
+  return (
+    <>
+      {cues.map((cue, i) => {
+        const caption = captions[cue.captionIndex - 1];
+        if (!caption || caption.end <= caption.start) return null;
+
+        const from = Math.round(caption.start * 30);
+        const duration = Math.max(1, Math.round((caption.end - caption.start) * 30));
+
+        return (
+          <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
+            {cue.kind === "tactical" ? (
+              <TacticalGraphic
+                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack"].includes(cue.type) ? cue.type as TacticalType : "attack")}
+                title={cue.title}
+                subtitle={cue.subtitle}
+              />
+            ) : (
+              <PlayerCueGraphic cue={cue} duration={duration} />
+            )}
+          </Sequence>
+        );
+      })}
+    </>
+  );
+};
+
+const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; duration: number }> = ({ cue, duration }) => {
+  const frame = useCurrentFrame();
+  const fade = Math.min(12, Math.floor(duration / 4));
+  const opacity = interpolate(
+    frame,
+    [0, fade, Math.max(fade, duration - fade), duration],
+    [0, 1, 1, 0],
+    { extrapolateRight: "clamp" }
+  );
+  const image = cue.image || (cue.team === "home" ? matchData.homePlayer : matchData.awayPlayer);
+  const role = cue.team === "home" ? matchData.homePlayerRole : matchData.awayPlayerRole;
+
+  return (
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", background: "rgba(2,6,16,0.32)", opacity }}>
+      <div style={{
+        position: "absolute", top: 520, width: 850, minHeight: 620, padding: 36,
+        boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
+        display: "flex", alignItems: "center", gap: 28,
+        background: "linear-gradient(135deg, rgba(3,12,24,0.97), rgba(12,31,48,0.94))",
+        border: "2px solid rgba(247,217,0,0.75)",
+        boxShadow: "0 0 38px rgba(0,0,0,0.45)"
+      }}>
+        {image ? <Img src={staticFile(image)} style={{ width: 330, height: 520, objectFit: "contain", alignSelf: "flex-end" }} /> : null}
+        <div style={{ flex: 1 }}>
+          <div style={{ color: gold, fontSize: 21, fontWeight: 900, letterSpacing: 3 }}>KEY PLAYER</div>
+          <div style={{ color: "#FFFFFF", fontSize: 43, fontWeight: 900, lineHeight: 1.05, marginTop: 18 }}>{cue.name.toUpperCase()}</div>
+          <div style={{ color: "#D8E2EA", fontSize: 22, fontWeight: 800, marginTop: 18 }}>{role || "PLAYER SPOTLIGHT"}</div>
+          <div style={{ color: "#9FB0BF", fontSize: 18, marginTop: 22 }}>{cue.team === "home" ? matchData.homeShort : matchData.awayShort}</div>
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 const StadiumBackground: React.FC = () => {
   const frame = useCurrentFrame();
   const cycle = frame % 300;
@@ -231,13 +303,11 @@ const StadiumBackground: React.FC = () => {
     if (name.includes("liverpool")) return "#C8102E";
     if (name.includes("arsenal")) return "#EF0107";
     if (name.includes("chelsea")) return "#034694";
-    if (name.includes("liverpool")) return "#C8102E";
     if (name.includes("manchester city")) return "#6CABDD";
     if (name.includes("brighton")) return "#0057B8";
     if (name.includes("tottenham")) return "#132257";
     if (name.includes("newcastle")) return "#241F20";
     if (name.includes("aston villa")) return "#670E36";
-    if (name.includes("brighton")) return "#0057B8";
     if (name.includes("west ham")) return "#7A263A";
     if (name.includes("everton")) return "#003399";
     if (name.includes("crystal palace")) return "#1B458F";
@@ -1062,7 +1132,7 @@ MATCH PREDICTION
         textShadow: "0 0 22px rgba(255,45,45,0.95)",
       }}
     >
-      {matchData.prediction || "LIVERPOOL WIN"}
+      {matchData.prediction || "MATCH PREDICTION"}
     </Text>
   </div>
 </AbsoluteFill>
@@ -1078,14 +1148,20 @@ export const LiverpoolBrightonComposition: React.FC = () => {
       <Sequence durationInFrames={240}>
         <MatchGraphic />
       </Sequence>
-      <Sequence from={240} durationInFrames={150}>
-        <BrunoSpotlight />
-      </Sequence>
-      {tacticalScenes.map((scene) => (
-        <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
-          <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
-        </Sequence>
-      ))}
+      {activeCues.length > 0 ? (
+        <CueTimeline />
+      ) : (
+        <>
+          <Sequence from={240} durationInFrames={150}>
+            <BrunoSpotlight />
+          </Sequence>
+          {tacticalScenes.map((scene) => (
+            <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
+              <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
+            </Sequence>
+          ))}
+        </>
+      )}
       <Sequence from={1425} durationInFrames={84}>
         <PredictionGraphic />
       </Sequence>

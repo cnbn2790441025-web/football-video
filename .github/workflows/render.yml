@@ -77,6 +77,15 @@ jobs:
 
           node scripts/srt-to-json.mjs "$SRT_SOURCE" src/activeCaptions.json
 
+          CUE_SOURCE="matches/${MATCH_KEY}.cues.json"
+          if [[ -f "$CUE_SOURCE" ]]; then
+            cp "$CUE_SOURCE" src/activeCues.json
+            echo "Loaded cue file: $CUE_SOURCE"
+          else
+            printf '[]\n' > src/activeCues.json
+            echo "No cue file found; using empty cue list"
+          fi
+
           node -e '
             const d = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
             console.log("Match:", d.homeTeam, "vs", d.awayTeam);
