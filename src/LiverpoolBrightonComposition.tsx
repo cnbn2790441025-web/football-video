@@ -264,7 +264,7 @@ const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; du
   );
   const image = cue.image || (cue.team === "home" ? matchData.homePlayer : matchData.awayPlayer);
   const role = cue.team === "home" ? matchData.homePlayerRole : matchData.awayPlayerRole;
-  const zoom = interpolate(frame, [0, 24, duration], [1, 1.04, 1.04], { extrapolateRight: "clamp" });
+  const zoom = interpolate(frame, [0, 90, duration], [1, 1.06, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
 
   return (
