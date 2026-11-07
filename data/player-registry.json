@@ -104,6 +104,18 @@
       "name": "Harvey Barnes",
       "team": "newcastle-united-old",
       "image": "players/harvey-barnes__newcastle-united-old.png"
+    },
+    "kai-havertz__arsenal": {
+      "name": "Kai Havertz",
+      "team": "arsenal",
+      "image": "players/kai-havertz__arsenal.png",
+      "role": "FORWARD"
+    },
+    "oliver-mcburnie__hull-city": {
+      "name": "Oliver Mcburnie",
+      "team": "hull-city",
+      "image": "players/oliver-mcburnie__hull-city.png",
+      "role": "FORWARD"
     }
   },
   "teamDefaults": {
@@ -120,6 +132,7 @@
     "fulham": "antonee-robinson__fulham",
     "aston-villa": "nicolas-jackson__aston-villa",
     "fulham-old": "antonee-robinson__fulham-old",
-    "newcastle-united-old": "harvey-barnes__newcastle-united-old"
+    "newcastle-united-old": "harvey-barnes__newcastle-united-old",
+    "hull-city": "oliver-mcburnie__hull-city"
   }
 }
