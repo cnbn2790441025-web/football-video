@@ -74,7 +74,7 @@ const ScoreHeader: React.FC = () => (
 );
 
 
-type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press";
+type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press" | "low-block";
 
 const tacticalScenes: {
   from: number;
@@ -98,6 +98,75 @@ export const TacticalGraphic: React.FC<{
   const pulse = 0.88 + Math.sin(frame / 7) * 0.12;
   const zoom = interpolate(frame, [0, 90], [1, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
+
+  if (type === "low-block") {
+    const defenders = [
+      [150, 115], [285, 115], [420, 115], [555, 115],
+      [205, 225], [350, 225], [490, 225], [635, 225],
+    ];
+    const screeners = [[250, 335], [420, 335], [590, 335]];
+
+    return (
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(2,8,20,0.24)" }}>
+        <div style={{
+          position: "absolute", top: 520, width: 900, height: 820, padding: 28,
+          boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
+          background: "linear-gradient(145deg, rgba(3,15,38,0.98), rgba(5,32,62,0.96))",
+          border: "2px solid rgba(65,160,255,0.9)",
+          boxShadow: "0 0 42px rgba(35,120,255,0.22)",
+          transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+          transformOrigin: "center top",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ color: "#65B8FF", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>DEFENSIVE STRUCTURE</div>
+            <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>{matchData.homeShort} · {matchData.awayShort}</div>
+          </div>
+          <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>{title}</div>
+          <div style={{ color: "#C5DDF5", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
+          <svg viewBox="0 0 840 470" style={{ width: "100%", marginTop: 24, display: "block" }}>
+            <defs>
+              <linearGradient id="lowBlockZone" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#168BFF" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#168BFF" stopOpacity="0.08" />
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="836" height="466" rx="16" fill="#123B52" stroke="#D5E8DC" strokeWidth="3" />
+            <line x1="420" y1="3" x2="420" y2="467" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <circle cx="420" cy="235" r="68" fill="none" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <rect x="2" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="2" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="800" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="90" y="72" width="600" height="300" rx="28" fill="url(#lowBlockZone)" stroke="#55AFFF" strokeWidth="3" strokeDasharray="12 8" />
+            <path d="M90 178 H690 M90 270 H690" stroke="#75C2FF" strokeWidth="3" strokeDasharray="8 8" opacity="0.75" />
+            <path d="M700 235 L650 235" stroke="#FFB84D" strokeWidth="6" strokeLinecap="round" />
+            <path d="M660 222 L647 235 L660 248" fill="none" stroke="#FFB84D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+            {defenders.map(([x, y], i) => (
+              <g key={`def-${i}`}>
+                <circle cx={x} cy={y} r="21" fill="#168BFF" stroke="#FFFFFF" strokeWidth="3" />
+                <path d={`M${x-8} ${y} H${x+8}`} stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" />
+              </g>
+            ))}
+            {screeners.map(([x, y], i) => (
+              <g key={`screen-${i}`}>
+                <circle cx={x} cy={y} r="19" fill="#F7D900" stroke="#FFFFFF" strokeWidth="3" />
+                <circle cx={x} cy={y} r="6" fill="#17212B" />
+              </g>
+            ))}
+            <text x="25" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.homeShort}</text>
+            <text x="690" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.awayShort}</text>
+            <text x="112" y="415" fill="#B8DEFF" fontSize="17" fontWeight="900">COMPACT DEFENSIVE BLOCK</text>
+          </svg>
+          <div style={{ marginTop: 18, color: "#B8DEFF", fontSize: 17, fontWeight: 800, letterSpacing: 1 }}>
+            PROTECT CENTRAL SPACE · HOLD THE LINE · DENY CHANNELS
+          </div>
+          <div style={{ marginTop: 12, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
+            ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
 
   if (type === "high-press") {
     return (
@@ -305,7 +374,7 @@ const CueTimeline: React.FC = () => {
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
             {cue.kind === "tactical" ? (
               <TacticalGraphic
-                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press"].includes(cue.type) ? cue.type as TacticalType : "attack")}
+                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block"].includes(cue.type) ? cue.type as TacticalType : "attack")}
                 title={cue.title}
                 subtitle={cue.subtitle}
               />

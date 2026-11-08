@@ -9,9 +9,9 @@
   {
     "captionIndex": 5,
     "kind": "tactical",
-    "type": "defensive",
-    "title": "HULL CITY DEFENSIVE SHAPE",
-    "subtitle": "Compact defensive structure"
+    "type": "low-block",
+    "title": "HULL CITY LOW BLOCK",
+    "subtitle": "Compact lines • protect central space"
   },
   {
     "captionIndex": 6,
