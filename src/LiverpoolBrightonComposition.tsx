@@ -74,7 +74,7 @@ const ScoreHeader: React.FC = () => (
 );
 
 
-type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press" | "low-block";
+type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press" | "low-block" | "wing-overload";
 
 const tacticalScenes: {
   from: number;
@@ -98,6 +98,69 @@ export const TacticalGraphic: React.FC<{
   const pulse = 0.88 + Math.sin(frame / 7) * 0.12;
   const zoom = interpolate(frame, [0, 90], [1, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
+
+  if (type === "wing-overload") {
+    return (
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(2,8,20,0.24)" }}>
+        <div style={{
+          position: "absolute", top: 520, width: 900, height: 820, padding: 28,
+          boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
+          background: "linear-gradient(145deg, rgba(3,24,22,0.98), rgba(5,48,37,0.96))",
+          border: "2px solid rgba(75,220,150,0.9)",
+          boxShadow: "0 0 42px rgba(35,210,130,0.2)",
+          transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+          transformOrigin: "center top",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ color: "#6FFFC0", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>ATTACKING PATTERN</div>
+            <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>{matchData.homeShort} · {matchData.awayShort}</div>
+          </div>
+          <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>{title}</div>
+          <div style={{ color: "#C5F4DF", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
+          <svg viewBox="0 0 840 470" style={{ width: "100%", marginTop: 24, display: "block" }}>
+            <defs>
+              <marker id="wingArrowHead" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+                <path d="M0 0 L8 4 L0 8" fill="none" stroke="#7CFFB2" strokeWidth="1.5" />
+              </marker>
+            </defs>
+            <rect x="2" y="2" width="836" height="466" rx="16" fill="#124C3D" stroke="#D5E8DC" strokeWidth="3" />
+            <line x1="420" y1="3" x2="420" y2="467" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <circle cx="420" cy="235" r="68" fill="none" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <rect x="2" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="2" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="800" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <path d="M420 65 L790 65 L790 405 L420 405 Z" fill="#27C879" opacity="0.12" stroke="#65F5A9" strokeWidth="2" strokeDasharray="10 8" />
+            <path d="M470 75 L780 75 L780 175 L470 175 Z" fill="#65F5A9" opacity="0.2" />
+            <path d="M470 295 L780 295 L780 395 L470 395 Z" fill="#65F5A9" opacity="0.2" />
+            <path d="M270 235 C390 235 450 125 600 125 S735 125 785 115" fill="none" stroke="#7CFFB2" strokeWidth="7" strokeLinecap="round" markerEnd="url(#wingArrowHead)" />
+            <path d="M300 250 C430 250 500 345 640 345 S745 345 785 355" fill="none" stroke="#7CFFB2" strokeWidth="7" strokeLinecap="round" markerEnd="url(#wingArrowHead)" />
+            <path d="M560 125 L690 225 L785 235" fill="none" stroke="#F7D900" strokeWidth="5" strokeDasharray="9 7" markerEnd="url(#wingArrowHead)" />
+            <path d="M560 345 L690 245 L785 235" fill="none" stroke="#F7D900" strokeWidth="5" strokeDasharray="9 7" markerEnd="url(#wingArrowHead)" />
+            {[[270,235],[420,235],[600,125],[600,345],[690,225]].map(([x,y], i) => (
+              <g key={`wing-home-${i}`}>
+                <circle cx={x} cy={y} r="20" fill="#F7D900" stroke="#FFFFFF" strokeWidth="3" />
+                <circle cx={x} cy={y} r="6" fill="#17372D" />
+              </g>
+            ))}
+            {[[690,115],[690,355],[760,185],[760,285]].map(([x,y], i) => (
+              <circle key={`wing-away-${i}`} cx={x} cy={y} r="18" fill="#E75B5B" stroke="#FFFFFF" strokeWidth="3" />
+            ))}
+            <text x="25" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.homeShort}</text>
+            <text x="690" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.awayShort}</text>
+            <text x="520" y="105" fill="#B8FFD8" fontSize="16" fontWeight="900">WIDE OVERLOAD</text>
+            <text x="520" y="390" fill="#B8FFD8" fontSize="16" fontWeight="900">WIDE OVERLOAD</text>
+          </svg>
+          <div style={{ marginTop: 18, color: "#B8F5D5", fontSize: 17, fontWeight: 800, letterSpacing: 1 }}>
+            CREATE WIDE NUMBERS · COMBINE ON THE FLANK · ATTACK THE BOX
+          </div>
+          <div style={{ marginTop: 12, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
+            ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
 
   if (type === "low-block") {
     const defenders = [
@@ -374,7 +437,7 @@ const CueTimeline: React.FC = () => {
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
             {cue.kind === "tactical" ? (
               <TacticalGraphic
-                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block"].includes(cue.type) ? cue.type as TacticalType : "attack")}
+                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block", "wing-overload"].includes(cue.type) ? cue.type as TacticalType : "attack")}
                 title={cue.title}
                 subtitle={cue.subtitle}
               />

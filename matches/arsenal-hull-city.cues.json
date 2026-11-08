@@ -7,6 +7,13 @@
     "image": "assets/players/kai-havertz__arsenal.png"
   },
   {
+    "captionIndex": 4,
+    "kind": "tactical",
+    "type": "wing-overload",
+    "title": "ARSENAL WING OVERLOAD",
+    "subtitle": "Create wide numbers • combine on the flank"
+  },
+  {
     "captionIndex": 5,
     "kind": "tactical",
     "type": "low-block",
