@@ -2,32 +2,42 @@ import React from "react";
 import {
   AbsoluteFill,
   Composition,
+  Img,
   Sequence,
   interpolate,
+  staticFile,
   useCurrentFrame,
 } from "remotion";
+import matchData from "./matchData.json";
 import { LeedsManUtdComposition } from "./LeedsManUtdComposition";
 
-const OutroGraphic: React.FC = () => {
+const gold = "#F7D46A";
+
+type PlayerSide = "home" | "away";
+
+const PlayerSpotlight: React.FC<{ side: PlayerSide }> = ({ side }) => {
   const frame = useCurrentFrame();
-  const pulse = 0.82 + Math.sin(frame / 8) * 0.18;
-  const opacity = interpolate(frame, [0, 15, 270, 290], [0, 1, 1, 0], {
+
+  const isHome = side === "home";
+  const team = isHome ? matchData.homeTeam : matchData.awayTeam;
+  const short = isHome ? matchData.homeShort : matchData.awayShort;
+  const name = isHome ? matchData.homePlayerName : matchData.awayPlayerName;
+  const role = isHome ? matchData.homePlayerRole : matchData.awayPlayerRole;
+  const trait = isHome ? matchData.homePlayerTrait : matchData.awayPlayerTrait;
+  const player = isHome ? matchData.homePlayer : matchData.awayPlayer;
+  const logo = isHome ? matchData.homeLogo : matchData.awayLogo;
+
+  const opacity = interpolate(frame, [0, 15, 135, 150], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const rise = interpolate(frame, [0, 20], [35, 0], {
+
+  const rise = interpolate(frame, [0, 25], [45, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const logoLeft = interpolate(frame, [0, 32], [-320, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const logoRight = interpolate(frame, [0, 32], [320, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const logoScale = interpolate(frame, [0, 32, 45], [0.65, 1.08, 1], {
+
+  const imageScale = interpolate(frame, [0, 150], [0.94, 1.04], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -36,9 +46,9 @@ const OutroGraphic: React.FC = () => {
     <AbsoluteFill
       style={{
         background:
-          "radial-gradient(ellipse at 50% 35%, #183b32 0%, #071610 45%, #020609 100%)",
+          "radial-gradient(ellipse at 50% 35%, #19354a 0%, #08131f 55%, #020609 100%)",
         color: "white",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Arial, Helvetica, sans-serif",
         justifyContent: "center",
         alignItems: "center",
         overflow: "hidden",
@@ -48,142 +58,114 @@ const OutroGraphic: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          inset: "9% 7%",
-          border: "3px solid rgba(255,255,255,0.8)",
-          borderRadius: 12,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: "7%",
-          right: "7%",
-          top: "50%",
-          borderTop: "2px solid rgba(255,255,255,0.7)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          width: 270,
-          height: 270,
-          border: "2px solid rgba(255,255,255,0.7)",
-          borderRadius: "50%",
-          top: "calc(50% - 135px)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          width: "48%",
-          height: "16%",
-          border: "2px solid rgba(255,255,255,0.65)",
-          top: "9%",
-          left: "26%",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          width: "48%",
-          height: "16%",
-          border: "2px solid rgba(255,255,255,0.65)",
-          bottom: "9%",
-          left: "26%",
+          inset: "7% 6%",
+          border: "2px solid rgba(255,255,255,0.22)",
+          borderRadius: 24,
         }}
       />
 
       <div
         style={{
           position: "absolute",
-          top: "20%",
-          left: "8%",
-          width: 250,
-          height: 250,
-          borderRadius: "50%",
-          border: "7px solid #f7d46a",
-          background: "radial-gradient(circle, #244c3d, #071610 72%)",
-          boxShadow: `0 0 ${35 + pulse * 20}px rgba(247,212,106,${0.25 + pulse * 0.3})`,
+          top: 125,
+          left: 65,
+          right: 65,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transform: `translateX(${logoLeft}px) scale(${logoScale})`,
-          zIndex: 3,
+          gap: 18,
         }}
       >
-        <div style={{ textAlign: "center", fontWeight: 900 }}>
-          <div style={{ fontSize: 34, color: "#f7d46a" }}>LUFC</div>
-          <div style={{ fontSize: 18, marginTop: 8 }}>LEEDS</div>
-          <div style={{ fontSize: 18 }}>UNITED</div>
+        {logo ? (
+          <Img
+            src={staticFile(logo)}
+            style={{ width: 82, height: 82, objectFit: "contain" }}
+          />
+        ) : null}
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              color: gold,
+              fontSize: 23,
+              fontWeight: 900,
+              letterSpacing: 4,
+            }}
+          >
+            KEY PLAYER
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 800, marginTop: 8 }}>
+            {short}
+          </div>
         </div>
       </div>
+
+      {player ? (
+        <Img
+          src={staticFile(player)}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: 650,
+            height: 1120,
+            objectFit: "contain",
+            objectPosition: "bottom center",
+            transform: `translateY(${rise}px) scale(${imageScale})`,
+            filter: "drop-shadow(0 0 32px rgba(0,0,0,0.55))",
+          }}
+        />
+      ) : null}
+
       <div
         style={{
           position: "absolute",
-          top: "20%",
-          right: "8%",
-          width: 250,
-          height: 250,
-          borderRadius: "50%",
-          border: "7px solid #d9d9e2",
-          background: "radial-gradient(circle, #7e1824, #19070b 72%)",
-          boxShadow: `0 0 ${35 + pulse * 20}px rgba(220,35,55,${0.25 + pulse * 0.3})`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transform: `translateX(${logoRight}px) scale(${logoScale})`,
-          zIndex: 3,
-        }}
-      >
-        <div style={{ textAlign: "center", fontWeight: 900 }}>
-          <div style={{ fontSize: 34, color: "#ffffff" }}>MUFC</div>
-          <div style={{ fontSize: 18, marginTop: 8 }}>MANCHESTER</div>
-          <div style={{ fontSize: 18 }}>UNITED</div>
-        </div>
-      </div>
-      <div
-        style={{
-          zIndex: 2,
-          width: "86%",
+          left: 55,
+          right: 55,
+          bottom: 125,
+          padding: "30px 28px",
           textAlign: "center",
-          transform: `translateY(${rise + 85}px)`,
+          borderRadius: 22,
+          border: "2px solid rgba(247,212,106,0.7)",
+          background: "rgba(2,8,15,0.88)",
+          transform: `translateY(${rise}px)`,
         }}
       >
         <div
           style={{
-            fontSize: 30,
-            letterSpacing: 8,
-            color: "#d8e4dc",
-            fontWeight: 700,
+            fontSize: 48,
+            fontWeight: 900,
+            lineHeight: 1.1,
+            color: gold,
           }}
         >
-          MATCH PREDICTION
+          {name}
         </div>
-
         <div
           style={{
-            fontSize: 100,
-            fontWeight: 900,
-            marginTop: 8,
-            color: "#ffffff",
-            textShadow: "0 0 35px rgba(247,212,106,0.5)",
+            fontSize: 23,
+            fontWeight: 800,
+            letterSpacing: 2,
+            marginTop: 14,
           }}
         >
-          1 — 2
+          {role}
         </div>
-
         <div
           style={{
-            marginTop: 55,
-            padding: "24px 18px",
-            background: "#f7d46a",
-            color: "#071610",
-            borderRadius: 14,
-            fontSize: 34,
-            fontWeight: 900,
+            fontSize: 22,
+            color: "#D9E2EC",
+            marginTop: 12,
           }}
         >
-          WHAT'S YOUR PREDICTION?
+          {trait}
+        </div>
+        <div
+          style={{
+            fontSize: 20,
+            color: "#FFFFFF",
+            marginTop: 16,
+          }}
+        >
+          {team}
         </div>
       </div>
     </AbsoluteFill>
@@ -192,11 +174,17 @@ const OutroGraphic: React.FC = () => {
 
 export const LeedsManUtdTikTokComposition: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: "#020609" }}>
-    <Sequence  durationInFrames={1650}>
+    <Sequence durationInFrames={1650}>
       <LeedsManUtdComposition />
     </Sequence>
+
     <Sequence from={1650} durationInFrames={300}>
-      <OutroGraphic />
+      <Sequence durationInFrames={150}>
+        <PlayerSpotlight side="home" />
+      </Sequence>
+      <Sequence from={150} durationInFrames={150}>
+        <PlayerSpotlight side="away" />
+      </Sequence>
     </Sequence>
   </AbsoluteFill>
 );
