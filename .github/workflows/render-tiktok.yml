@@ -1,0 +1,112 @@
+name: Render TikTok 65s
+
+on:
+  workflow_dispatch:
+    inputs:
+      match_key:
+        description: "Match key from the matches"
+        required: true
+        default: "liverpool-brighton"
+        type: string
+
+jobs:
+  render_tiktok:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Select match assets
+        env:
+          MATCH_KEY: ${{ inputs.match_key }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$MATCH_KEY" =~ ^[a-z0-9-]+$ ]]; then
+            echo "Invalid match key: $MATCH_KEY"
+            exit 1
+          fi
+
+          MATCH_FILE="matches/${MATCH_KEY}.json"
+          if [[ ! -f "$MATCH_FILE" ]]; then
+            echo "Match JSON not found: $MATCH_FILE"
+            exit 1
+          fi
+
+          AUDIO_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).audioFile || ""' "$MATCH_FILE")"
+          SRT_SOURCE="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).subtitleFile || ""' "$MATCH_FILE")"
+
+          for SOURCE in "$AUDIO_SOURCE" "$SRT_SOURCE"; do
+            if [[ "$SOURCE" = /* || "$SOURCE" != public/* || "$SOURCE" == *".."* || "$SOURCE" == *"\\"* ]]; then
+              echo "Unsafe media path: $SOURCE (must be inside public/)"
+              exit 1
+            fi
+          done
+
+          if [[ "$AUDIO_SOURCE" != *.mp3 || "$SRT_SOURCE" != *.srt ]]; then
+            echo "Invalid media extension: MP3 and SRT are required."
+            exit 1
+          fi
+
+          if [[ -z "$AUDIO_SOURCE" || ! -f "$AUDIO_SOURCE" ]]; then
+            echo "Audio file missing: $AUDIO_SOURCE"
+            exit 1
+          fi
+
+          if [[ -z "$SRT_SOURCE" || ! -f "$SRT_SOURCE" ]]; then
+            echo "Subtitle file missing: $SRT_SOURCE"
+            exit 1
+          fi
+
+          cp "$MATCH_FILE" src/matchData.json
+
+          if [[ "$AUDIO_SOURCE" != "public/narration.mp3" ]]; then
+            cp "$AUDIO_SOURCE" public/narration.mp3
+          fi
+
+          node scripts/srt-to-json.mjs "$SRT_SOURCE" src/activeCaptions.json
+
+          CUE_SOURCE="matches/${MATCH_KEY}.cues.json"
+          if [[ -f "$CUE_SOURCE" ]]; then
+            cp "$CUE_SOURCE" src/activeCues.json
+            echo "Loaded cue file: $CUE_SOURCE"
+          else
+            printf '[]\n' > src/activeCues.json
+            echo "No cue file found; using empty cue list"
+          fi
+
+          node -e '
+            const d = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+            console.log("Match:", d.homeTeam, "vs", d.awayTeam);
+            console.log("Date:", d.matchDate);
+            console.log("Kick-off (Myanmar):", d.kickoffMyanmar);
+            console.log("Prediction:", d.prediction);
+          ' "$MATCH_FILE"
+
+          echo "Selected match key: $MATCH_KEY"
+
+      - name: Install render dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
+          fc-cache -f
+
+      - name: Render TikTok video
+        run: |
+          mkdir -p out
+          npx remotion render LeedsManUtdTikTok out/football_preview_tiktok_65s.mp4 --gl=swangle
+
+      - name: Upload TikTok video
+        uses: actions/upload-artifact@v4
+        with:
+          name: Football-Preview-TikTok-65s
+          path: out/football_preview_tiktok_65s.mp4
