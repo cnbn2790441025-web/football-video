@@ -413,7 +413,7 @@ export const TacticalGraphic: React.FC<{
 
 
 
-type CueItem =
+export type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
   | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image?: string; offsetSeconds?: number; durationSeconds?: number };
 
@@ -451,7 +451,7 @@ const CueTimeline: React.FC = () => {
   );
 };
 
-const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; duration: number }> = ({ cue, duration }) => {
+export const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; duration: number }> = ({ cue, duration }) => {
   const frame = useCurrentFrame();
   const fade = Math.min(12, Math.floor(duration / 4));
   const opacity = interpolate(
