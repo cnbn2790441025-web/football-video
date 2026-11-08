@@ -468,7 +468,7 @@ const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player" }>; du
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", background: "rgba(2,6,16,0.32)", opacity }}>
       <div style={{
-        position: "absolute", top: 470, width: 900, minHeight: 760, padding: 24,
+        position: "absolute", top: 510, width: 900, minHeight: 760, padding: 24,
         boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
         display: "flex", alignItems: "center", gap: 16,
         background: "linear-gradient(135deg, rgba(3,12,24,0.97), rgba(12,31,48,0.94))",
@@ -1274,7 +1274,7 @@ const BrunoSpotlight: React.FC = () => {
 const PredictionGraphic: React.FC = () => {
 const frame = useCurrentFrame();
 
-const progress = interpolate(frame, [0, 12, 171, 180], [0, 1, 1, 0], {
+const progress = interpolate(frame, [0, 12, 127, 136], [0, 1, 1, 0], {
 extrapolateLeft: "clamp",
 extrapolateRight: "clamp",
 });
@@ -1345,6 +1345,87 @@ MATCH PREDICTION
 );
 };
 
+
+const AudienceQuestionGraphic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const duration = 178;
+  const fade = interpolate(frame, [0, 12, 166, duration], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const scale = interpolate(frame, [0, 12], [0.88, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const glow = 0.35 + 0.25 * Math.sin(frame / 9);
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: fade,
+        transform: `scale(${scale})`,
+        background: "rgba(2,6,16,0.58)",
+      }}
+    >
+      <div
+        style={{
+          width: 900,
+          padding: "42px 34px",
+          boxSizing: "border-box",
+          borderRadius: 30,
+          textAlign: "center",
+          background: "linear-gradient(145deg, rgba(5,15,32,0.98), rgba(14,29,48,0.97))",
+          border: "2px solid rgba(247,217,0,0.85)",
+          boxShadow: `0 0 42px rgba(247,217,0,${glow})`,
+        }}
+      >
+        <Text size={25} color={gold} style={{ letterSpacing: 5 }}>
+          YOUR PREDICTION
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-around",
+            marginTop: 34,
+            gap: 20,
+          }}
+        >
+          <div style={{ width: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {matchData.homeLogo ? (
+              <Img src={staticFile(matchData.homeLogo)} style={{ width: 145, height: 145, objectFit: "contain" }} />
+            ) : null}
+            <Text size={34} style={{ marginTop: 14 }}>{matchData.homeShort}</Text>
+          </div>
+          <Text size={42} color={gold}>VS</Text>
+          <div style={{ width: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {matchData.awayLogo ? (
+              <Img src={staticFile(matchData.awayLogo)} style={{ width: 145, height: 145, objectFit: "contain" }} />
+            ) : null}
+            <Text size={34} style={{ marginTop: 14 }}>{matchData.awayShort}</Text>
+          </div>
+        </div>
+        <div
+          style={{
+            width: "78%",
+            height: 4,
+            margin: "34px auto 28px",
+            background: `linear-gradient(90deg, transparent, ${gold}, #FFFFFF, ${gold}, transparent)`,
+          }}
+        />
+        <Text size={39} color="#FFFFFF" style={{ lineHeight: 1.25 }}>
+          ဘယ်အသင်းနိုင်မယ်ထင်လဲ?
+        </Text>
+        <Text size={25} color="#D5DFEA" weight={700} style={{ marginTop: 18 }}>
+          သင့်ရဲ့ခန့်မှန်းချက်ကို Comment မှာ ရေးခဲ့ပါဦး
+        </Text>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 export const LiverpoolBrightonComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
@@ -1367,8 +1448,11 @@ export const LiverpoolBrightonComposition: React.FC = () => {
           ))}
         </>
       )}
-      <Sequence from={1425} durationInFrames={180}>
+      <Sequence from={1221} durationInFrames={136}>
         <PredictionGraphic />
+      </Sequence>
+      <Sequence from={1357} durationInFrames={178}>
+        <AudienceQuestionGraphic />
       </Sequence>
       <Audio src={staticFile("narration.mp3")} />
       <SubtitleOverlay />
