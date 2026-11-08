@@ -74,7 +74,7 @@ const ScoreHeader: React.FC = () => (
 );
 
 
-type TacticalType = "press" | "midfield" | "counter" | "attack";
+type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press";
 
 const tacticalScenes: {
   from: number;
@@ -98,6 +98,72 @@ export const TacticalGraphic: React.FC<{
   const pulse = 0.88 + Math.sin(frame / 7) * 0.12;
   const zoom = interpolate(frame, [0, 90], [1, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
+
+  if (type === "high-press") {
+    return (
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(3,5,14,0.22)" }}>
+        <div style={{
+          position: "absolute", top: 520, width: 900, height: 820, padding: 28,
+          boxSizing: "border-box", borderRadius: 28, overflow: "hidden",
+          background: "linear-gradient(145deg, rgba(20,5,12,0.98), rgba(8,15,28,0.96))",
+          border: "2px solid rgba(255,65,75,0.9)",
+          boxShadow: "0 0 42px rgba(255,35,55,0.22)",
+          transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+          transformOrigin: "center top",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ color: "#FF5964", fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>PRESSING ANALYSIS</div>
+            <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>{matchData.homeShort} · {matchData.awayShort}</div>
+          </div>
+          <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>{title}</div>
+          <div style={{ color: "#F4C7CB", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
+          <svg viewBox="0 0 840 470" style={{ width: "100%", marginTop: 24, display: "block" }}>
+            <defs>
+              <marker id="highPressArrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+                <path d="M0,0 L0,8 L9,4 z" fill="#FF4B57" />
+              </marker>
+              <radialGradient id="pressZone">
+                <stop offset="0%" stopColor="#FF263D" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#FF263D" stopOpacity="0.04" />
+              </radialGradient>
+            </defs>
+            <rect x="2" y="2" width="836" height="466" rx="16" fill="#102B2B" stroke="#D5E8DC" strokeWidth="3" />
+            <line x1="420" y1="3" x2="420" y2="467" stroke="#D5E8DC" strokeWidth="2" opacity="0.7" />
+            <circle cx="420" cy="235" r="68" fill="none" stroke="#D5E8DC" strokeWidth="2" opacity="0.7" />
+            <rect x="2" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <ellipse cx="650" cy="235" rx="190" ry="205" fill="url(#pressZone)" />
+            <ellipse cx="735" cy="235" rx="95" ry="150" fill="none" stroke="#FF5964" strokeWidth="3" strokeDasharray="10 9" opacity="0.9" />
+            <path d="M180 95 L330 160 L505 180" fill="none" stroke="#FF4B57" strokeWidth="7" strokeLinecap="round" markerEnd="url(#highPressArrow)" />
+            <path d="M180 235 L350 235 L560 235" fill="none" stroke="#FF4B57" strokeWidth="7" strokeLinecap="round" markerEnd="url(#highPressArrow)" />
+            <path d="M180 375 L330 310 L505 290" fill="none" stroke="#FF4B57" strokeWidth="7" strokeLinecap="round" markerEnd="url(#highPressArrow)" />
+            <path d="M505 180 Q610 115 735 175 M505 290 Q610 355 735 295" fill="none" stroke="#FFD166" strokeWidth="4" strokeDasharray="9 8" opacity="0.95" />
+            {[ [180,95],[180,235],[180,375],[330,160],[350,235],[330,310] ].map(([x,y], i) => (
+              <g key={i}>
+                <circle cx={x} cy={y} r="21" fill="#F7D900" stroke="#FFFFFF" strokeWidth="3" />
+                <circle cx={x} cy={y} r="6" fill="#17212B" />
+              </g>
+            ))}
+            {[ [650,155],[735,235],[650,315] ].map(([x,y], i) => (
+              <g key={i}>
+                <circle cx={x} cy={y} r="20" fill="#DA291C" stroke="#FFFFFF" strokeWidth="3" />
+                <path d={`M${x-7} ${y-7} L${x+7} ${y+7} M${x+7} ${y-7} L${x-7} ${y+7}`} stroke="#FFFFFF" strokeWidth="3" />
+              </g>
+            ))}
+            <text x="25" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.homeShort}</text>
+            <text x="690" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.awayShort}</text>
+            <text x="585" y="435" fill="#FFB3B8" fontSize="17" fontWeight="900">PRESSING TRAP</text>
+          </svg>
+          <div style={{ marginTop: 18, color: "#FFB3B8", fontSize: 17, fontWeight: 800, letterSpacing: 1 }}>
+            CLOSE PASSING LANES · FORCE TURNOVER · WIN POSSESSION
+          </div>
+          <div style={{ marginTop: 12, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
+            ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
 
   const dots: { x: number; y: number; team: "home" | "away"; label?: string }[] =
     type === "press"
@@ -239,7 +305,7 @@ const CueTimeline: React.FC = () => {
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
             {cue.kind === "tactical" ? (
               <TacticalGraphic
-                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack"].includes(cue.type) ? cue.type as TacticalType : "attack")}
+                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press"].includes(cue.type) ? cue.type as TacticalType : "attack")}
                 title={cue.title}
                 subtitle={cue.subtitle}
               />
