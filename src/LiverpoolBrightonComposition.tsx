@@ -12,6 +12,7 @@ import {
   interpolate,
   staticFile,
   useCurrentFrame,
+  useVideoConfig,
 } from "remotion";
 
 
@@ -422,17 +423,30 @@ export type CueItem =
 const CueTimeline: React.FC = () => {
   const captions = activeCaptions as { start: number; end: number; text: string }[];
   const cues = activeCues as CueItem[];
+  const { durationInFrames } = useVideoConfig();
+  const outroDuration = 150;
 
   return (
     <>
       {cues.map((cue, i) => {
+        if (cue.kind === "outro") {
+          return (
+            <Sequence
+              key={`cue-outro-${i}`}
+              from={Math.max(0, durationInFrames - outroDuration)}
+              durationInFrames={outroDuration}
+            >
+              <AudienceQuestionGraphic />
+            </Sequence>
+          );
+        }
+
         const caption = captions[cue.captionIndex - 1];
         if (!caption || caption.end <= caption.start) return null;
 
         const isPlayer = cue.kind === "player";
         const durationFrames =
           cue.kind === "prediction" ? 136 :
-          cue.kind === "outro" ? 178 :
           Math.max(1, Math.round(
             (isPlayer ? cue.durationSeconds ?? 6 : caption.end - caption.start) * 30
           ));
@@ -449,10 +463,8 @@ const CueTimeline: React.FC = () => {
               />
             ) : cue.kind === "player" ? (
               <PlayerCueGraphic cue={cue} duration={durationFrames} />
-            ) : cue.kind === "prediction" ? (
-              <PredictionGraphic />
             ) : (
-              <AudienceQuestionGraphic />
+              <PredictionGraphic />
             )}
           </Sequence>
         );
@@ -1438,6 +1450,7 @@ const AudienceQuestionGraphic: React.FC = () => {
 };
 
 export const LiverpoolBrightonComposition: React.FC = () => {
+  const { durationInFrames } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: "#030710" }}>
       <StadiumBackground />
@@ -1460,7 +1473,7 @@ export const LiverpoolBrightonComposition: React.FC = () => {
           <Sequence from={1221} durationInFrames={136}>
             <PredictionGraphic />
           </Sequence>
-          <Sequence from={1357} durationInFrames={178}>
+          <Sequence from={Math.max(0, durationInFrames - 150)} durationInFrames={150}>
             <AudienceQuestionGraphic />
           </Sequence>
         </>

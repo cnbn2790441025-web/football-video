@@ -4,33 +4,39 @@
     "kind": "player",
     "team": "home",
     "name": "Kai Havertz",
-    "image": "assets/players/kai-havertz__arsenal.png"
-  },
-  {
-    "captionIndex": 4,
-    "kind": "tactical",
-    "type": "wing-overload",
-    "title": "ARSENAL WING OVERLOAD",
-    "subtitle": "Create wide numbers • combine on the flank"
+    "image": "assets/players/kai-havertz__arsenal.png",
+    "role": "FORWARD",
+    "offsetSeconds": 0
   },
   {
     "captionIndex": 5,
     "kind": "tactical",
     "type": "low-block",
-    "title": "HULL CITY LOW BLOCK",
-    "subtitle": "Compact lines • protect central space"
+    "title": "ARS vs HUL · LOW BLOCK",
+    "subtitle": "Stay compact • protect central space"
   },
   {
     "captionIndex": 6,
     "kind": "player",
     "team": "away",
-    "name": "Oliver McBurnie"
+    "name": "Oliver McBurnie",
+    "image": "assets/players/oliver-mcburnie__hull-city.png",
+    "role": "FORWARD",
+    "offsetSeconds": 0
   },
   {
     "captionIndex": 8,
     "kind": "tactical",
-    "type": "high-press",
-    "title": "ARSENAL HIGH PRESS",
-    "subtitle": "Close passing lanes • force a turnover"
+    "type": "press",
+    "title": "ARS vs HUL · PRESS",
+    "subtitle": "Close passing lanes • force play wide"
+  },
+  {
+    "captionIndex": 10,
+    "kind": "prediction"
+  },
+  {
+    "captionIndex": 11,
+    "kind": "outro"
   }
 ]
