@@ -1,0 +1,47 @@
+name: Burmese Word Alignment Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      match_key:
+        description: "Match key to test"
+        required: true
+        default: "arsenal-hull-city"
+
+jobs:
+  alignment-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install stable-ts
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install stable-ts
+
+      - name: Align existing Burmese narration
+        env:
+          MATCH_KEY: ${{ inputs.match_key }}
+        run: |
+          python scripts/test-word-alignment.py "$MATCH_KEY"
+
+      - name: Upload alignment results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: burmese-alignment-${{ inputs.match_key }}
+          path: alignment-test-output/
+          if-no-files-found: warn
