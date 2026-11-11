@@ -88,5 +88,15 @@ fi
 JSON_KEY="$(basename "$JSON_PATH" .json)"
 
 echo
-echo "JSON ဖန်တီးပြီးပါပြီ။ Stage/commit အဆင့်ကို ဆက်လုပ်ပါမယ်။"
+echo "Narration Cue များ ဖန်တီးနေပါသည်..."
+node scripts/generate-narration-cues.js "$JSON_PATH"
+
+CUE_PATH="matches/${JSON_KEY}.cues.json"
+if [ ! -f "$CUE_PATH" ]; then
+  echo "ERROR: Cue JSON မဖန်တီးနိုင်ပါ။"
+  exit 1
+fi
+
+echo
+echo "JSON နှင့် Cue JSON ဖန်တီးပြီးပါပြီ။ Stage အဆင့်ကို ဆက်လုပ်ပါမယ်။"
 ./scripts/stage-commit-match.sh "$JSON_KEY"

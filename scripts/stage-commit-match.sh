@@ -93,15 +93,16 @@ done
 
 # Player registry and only the approved automation files.
 for file in \
-  .github/workflows/render.yml \
   data/player-registry.json \
   templates/match-template.json \
   scripts/team-resolver.js \
   scripts/create-match-json.js \
+  scripts/generate-narration-cues.js \
   scripts/new-match.sh \
   scripts/stage-commit-match.sh \
   scripts/sync-player-registry.js \
-  scripts/sync-player-roles.js
+  scripts/sync-player-roles.js \
+  src/LiverpoolBrightonComposition.tsx
 do
   add_existing_file "$file"
 done

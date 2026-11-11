@@ -415,7 +415,9 @@ export const TacticalGraphic: React.FC<{
 
 export type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
-  | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image?: string; offsetSeconds?: number; durationSeconds?: number };
+  | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image: string; role: string; offsetSeconds?: number; durationSeconds?: number }
+  | { captionIndex: number; kind: "prediction" }
+  | { captionIndex: number; kind: "outro" };
 
 const CueTimeline: React.FC = () => {
   const captions = activeCaptions as { start: number; end: number; text: string }[];
@@ -428,21 +430,29 @@ const CueTimeline: React.FC = () => {
         if (!caption || caption.end <= caption.start) return null;
 
         const isPlayer = cue.kind === "player";
-        const from = Math.round((caption.start + (isPlayer ? cue.offsetSeconds ?? 4 : 0)) * 30);
-        const duration = Math.max(1, Math.round(
-          (isPlayer ? cue.durationSeconds ?? 6 : caption.end - caption.start) * 30
-        ));
+        const durationFrames =
+          cue.kind === "prediction" ? 136 :
+          cue.kind === "outro" ? 178 :
+          Math.max(1, Math.round(
+            (isPlayer ? cue.durationSeconds ?? 6 : caption.end - caption.start) * 30
+          ));
+        const offset = isPlayer ? cue.offsetSeconds ?? 0 : 0;
+        const from = Math.round((caption.start + offset) * 30);
 
         return (
-          <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={duration}>
+          <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={durationFrames}>
             {cue.kind === "tactical" ? (
               <TacticalGraphic
                 type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block", "wing-overload"].includes(cue.type) ? cue.type as TacticalType : "attack")}
                 title={cue.title}
                 subtitle={cue.subtitle}
               />
+            ) : cue.kind === "player" ? (
+              <PlayerCueGraphic cue={cue} duration={durationFrames} />
+            ) : cue.kind === "prediction" ? (
+              <PredictionGraphic />
             ) : (
-              <PlayerCueGraphic cue={cue} duration={duration} />
+              <AudienceQuestionGraphic />
             )}
           </Sequence>
         );
@@ -460,8 +470,9 @@ export const PlayerCueGraphic: React.FC<{ cue: Extract<CueItem, { kind: "player"
     [0, 1, 1, 0],
     { extrapolateRight: "clamp" }
   );
-  const image = cue.image || (cue.team === "home" ? matchData.homePlayer : matchData.awayPlayer);
-  const role = cue.team === "home" ? matchData.homePlayerRole : matchData.awayPlayerRole;
+  if (!cue.image) return null;
+  const image = cue.image;
+  const role = cue.role;
   const zoom = interpolate(frame, [0, 90, duration], [1, 1.06, 1.06], { extrapolateRight: "clamp" });
   const zoomDrop = (zoom - 1) * 410;
 
@@ -1446,14 +1457,15 @@ export const LiverpoolBrightonComposition: React.FC = () => {
               <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
             </Sequence>
           ))}
+          <Sequence from={1221} durationInFrames={136}>
+            <PredictionGraphic />
+          </Sequence>
+          <Sequence from={1357} durationInFrames={178}>
+            <AudienceQuestionGraphic />
+          </Sequence>
         </>
       )}
-      <Sequence from={1221} durationInFrames={136}>
-        <PredictionGraphic />
-      </Sequence>
-      <Sequence from={1357} durationInFrames={178}>
-        <AudienceQuestionGraphic />
-      </Sequence>
+
       <Audio src={staticFile("narration.mp3")} />
       <SubtitleOverlay />
 
