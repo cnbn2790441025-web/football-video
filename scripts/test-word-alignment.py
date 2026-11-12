@@ -128,6 +128,7 @@ def main():
     )
 
     combined_text = ""
+    caption_spans = []
 
     for caption in captions:
         current = caption["text"].strip()
@@ -152,28 +153,15 @@ def main():
 
             combined_text += separator
 
+        text_start = len(combined_text)
         combined_text += current
 
-    pieces = []
-    cursor = 0
-
-    for match in syllable_pattern.finditer(combined_text):
-        gap = combined_text[cursor:match.start()]
-
-        if pieces and not gap:
-            pieces.append(" ")
-
-        pieces.append(gap)
-        pieces.append(match.group())
-        cursor = match.end()
-
-    pieces.append(combined_text[cursor:])
-    alignment_text = "".join(pieces).strip()
-
-    print(f"Audio: {audio}")
-    print(f"SRT: {srt}")
-    print(f"Original captions: {len(captions)}")
-    print(f"Alignment text: {alignment_text}")
+        caption_spans.append({
+            "text_start": text_start,
+            "text_end": len(combined_text),
+            "start": float(caption["start"]),
+            "end": float(caption["end"]),
+        })
 
     duration_result = subprocess.run(
         [
@@ -189,16 +177,112 @@ def main():
     )
     audio_duration = float(duration_result.stdout.strip())
 
+    def estimate_time(char_position):
+        for span in caption_spans:
+            if span["text_start"] <= char_position < span["text_end"]:
+                text_length = max(
+                    1, span["text_end"] - span["text_start"]
+                )
+                ratio = (
+                    char_position - span["text_start"]
+                ) / text_length
+                ratio = max(0.0, min(1.0, ratio))
+
+                return (
+                    span["start"]
+                    + ratio * (span["end"] - span["start"])
+                )
+
+        if char_position < caption_spans[0]["text_start"]:
+            return caption_spans[0]["start"]
+
+        return caption_spans[-1]["end"]
+
+    units = []
+    cursor = 0
+
+    for match in syllable_pattern.finditer(combined_text):
+        gap = combined_text[cursor:match.start()]
+
+        for gap_match in re.finditer(r"\S+", gap):
+            units.append({
+                "text": gap_match.group(),
+                "char_start": cursor + gap_match.start(),
+                "char_end": cursor + gap_match.end(),
+            })
+
+        units.append({
+            "text": match.group(),
+            "char_start": match.start(),
+            "char_end": match.end(),
+        })
+
+        cursor = match.end()
+
+    remaining = combined_text[cursor:]
+
+    for gap_match in re.finditer(r"\S+", remaining):
+        units.append({
+            "text": gap_match.group(),
+            "char_start": cursor + gap_match.start(),
+            "char_end": cursor + gap_match.end(),
+        })
+
+    if not units or not caption_spans:
+        raise ValueError("No alignment text or caption timing information found.")
+
+    for unit in units:
+        unit["estimated_start"] = estimate_time(unit["char_start"])
+        unit["estimated_end"] = estimate_time(
+            max(unit["char_start"], unit["char_end"] - 1)
+        )
+
+    MAX_UNITS_PER_CHUNK = 65
+    alignment_segments = []
+
+    for offset in range(0, len(units), MAX_UNITS_PER_CHUNK):
+        chunk_units = units[offset:offset + MAX_UNITS_PER_CHUNK]
+
+        chunk_text = " ".join(
+            unit["text"] for unit in chunk_units
+        )
+
+        chunk_start = max(
+            0.0,
+            min(unit["estimated_start"] for unit in chunk_units) - 0.8,
+        )
+        chunk_end = min(
+            audio_duration,
+            max(unit["estimated_end"] for unit in chunk_units) + 0.8,
+        )
+
+        alignment_segments.append({
+            "start": chunk_start,
+            "end": chunk_end,
+            "text": chunk_text,
+        })
+
+    print(f"Audio: {audio}")
+    print(f"SRT: {srt}")
+    print(f"Original captions: {len(captions)}")
+    print(f"Alignment units: {len(units)}")
+    print(f"Alignment chunks: {len(alignment_segments)}")
+
+    for number, segment in enumerate(alignment_segments, start=1):
+        segment["end"] = min(segment["end"], audio_duration)
+        print(
+            f"Chunk {number}: "
+            f"{segment['start']:.2f}-{segment['end']:.2f}s, "
+            f"{len(segment['text'].split())} units, "
+            f"{len(segment['text'])} characters"
+        )
+
     print(f"Audio duration: {audio_duration:.3f}s")
-    print("Aligning the complete audio in one pass...")
+    print("Aligning the complete audio in grouped chunks...")
 
     result = model.align_words(
         str(audio),
-        [{
-            "start": 0.0,
-            "end": audio_duration,
-            "text": alignment_text,
-        }],
+        alignment_segments,
         language="my",
         verbose=False,
     )
@@ -240,16 +324,19 @@ def main():
 
         midpoint = (token_start + token_end) / 2
 
+        matching_captions = [
+            caption
+            for caption in captions
+            if caption["start"] <= midpoint <= caption["end"]
+        ]
+
+        if not matching_captions:
+            unassigned_tokens += 1
+            continue
+
         target_caption = min(
-            captions,
-            key=lambda caption: (
-                0.0
-                if caption["start"] <= midpoint <= caption["end"]
-                else min(
-                    abs(midpoint - caption["start"]),
-                    abs(midpoint - caption["end"]),
-                )
-            ),
+            matching_captions,
+            key=lambda caption: caption["end"] - caption["start"],
         )
 
         grouped_tokens[target_caption["index"]].append(token)
