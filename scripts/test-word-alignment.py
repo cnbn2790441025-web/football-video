@@ -2,7 +2,6 @@ import json
 import re
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 import stable_whisper
@@ -42,7 +41,32 @@ def read_srt(path):
         if not match:
             raise ValueError(f"Invalid SRT timestamp: {lines[timing_index]}")
 
-        text = " ".join(lines[timing_index + 1:]).strip()
+        text_lines = lines[timing_index + 1:]
+        text_parts = []
+
+        for line in text_lines:
+            if text_parts:
+                previous = text_parts[-1][-1]
+                current = line[0]
+
+                previous_is_myanmar = (
+                    "\u1000" <= previous <= "\u109f"
+                    and previous not in "\u104a\u104b"
+                )
+                current_is_myanmar = (
+                    "\u1000" <= current <= "\u109f"
+                    and current not in "\u104a\u104b"
+                )
+
+                separator = (
+                    "" if previous_is_myanmar and current_is_myanmar
+                    else " "
+                )
+                text_parts.append(separator)
+
+            text_parts.append(line)
+
+        text = "".join(text_parts).strip()
         if not text:
             continue
 
@@ -93,94 +117,158 @@ def main():
     print(f"SRT: {srt}")
     print(f"Original captions: {len(captions)}")
     print("Loading multilingual Whisper base model on CPU...")
-
     model = stable_whisper.load_model("base", device="cpu")
-    padding = 0.25
+
+    syllable_pattern = re.compile(
+        r"[\u1000-\u1021](?:\u1039[\u1000-\u1021])?"
+        r"[\u103B-\u103E]*[\u102B-\u1032\u1036]*"
+        r"(?:[\u1000-\u1021](?:\u103A[\u1037\u1038]*|[\u1037\u1038]+\u103A?))?"
+        r"[\u103A\u1037\u1038]*"
+        r"|[\u1021-\u102A][\u102B-\u1032\u1036]*[\u103A\u1037\u1038]*"
+    )
+
+    combined_text = ""
+
+    for caption in captions:
+        current = caption["text"].strip()
+        if not current:
+            continue
+
+        if combined_text:
+            previous_char = combined_text[-1]
+            current_char = current[0]
+
+            previous_is_myanmar = "\u1000" <= previous_char <= "\u109f"
+            current_is_myanmar = "\u1000" <= current_char <= "\u109f"
+
+            if current_char in "။၊!?.,:;":
+                separator = ""
+            elif previous_char in "။၊!?.,:;":
+                separator = " "
+            elif previous_is_myanmar and current_is_myanmar:
+                separator = ""
+            else:
+                separator = " "
+
+            combined_text += separator
+
+        combined_text += current
+
+    pieces = []
+    cursor = 0
+
+    for match in syllable_pattern.finditer(combined_text):
+        gap = combined_text[cursor:match.start()]
+
+        if pieces and not gap:
+            pieces.append(" ")
+
+        pieces.append(gap)
+        pieces.append(match.group())
+        cursor = match.end()
+
+    pieces.append(combined_text[cursor:])
+    alignment_text = "".join(pieces).strip()
+
+    print(f"Audio: {audio}")
+    print(f"SRT: {srt}")
+    print(f"Original captions: {len(captions)}")
+    print(f"Alignment text: {alignment_text}")
+
+    duration_result = subprocess.run(
+        [
+            "ffprobe",
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(audio),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    audio_duration = float(duration_result.stdout.strip())
+
+    print(f"Audio duration: {audio_duration:.3f}s")
+    print("Aligning the complete audio in one pass...")
+
+    result = model.align_words(
+        str(audio),
+        [{
+            "start": 0.0,
+            "end": audio_duration,
+            "text": alignment_text,
+        }],
+        language="my",
+        verbose=False,
+    )
+
+    all_tokens = []
+
+    for segment in getattr(result, "segments", []) or []:
+        for word in getattr(segment, "words", []) or []:
+            local_start = (
+                float(word.start) if word.start is not None else None
+            )
+            local_end = (
+                float(word.end) if word.end is not None else None
+            )
+
+            all_tokens.append({
+                "text": word.word,
+                "start": local_start,
+                "end": local_end,
+                "zero_duration": (
+                    local_start is not None
+                    and local_end is not None
+                    and local_end <= local_start
+                ),
+            })
+
+    grouped_tokens = {
+        caption["index"]: [] for caption in captions
+    }
+    unassigned_tokens = 0
+
+    for token in all_tokens:
+        token_start = token["start"]
+        token_end = token["end"]
+
+        if token_start is None or token_end is None:
+            unassigned_tokens += 1
+            continue
+
+        midpoint = (token_start + token_end) / 2
+
+        target_caption = min(
+            captions,
+            key=lambda caption: (
+                0.0
+                if caption["start"] <= midpoint <= caption["end"]
+                else min(
+                    abs(midpoint - caption["start"]),
+                    abs(midpoint - caption["end"]),
+                )
+            ),
+        )
+
+        grouped_tokens[target_caption["index"]].append(token)
+
     aligned_captions = []
 
-    with tempfile.TemporaryDirectory(prefix="caption-alignment-") as temp:
-        temp_dir = Path(temp)
+    for caption in captions:
+        tokens = grouped_tokens[caption["index"]]
 
-        for caption in captions:
-            index = caption["index"]
-            clip_start = max(0.0, caption["start"] - padding)
-            clip_end = caption["end"] + padding
-            clip_duration = clip_end - clip_start
-            clip_path = temp_dir / f"caption-{index:02d}.wav"
-
-            print(
-                f"\nCaption {index}/{len(captions)}: "
-                f"{caption['start']:.3f}-{caption['end']:.3f}"
-            )
-
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-hide_banner",
-                    "-loglevel", "error",
-                    "-y",
-                    "-i", str(audio),
-                    "-ss", f"{clip_start:.3f}",
-                    "-t", f"{clip_duration:.3f}",
-                    "-vn",
-                    "-ac", "1",
-                    "-ar", "16000",
-                    str(clip_path),
-                ],
-                check=True,
-            )
-
-            local_segment = {
-                "start": caption["start"] - clip_start,
-                "end": caption["end"] - clip_start,
-                "text": caption["text"],
-            }
-
-            result = model.align_words(
-                str(clip_path),
-                [local_segment],
-                language="my",
-                verbose=False,
-            )
-
-            tokens = []
-
-            for segment in getattr(result, "segments", []) or []:
-                for word in getattr(segment, "words", []) or []:
-                    local_start = (
-                        float(word.start) if word.start is not None else None
-                    )
-                    local_end = (
-                        float(word.end) if word.end is not None else None
-                    )
-
-                    absolute_start = (
-                        clip_start + local_start
-                        if local_start is not None else None
-                    )
-                    absolute_end = (
-                        clip_start + local_end
-                        if local_end is not None else None
-                    )
-
-                    tokens.append({
-                        "text": word.word,
-                        "start": absolute_start,
-                        "end": absolute_end,
-                        "zero_duration": (
-                            absolute_start is not None
-                            and absolute_end is not None
-                            and absolute_end <= absolute_start
-                        ),
-                    })
-
-            aligned_captions.append({
-                "index": index,
-                "original_start": caption["start"],
-                "original_end": caption["end"],
-                "text": caption["text"],
-                "tokens": tokens,
-            })
+        aligned_captions.append({
+            "index": caption["index"],
+            "original_start": caption["start"],
+            "original_end": caption["end"],
+            "text": caption["text"],
+            "alignment_text": " ".join(
+                token["text"] for token in tokens
+            ),
+            "tokens": tokens,
+        })
 
     json_path = output / f"{key}.alignment.json"
     report_path = output / f"{key}.alignment.txt"
@@ -189,8 +277,9 @@ def main():
         "match_key": key,
         "audio": str(audio),
         "srt": str(srt),
-        "method": "caption-by-caption alignment with original SRT time bounds",
-        "context_padding_seconds": padding,
+        "method": "full-audio syllable alignment mapped to original SRT captions by token midpoint",
+        "audio_duration_seconds": audio_duration,
+        "unassigned_tokens": unassigned_tokens,
         "captions": aligned_captions,
     }
 
