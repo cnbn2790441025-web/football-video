@@ -238,22 +238,40 @@ def main():
         )
 
     MAX_UNITS_PER_CHUNK = 65
+    chunks = [
+        units[offset:offset + MAX_UNITS_PER_CHUNK]
+        for offset in range(0, len(units), MAX_UNITS_PER_CHUNK)
+    ]
+
+    # Use one shared boundary between adjacent chunks to prevent overlap.
+    chunk_boundaries = [0.0]
+
+    for index in range(len(chunks) - 1):
+        previous_end = chunks[index][-1]["estimated_end"]
+        next_start = chunks[index + 1][0]["estimated_start"]
+        boundary = (previous_end + next_start) / 2
+
+        boundary = max(
+            chunk_boundaries[-1],
+            min(audio_duration, boundary),
+        )
+        chunk_boundaries.append(boundary)
+
+    chunk_boundaries.append(audio_duration)
     alignment_segments = []
 
-    for offset in range(0, len(units), MAX_UNITS_PER_CHUNK):
-        chunk_units = units[offset:offset + MAX_UNITS_PER_CHUNK]
+    for index, chunk_units in enumerate(chunks):
+        chunk_start = chunk_boundaries[index]
+        chunk_end = chunk_boundaries[index + 1]
+
+        if chunk_end <= chunk_start:
+            raise ValueError(
+                f"Invalid chunk timing for chunk {index + 1}: "
+                f"{chunk_start:.3f}-{chunk_end:.3f}s"
+            )
 
         chunk_text = " ".join(
             unit["text"] for unit in chunk_units
-        )
-
-        chunk_start = max(
-            0.0,
-            min(unit["estimated_start"] for unit in chunk_units) - 0.8,
-        )
-        chunk_end = min(
-            audio_duration,
-            max(unit["estimated_end"] for unit in chunk_units) + 0.8,
         )
 
         alignment_segments.append({
