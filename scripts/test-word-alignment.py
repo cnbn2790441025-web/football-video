@@ -237,7 +237,7 @@ def main():
             max(unit["char_start"], unit["char_end"] - 1)
         )
 
-    MAX_UNITS_PER_CHUNK = 65
+    MAX_UNITS_PER_CHUNK = 10
     chunks = [
         units[offset:offset + MAX_UNITS_PER_CHUNK]
         for offset in range(0, len(units), MAX_UNITS_PER_CHUNK)
