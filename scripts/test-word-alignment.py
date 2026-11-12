@@ -87,18 +87,10 @@ def main():
 
     model = stable_whisper.load_model("base", device="cpu")
 
-    print("Stage 1/2: Aligning SRT captions to existing audio...")
-    result = model.align(
-        str(audio),
-        "\n".join(caption["text"] for caption in captions),
-        language="my",
-        verbose=True,
-    )
-
-    print("Stage 2/2: Refining word/token timestamps...")
+    print("Aligning each SRT caption within its original time range...")
     result = model.align_words(
         str(audio),
-        result,
+        captions,
         language="my",
         verbose=True,
     )
