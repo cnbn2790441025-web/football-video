@@ -92,7 +92,6 @@ def main():
         str(audio),
         captions,
         language="my",
-        normalize_text=False,
         verbose=True,
     )
 
