@@ -13,7 +13,7 @@ def to_seconds(value):
         int(hours) * 3600
         + int(minutes) * 60
         + int(seconds)
-        + int("0." + milliseconds)
+        + int(milliseconds) / 1000
     )
 
 
