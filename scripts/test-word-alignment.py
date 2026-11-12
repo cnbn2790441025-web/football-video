@@ -90,7 +90,7 @@ def main():
     print("Stage 1/2: Aligning SRT captions to existing audio...")
     result = model.align(
         str(audio),
-        captions,
+        "\n".join(caption["text"] for caption in captions),
         language="my",
         verbose=True,
     )
