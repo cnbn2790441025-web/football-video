@@ -217,37 +217,130 @@ def main():
     if "<blank>" not in vocab or int(vocab["<blank>"]) != BLANK or len(set(ids)) != len(ids): raise ValueError("Unexpected vocab mapping")
     model, cmvn, mel = load_bundle(folder, max(ids)+1); wav = audio_load(audio_path); duration = len(wav)/SR; trie = trie_for(vocab); id_to_token = {int(v): k for k, v in vocab.items()}
     aligned, unsupported, failed, diagnostics = [], [], [], []
-    print(f"Audio duration: {duration:.3f}s | captions: {len(captions)} | Burmese runs: {len(my_runs)} | Latin spans: {len(latin)}")
-    for ri, run in enumerate(my_runs, 1):
-        toks = tokenize(run["text"], trie); capids = source_captions(run["a"], run["b"], spans)
-        if not toks:
-            unsupported.append({"run":ri,"text":run["text"],"reason":"no_complete_vocab_segmentation","captions":capids}); continue
-        ws, we = window_for(run["a"], run["b"], spans, duration)
-        crop = wav[int(ws*SR):min(len(wav), int(we*SR))]
-        if len(crop) < int(.15*SR):
-            failed.append({"run":ri,"text":run["text"],"reason":"audio_window_too_short"}); continue
-        try:
-            lp = log_probs_for(model, cmvn, mel, crop)
-            spans_out, path_score = viterbi(lp, [x["id"] for x in toks])
-            greedy = []
-            best = np.argmax(lp, axis=1).tolist(); last = None
+
+    if args.alignment_mode == "global":
+        token_items = []
+        for ri, run in enumerate(my_runs, 1):
+            toks = tokenize(run["text"], trie)
+            capids = source_captions(run["a"], run["b"], spans)
+            if not toks:
+                unsupported.append({
+                    "run": ri, "text": run["text"],
+                    "reason": "no_complete_vocab_segmentation",
+                    "captions": capids
+                })
+                continue
+            for tok in toks:
+                ca = run["positions"][tok["a"]]
+                cb = run["positions"][tok["b"]-1] + 1
+                token_items.append({
+                    "text": tok["text"], "id": tok["id"],
+                    "run": ri, "source_caption_indices": source_captions(ca, cb, spans)
+                })
+
+        if unsupported:
+            failed.append({
+                "run": "global",
+                "reason": "global_alignment_blocked_unsupported_myanmar_runs",
+                "unsupported_run_count": len(unsupported),
+                "detail": "Global alignment was skipped because one or more Burmese runs could not be tokenized completely."
+            })
+            print(f"Global alignment blocked: {len(unsupported)} unsupported Burmese runs")
+        elif token_items:
+            lp = log_probs_for(model, cmvn, mel, wav)
+            spans_out, path_score = viterbi(lp, [x["id"] for x in token_items])
+
+            best = np.argmax(lp, axis=1).tolist()
+            greedy, last = [], None
             for tid in best:
-                if tid != last and tid != BLANK: greedy.append(id_to_token.get(tid, f"<id:{tid}>"))
+                if tid != last and tid != BLANK:
+                    greedy.append(id_to_token.get(tid, f"<id:{tid}>"))
                 last = tid
-            diagnostics.append({"run":ri,"srt_text":run["text"],"greedy_token_ids":" ".join(greedy),"window":[round(ws,3),round(we,3)]})
-            for tok, (f0,f1,mean_lp) in zip(toks, spans_out):
-                start = min(we, ws + f0*FRAME_SEC); end = min(we, ws + (f1+1)*FRAME_SEC)
-                ca = run["positions"][tok["a"]]; cb = run["positions"][tok["b"]-1]+1
-                aligned.append({"text":tok["text"],"token_id":tok["id"],"start":round(start,3),"end":round(max(start,end),3),"mean_token_log_probability":round(mean_lp,5),"run_path_score_per_frame":round(path_score,5),"run":ri,"source_caption_indices":source_captions(ca,cb,spans),"audio_window_start":round(ws,3),"audio_window_end":round(we,3)})
-            print(f"Run {ri}: {len(toks)} tokens aligned in {ws:.2f}-{we:.2f}s")
-        except Exception as exc:
-            failed.append({"run":ri,"text":run["text"],"reason":"ctc_alignment_failed","detail":str(exc),"window":[round(ws,3),round(we,3)]})
+
+            diagnostics.append({
+                "alignment_mode": "global",
+                "greedy_token_ids": " ".join(greedy),
+                "window": [0.0, round(duration, 3)]
+            })
+
+            for item, (f0, f1, mean_lp) in zip(token_items, spans_out):
+                start = min(duration, f0 * FRAME_SEC)
+                end = min(duration, (f1 + 1) * FRAME_SEC)
+                aligned.append({
+                    "text": item["text"], "token_id": item["id"],
+                    "start": round(start, 3), "end": round(max(start, end), 3),
+                    "mean_token_log_probability": round(mean_lp, 5),
+                    "run_path_score_per_frame": round(path_score, 5),
+                    "run": item["run"],
+                    "source_caption_indices": item["source_caption_indices"],
+                    "audio_window_start": 0.0,
+                    "audio_window_end": round(duration, 3)
+                })
+
+            print(f"Global ordered alignment: {len(token_items)} tokens across {duration:.2f}s")
+
+    else:
+        for ri, run in enumerate(my_runs, 1):
+            toks = tokenize(run["text"], trie)
+            capids = source_captions(run["a"], run["b"], spans)
+            if not toks:
+                unsupported.append({
+                    "run": ri, "text": run["text"],
+                    "reason": "no_complete_vocab_segmentation",
+                    "captions": capids
+                })
+                continue
+
+            ws, we = window_for(run["a"], run["b"], spans, duration)
+            crop = wav[int(ws*SR):min(len(wav), int(we*SR))]
+            if len(crop) < int(.15*SR):
+                failed.append({"run":ri,"text":run["text"],"reason":"audio_window_too_short"})
+                continue
+
+            try:
+                lp = log_probs_for(model, cmvn, mel, crop)
+                spans_out, path_score = viterbi(lp, [x["id"] for x in toks])
+                greedy = []
+                best = np.argmax(lp, axis=1).tolist()
+                last = None
+                for tid in best:
+                    if tid != last and tid != BLANK:
+                        greedy.append(id_to_token.get(tid, f"<id:{tid}>"))
+                    last = tid
+                diagnostics.append({
+                    "run":ri,"srt_text":run["text"],
+                    "greedy_token_ids":" ".join(greedy),
+                    "window":[round(ws,3),round(we,3)]
+                })
+                for tok, (f0,f1,mean_lp) in zip(toks, spans_out):
+                    start = min(we, ws + f0*FRAME_SEC)
+                    end = min(we, ws + (f1+1)*FRAME_SEC)
+                    ca = run["positions"][tok["a"]]
+                    cb = run["positions"][tok["b"]-1]+1
+                    aligned.append({
+                        "text":tok["text"],"token_id":tok["id"],
+                        "start":round(start,3),"end":round(max(start,end),3),
+                        "mean_token_log_probability":round(mean_lp,5),
+                        "run_path_score_per_frame":round(path_score,5),
+                        "run":ri,
+                        "source_caption_indices":source_captions(ca,cb,spans),
+                        "audio_window_start":round(ws,3),
+                        "audio_window_end":round(we,3)
+                    })
+                print(f"Run {ri}: {len(toks)} tokens aligned in {ws:.2f}-{we:.2f}s")
+            except Exception as exc:
+                failed.append({
+                    "run":ri,"text":run["text"],
+                    "reason":"ctc_alignment_failed","detail":str(exc),
+                    "window":[round(ws,3),round(we,3)]
+                })
+
     latin_out = [{"text":x["text"],"source_caption_indices":source_captions(x["a"],x["b"],spans),"reason":"latin_script_not_in_burmese_vocab"} for x in latin]
     caption_out = []
     for c in captions:
         ct = [x for x in aligned if c["index"] in x["source_caption_indices"]]
         caption_out.append({"index":c["index"],"srt_start":c["start"],"srt_end":c["end"],"text":c["text"],"aligned_tokens":ct})
-    payload = {"match_key":key,"method":"CTC Viterbi forced alignment","model_repo":REPO,"audio":str(audio_path),"srt":str(srt_path),"duration_seconds":round(duration,3),"sample_rate":SR,"nominal_frame_step_seconds":FRAME_SEC,"timing_warning":"40 ms is the nominal encoder frame step, not guaranteed phonetic boundary accuracy.","tokenization":"minimum-token-count vocabulary DP; ties prefer longer current token; alternate segmentations may exist.","alignment_window":"each Burmese run uses union of overlapping SRT caption intervals plus 350 ms margin; windows can overlap when English and Burmese share a caption.","aligned_token_count":len(aligned),"unsupported_myanmar_runs":unsupported,"unsupported_latin_spans":latin_out,"failed_runs":failed,"aligned_tokens":aligned,"captions":caption_out,"greedy_diagnostics":diagnostics}
+    payload = {"match_key":key,"method":f"CTC Viterbi forced alignment ({args.alignment_mode})","model_repo":REPO,"audio":str(audio_path),"srt":str(srt_path),"duration_seconds":round(duration,3),"sample_rate":SR,"nominal_frame_step_seconds":FRAME_SEC,"timing_warning":"40 ms is the nominal encoder frame step, not guaranteed phonetic boundary accuracy.","tokenization":"minimum-token-count vocabulary DP; ties prefer longer current token; alternate segmentations may exist.","alignment_window":("one full-audio ordered target sequence; omitted Latin spans are absorbed by CTC blank states" if args.alignment_mode == "global" else "each Burmese run uses union of overlapping SRT caption intervals plus 350 ms margin; windows can overlap when English and Burmese share a caption."),"aligned_token_count":len(aligned),"unsupported_myanmar_runs":unsupported,"unsupported_latin_spans":latin_out,"failed_runs":failed,"aligned_tokens":aligned,"captions":caption_out,"greedy_diagnostics":diagnostics}
     jp, cp, rp = outdir/f"{key}.ctc-viterbi.json", outdir/f"{key}.ctc-viterbi.csv", outdir/f"{key}.ctc-viterbi.txt"
     jp.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
     fields=["text","token_id","start","end","mean_token_log_probability","run_path_score_per_frame","run","source_caption_indices","audio_window_start","audio_window_end"]
