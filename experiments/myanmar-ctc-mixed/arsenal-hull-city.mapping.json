@@ -1,0 +1,11 @@
+{
+  "match_key": "arsenal-hull-city",
+  "replacements": [
+    {"source": "Premier League", "target": "ပရီးမီယာလိ"},
+    {"source": "Oliver McBurnie", "target": "အိုလီဗာမက်ဘန်းနီ"},
+    {"source": "Kai Havertz", "target": "ကိုင်ဟာဗက်"},
+    {"source": "Hull City", "target": "ဟူးစီးတီး"},
+    {"source": "Arsenal", "target": "အာဆင်နယ်"},
+    {"source": "Hull", "target": "ဟူး"}
+  ]
+}
