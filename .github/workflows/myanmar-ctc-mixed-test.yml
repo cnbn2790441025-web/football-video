@@ -21,6 +21,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,10 +56,17 @@ jobs:
         run: |
           python scripts/test-myanmar-ctc-mixed.py "$MATCH_KEY"
 
+      - name: Render 15-second preview
+        run: |
+          mkdir -p experiments/myanmar-ctc-mixed/output
+          npx remotion render experiments/myanmar-ctc-mixed/preview-entry.tsx MyanmarCtcPreview experiments/myanmar-ctc-mixed/output/preview-15s.mp4 --codec=h264
+
       - name: Upload mixed alignment results
         uses: actions/upload-artifact@v4
         with:
           name: myanmar-ctc-mixed-${{ inputs.match_key }}
-          path: ctc-mixed-test-output/
+          path: |
+            ctc-mixed-test-output/
+            experiments/myanmar-ctc-mixed/output/preview-15s.mp4
           if-no-files-found: error
           retention-days: 7
