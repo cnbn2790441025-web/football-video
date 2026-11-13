@@ -260,6 +260,7 @@ def main():
 
             diagnostics.append({
                 "alignment_mode": "global",
+                "srt_text": " ".join(x["text"] for x in token_items),
                 "greedy_token_ids": " ".join(greedy),
                 "window": [0.0, round(duration, 3)]
             })
