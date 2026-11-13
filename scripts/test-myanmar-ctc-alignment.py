@@ -204,6 +204,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("match_key")
     p.add_argument("--model-dir")
+    p.add_argument("--alignment-mode", choices=["global", "run-wise"], default="global")
     args = p.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9_-]+", args.match_key): raise ValueError("Invalid match key")
     key = args.match_key
