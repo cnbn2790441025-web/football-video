@@ -59,7 +59,12 @@ jobs:
       - name: Render 15-second preview
         run: |
           mkdir -p experiments/myanmar-ctc-mixed/output
-          npx remotion render experiments/myanmar-ctc-mixed/preview-entry.tsx MyanmarCtcPreview experiments/myanmar-ctc-mixed/output/preview-15s.mp4 --codec=h264
+          npx remotion render experiments/myanmar-ctc-mixed/preview-entry.tsx MyanmarCtcPreview experiments/myanmar-ctc-mixed/output/preview-15s.mp4
+
+      - name: Render full-length preview
+        run: |
+          mkdir -p experiments/myanmar-ctc-mixed/output
+          npx remotion render experiments/myanmar-ctc-mixed/preview-full-entry.tsx MyanmarCtcFullPreview experiments/myanmar-ctc-mixed/output/preview-full.mp4 --codec=h264
 
       - name: Upload mixed alignment results
         uses: actions/upload-artifact@v4
@@ -68,5 +73,6 @@ jobs:
           path: |
             ctc-mixed-test-output/
             experiments/myanmar-ctc-mixed/output/preview-15s.mp4
+              experiments/myanmar-ctc-mixed/output/preview-full.mp4
           if-no-files-found: error
           retention-days: 7
