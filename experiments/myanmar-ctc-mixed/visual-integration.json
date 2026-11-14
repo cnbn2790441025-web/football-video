@@ -1,0 +1,63 @@
+{
+  "matchKey": "arsenal-hull-city",
+  "fps": 30,
+  "durationSeconds": 51.482902,
+  "homeTeam": "Arsenal FC",
+  "awayTeam": "Hull City AFC",
+  "homeShort": "ARS",
+  "awayShort": "HUL",
+  "homeLogo": "assets/logos/arsenal.png",
+  "awayLogo": "assets/logos/hull-city.png",
+  "prediction": "ARSENAL 2–0 HULL CITY",
+  "cues": [
+    {
+      "kind": "intro",
+      "start": 0,
+      "end": 8.62
+    },
+    {
+      "kind": "player",
+      "name": "Kai Havertz",
+      "team": "home",
+      "image": "assets/players/kai-havertz__arsenal.png",
+      "role": "ATTACKER",
+      "start": 11.96,
+      "end": 13.46
+    },
+    {
+      "kind": "tactical",
+      "type": "low-block",
+      "title": "HULL CITY DEFENSIVE BLOCK",
+      "subtitle": "Protect central space · Hold the line",
+      "start": 13.46,
+      "end": 22.78
+    },
+    {
+      "kind": "player",
+      "name": "Oliver McBurnie",
+      "team": "away",
+      "image": "assets/players/oliver-mcburnie__hull-city.png",
+      "role": "FORWARD",
+      "start": 26.4,
+      "end": 30.72
+    },
+    {
+      "kind": "tactical",
+      "type": "attack",
+      "title": "ARSENAL ATTACK",
+      "subtitle": "Create chances · Exploit attacking space",
+      "start": 31.64,
+      "end": 40.7
+    },
+    {
+      "kind": "prediction",
+      "start": 40.7,
+      "end": 45.22
+    },
+    {
+      "kind": "outro",
+      "startFromEndSeconds": 5,
+      "durationSeconds": 5
+    }
+  ]
+}
