@@ -16,10 +16,12 @@ type Caption = {
   start: number;
   end: number;
   text: string;
+  words?: { text: string; start: number; end: number }[];
 };
 
-const SubtitleStyle: React.FC<{ text: string }> = ({ text }) => {
+const SubtitleStyle: React.FC<{ text: string; words?: Caption["words"]; start: number }> = ({ text, words, start }) => {
   const frame = useCurrentFrame();
+  const time = start + frame / FPS;
 
   const opacity = interpolate(frame, [0, 7, 15, 24], [0, 1, 1, 1], {
     extrapolateLeft: "clamp",
@@ -68,7 +70,20 @@ const SubtitleStyle: React.FC<{ text: string }> = ({ text }) => {
         boxShadow: `0 0 18px rgba(255,190,30,${glow * 0.35})`,
       }}
     >
-      {text}
+      {words?.length ? words.map((word, i) => {
+        const active = time >= word.start && time < word.end;
+        return (
+          <React.Fragment key={`${i}-${word.start}`}>
+            {i > 0 ? " " : ""}
+            <span style={{
+              backgroundColor: active ? "#FFD84D" : "transparent",
+              color: active ? "#111111" : "inherit",
+              borderRadius: 5,
+              padding: active ? "0 3px" : 0,
+            }}>{word.text}</span>
+          </React.Fragment>
+        );
+      }) : text}
     </div>
   );
 };
@@ -108,7 +123,7 @@ export const SubtitleOverlay: React.FC = () => (
           from={from}
           durationInFrames={Math.max(1, end - from)}
         >
-          <SubtitleStyle text={caption.text} />
+          <SubtitleStyle text={caption.text} words={caption.words} start={caption.start} />
         </Sequence>
       );
     })}

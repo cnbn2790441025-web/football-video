@@ -95,6 +95,44 @@ jobs:
           ' "$MATCH_FILE"
 
           echo "Selected match key: $MATCH_KEY"
+          echo "AUDIO_SOURCE=$AUDIO_SOURCE" >> "$GITHUB_ENV"
+          echo "SRT_SOURCE=$SRT_SOURCE" >> "$GITHUB_ENV"
+          if [[ -f "matches/${MATCH_KEY}.mapping.json" ]]; then
+            echo "MAPPING_SOURCE=matches/${MATCH_KEY}.mapping.json" >> "$GITHUB_ENV"
+          else
+            echo "MAPPING_SOURCE=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Setup Python for CTC alignment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install CTC dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy==1.26.4 huggingface_hub safetensors
+          python -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Generate word-level subtitle timings
+        env:
+          MATCH_KEY: ${{ inputs.match_key }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$MAPPING_SOURCE" ]]; then
+            python scripts/standard-ctc-captions.py \
+              --match-key "$MATCH_KEY" \
+              --audio "$AUDIO_SOURCE" \
+              --srt "$SRT_SOURCE" \
+              --mapping "$MAPPING_SOURCE" \
+              --output src/activeCaptions.json
+          else
+            python scripts/standard-ctc-captions.py \
+              --match-key "$MATCH_KEY" \
+              --audio "$AUDIO_SOURCE" \
+              --srt "$SRT_SOURCE" \
+              --output src/activeCaptions.json
+          fi
 
       - name: Install render dependencies
         run: |
