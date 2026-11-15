@@ -114,6 +114,12 @@ jobs:
           python -m pip install numpy==1.26.4 huggingface_hub safetensors
           python -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
 
+      - name: Install render dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
+          fc-cache -f
+
       - name: Generate word-level subtitle timings
         env:
           MATCH_KEY: ${{ inputs.match_key }}
@@ -133,12 +139,6 @@ jobs:
               --srt "$SRT_SOURCE" \
               --output src/activeCaptions.json
           fi
-
-      - name: Install render dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
-          fc-cache -f
 
       - name: Render video
         run: |
