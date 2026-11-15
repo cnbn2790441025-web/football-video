@@ -145,8 +145,25 @@ def main():
         caption_text = "".join(transformed_text[i] for i in selected)
         words = []
 
-        for match in re.finditer(r"\S+", caption_text):
-            local_a, local_b = match.span()
+        matches = list(re.finditer(r"\S+", caption_text))
+        groups = []
+        i = 0
+
+        while i < len(matches):
+            match = matches[i]
+            if re.fullmatch(r"[။၊,;:!?…—–\-]+", match.group()):
+                if i + 1 < len(matches):
+                    groups.append((match.start(), matches[i + 1].end()))
+                    i += 2
+                    continue
+                elif groups:
+                    groups[-1] = (groups[-1][0], match.end())
+                    i += 1
+                    continue
+            groups.append(match.span())
+            i += 1
+
+        for local_a, local_b in groups:
             global_positions = selected[local_a:local_b]
             if not global_positions:
                 continue
@@ -160,10 +177,10 @@ def main():
             if not word_tokens:
                 raise ValueError(
                     f"Missing CTC timing for caption {caption['index']} "
-                    f"word: {match.group()}"
+                    f"word: {caption_text[local_a:local_b]}"
                 )
             words.append({
-                "text": match.group(),
+                "text": caption_text[local_a:local_b],
                 "start": min(t["start_seconds"] for t in word_tokens),
                 "end": max(t["end_seconds"] for t in word_tokens),
             })
