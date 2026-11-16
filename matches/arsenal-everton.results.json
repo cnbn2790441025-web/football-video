@@ -1,0 +1,111 @@
+{
+  "matchKey": "arsenal-everton",
+  "fetchedAt": "2026-11-16T16:07:27.881Z",
+  "source": "football-data.org",
+  "home": {
+    "teamName": "Arsenal FC",
+    "teamId": 57,
+    "available": true,
+    "count": 5,
+    "matches": [
+      {
+        "date": "2026-10-21T19:00:00Z",
+        "opponentName": "FC Bayern München",
+        "opponentId": 5,
+        "opponentCrest": "assets/logos/bayern-munchen.png",
+        "selectedScore": 2,
+        "opponentScore": 2,
+        "result": "D"
+      },
+      {
+        "date": "2026-10-24T14:00:00Z",
+        "opponentName": "Everton FC",
+        "opponentId": 62,
+        "opponentCrest": "assets/logos/everton.png",
+        "selectedScore": 2,
+        "opponentScore": 0,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-01T16:30:00Z",
+        "opponentName": "Liverpool FC",
+        "opponentId": 64,
+        "opponentCrest": "assets/logos/liverpool.png",
+        "selectedScore": 1,
+        "opponentScore": 0,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-04T20:00:00Z",
+        "opponentName": "SK Slavia Praha",
+        "opponentId": 930,
+        "opponentCrest": "assets/logos/sk-slavia-praha.png",
+        "selectedScore": 2,
+        "opponentScore": 1,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-07T15:00:00Z",
+        "opponentName": "Hull City AFC",
+        "opponentId": 322,
+        "opponentCrest": "assets/logos/hull-city.png",
+        "selectedScore": 1,
+        "opponentScore": 0,
+        "result": "W"
+      }
+    ]
+  },
+  "away": {
+    "teamName": "Everton FC",
+    "teamId": 62,
+    "available": true,
+    "count": 5,
+    "matches": [
+      {
+        "date": "2026-10-11T13:00:00Z",
+        "opponentName": "Hull City AFC",
+        "opponentId": 322,
+        "opponentCrest": "assets/logos/hull-city.png",
+        "selectedScore": 2,
+        "opponentScore": 2,
+        "result": "D"
+      },
+      {
+        "date": "2026-10-17T11:30:00Z",
+        "opponentName": "Chelsea FC",
+        "opponentId": 61,
+        "opponentCrest": "assets/logos/chelsea.png",
+        "selectedScore": 0,
+        "opponentScore": 2,
+        "result": "L"
+      },
+      {
+        "date": "2026-10-24T14:00:00Z",
+        "opponentName": "Arsenal FC",
+        "opponentId": 57,
+        "opponentCrest": "assets/logos/arsenal.png",
+        "selectedScore": 0,
+        "opponentScore": 2,
+        "result": "L"
+      },
+      {
+        "date": "2026-11-02T20:00:00Z",
+        "opponentName": "Newcastle United FC",
+        "opponentId": 67,
+        "opponentCrest": "assets/logos/newcastle-united.png",
+        "selectedScore": 1,
+        "opponentScore": 0,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-06T20:00:00Z",
+        "opponentName": "Coventry City FC",
+        "opponentId": 1076,
+        "opponentCrest": "assets/logos/coventry-city.png",
+        "selectedScore": 3,
+        "opponentScore": 1,
+        "result": "W"
+      }
+    ]
+  }
+}

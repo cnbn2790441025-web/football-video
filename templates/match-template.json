@@ -22,5 +22,7 @@
   "awayPlayerTrait": "",
   "prediction": "",
   "audioFile": "",
-  "subtitleFile": ""
+  "subtitleFile": "",
+  "homeTeamId": null,
+  "awayTeamId": null
 }

@@ -3,7 +3,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { sameTeam } = require("./team-resolver");
+const { sameTeam, assetSlug } = require("./team-resolver");
 
 const matchPath = process.argv[2];
 const outputPath = process.argv[3];
@@ -227,6 +227,55 @@ function detectTactical(captions, match) {
   return cues;
 }
 
+function detectResults(captions, match, results) {
+  const cues = [];
+  if (!results) return cues;
+
+  const recentFormPattern = /(နောက်ဆုံး(?:ငါး|၅|5|five)ပွဲ|last\s*(?:five|5))/i;
+  const headToHeadPattern = /(ထိပ်တိုက်|တွေ့ဆုံမှု|head\s*to\s*head|h2h)/i;
+
+  for (const side of ["home", "away"]) {
+    const data = results[side];
+    if (!data || data.available !== true || data.count !== 5 ||
+        !Array.isArray(data.matches) || data.matches.length !== 5) continue;
+
+    const logosReady = data.matches.every(item => {
+      if (!item.opponentName || !item.opponentCrest ||
+          !Number.isFinite(item.selectedScore) ||
+          !Number.isFinite(item.opponentScore) ||
+          !["W", "D", "L"].includes(item.result)) return false;
+      const slug = assetSlug(item.opponentName);
+      return slug && fs.existsSync(path.join("public/assets/logos", `${slug}.png`));
+    });
+    if (!logosReady) {
+      console.log(`RESULTS OMITTED: ${side} team opponent logo/data incomplete`);
+      continue;
+    }
+
+    const teamName = side === "home" ? match.homeTeam : match.awayTeam;
+    const shortName = side === "home" ? match.homeShort : match.awayShort;
+    const variants = [teamName, shortName]
+      .filter(Boolean)
+      .map(normalize)
+      .filter(Boolean);
+
+    for (let i = 0; i < captions.length; i++) {
+      const current = normalize(captions[i].text);
+      if (!variants.some(name => current.includes(name))) continue;
+
+      const windowText = normalize(captions.slice(i, i + 2).map(c => c.text).join(" "));
+      if (headToHeadPattern.test(windowText)) continue;
+      if (!recentFormPattern.test(windowText)) continue;
+
+      cues.push({ captionIndex: i + 1, kind: "results", team: side });
+      console.log(`RESULTS: ${teamName} (${side})`);
+      break;
+    }
+  }
+
+  return cues;
+}
+
 function detectEndingCues(captions) {
   const cues = [];
   let predictionAdded = false;
@@ -257,6 +306,8 @@ try {
   const registry = readJson(path.resolve("data/player-registry.json"));
   const subtitlePath = findSubtitle(match);
   const captions = parseSrt(fs.readFileSync(subtitlePath, "utf8"));
+    const resultsPath = absoluteMatchPath.replace(/\.json$/i, ".results.json");
+    const results = fs.existsSync(resultsPath) ? readJson(resultsPath) : null;
 
   if (!captions.length) throw new Error("No valid SRT captions found.");
 
@@ -264,6 +315,7 @@ try {
   const cues = [
     ...findPlayerMentions(captions, registry, match, diagnostics),
     ...detectTactical(captions, match),
+    ...detectResults(captions, match, results),
     ...detectEndingCues(captions),
   ].sort((a, b) => a.captionIndex - b.captionIndex);
 

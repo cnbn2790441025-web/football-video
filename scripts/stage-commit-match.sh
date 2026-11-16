@@ -12,6 +12,7 @@ fi
 MATCH_KEY="$1"
 MATCH_FILE="matches/${MATCH_KEY}.json"
 CUE_FILE="matches/${MATCH_KEY}.cues.json"
+RESULTS_FILE="matches/${MATCH_KEY}.results.json"
 
 if [[ ! "$MATCH_KEY" =~ ^[a-z0-9-]+$ ]]; then
   echo "ERROR: Match key ပုံစံ မမှန်ပါ။"
@@ -20,6 +21,12 @@ fi
 
 if [ ! -f "$MATCH_FILE" ]; then
   echo "ERROR: $MATCH_FILE မတွေ့ပါ။"
+  exit 1
+fi
+
+if [ ! -f "$RESULTS_FILE" ]; then
+  echo "ERROR: $RESULTS_FILE မတွေ့ပါ။"
+  echo "Commit / Push / Render မလုပ်ပါ။"
   exit 1
 fi
 
@@ -36,7 +43,7 @@ if [ -n "$(git diff --cached --name-only)" ]; then
 fi
 
 mapfile -t ASSETS < <(
-  node - "$MATCH_FILE" "$CUE_FILE" <<'NODE'
+  node - "$MATCH_FILE" "$CUE_FILE" "$RESULTS_FILE" <<'NODE'
 const fs = require("fs");
 const data = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 const found = new Set();
@@ -61,11 +68,14 @@ if (fs.existsSync(cueFile)) {
   const cues = JSON.parse(fs.readFileSync(cueFile, "utf8"));
   scan(cues);
 }
+const resultsFile = process.argv[4];
+const results = JSON.parse(fs.readFileSync(resultsFile, "utf8"));
+scan(results);
 for (const asset of [...found].sort()) console.log(asset);
 NODE
 )
 
-FILES=("$MATCH_FILE")
+FILES=("$MATCH_FILE" "$RESULTS_FILE")
 
 add_existing_file() {
   local file="$1"
@@ -98,11 +108,13 @@ for file in \
   scripts/team-resolver.js \
   scripts/create-match-json.js \
   scripts/generate-narration-cues.js \
+  scripts/fetch-team-results.js \
   scripts/new-match.sh \
   scripts/stage-commit-match.sh \
   scripts/sync-player-registry.js \
   scripts/sync-player-roles.js \
-  src/LiverpoolBrightonComposition.tsx
+  src/LiverpoolBrightonComposition.tsx \
+  src/activeResults.json
 do
   add_existing_file "$file"
 done

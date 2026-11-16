@@ -258,6 +258,8 @@ async function main() {
     ...template,
     homeTeam: home,
     awayTeam: away,
+    homeTeamId: match.homeTeam.id,
+    awayTeamId: match.awayTeam.id,
     homeShort: match.homeTeam.tla || "",
     awayShort: match.awayTeam.tla || "",
     matchDate: format("Europe/London", {

@@ -3,6 +3,7 @@ import { SubtitleOverlay } from "./SubtitleOverlay";
 import matchData from "./matchData.json";
 import activeCaptions from "./activeCaptions.json";
 import activeCues from "./activeCues.json";
+import activeResults from "./activeResults.json";
 import {
   AbsoluteFill,
   Audio,
@@ -417,6 +418,7 @@ export const TacticalGraphic: React.FC<{
 export type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
   | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image: string; role: string; offsetSeconds?: number; durationSeconds?: number }
+  | { captionIndex: number; kind: "results"; team: "home" | "away" }
   | { captionIndex: number; kind: "prediction" }
   | { captionIndex: number; kind: "outro" };
 
@@ -463,6 +465,8 @@ const CueTimeline: React.FC = () => {
               />
             ) : cue.kind === "player" ? (
               <PlayerCueGraphic cue={cue} duration={durationFrames} />
+            ) : cue.kind === "results" ? (
+              <ResultsGraphic team={cue.team} results={activeResults} duration={durationFrames} />
             ) : (
               <PredictionGraphic />
             )}
@@ -470,6 +474,154 @@ const CueTimeline: React.FC = () => {
         );
       })}
     </>
+  );
+};
+
+type ResultsMatch = {
+  opponentName: string;
+  opponentCrest: string;
+  selectedScore: number;
+  opponentScore: number;
+  result: "W" | "D" | "L";
+};
+
+type ResultsData = {
+  home: { available: boolean; matches: ResultsMatch[] };
+  away: { available: boolean; matches: ResultsMatch[] };
+};
+
+export const ResultsGraphic: React.FC<{
+  team: "home" | "away";
+  results: ResultsData;
+  duration: number;
+}> = ({ team, results, duration }) => {
+  const frame = useCurrentFrame();
+  const data = results?.[team];
+
+  if (
+    !data?.available ||
+    !Array.isArray(data.matches) ||
+    data.matches.length !== 5 ||
+    data.matches.some((m) =>
+      !m.opponentName ||
+      !m.opponentCrest ||
+      !Number.isFinite(m.selectedScore) ||
+      !Number.isFinite(m.opponentScore) ||
+      !["W", "D", "L"].includes(m.result)
+    )
+  ) return null;
+
+  const fade = Math.min(12, Math.floor(duration / 4));
+  const opacity = interpolate(
+    frame,
+    [0, fade, Math.max(fade, duration - fade), duration],
+    [0, 1, 1, 0],
+    { extrapolateRight: "clamp" }
+  );
+  const zoom = interpolate(frame, [0, 90], [1, 1.035], {
+    extrapolateRight: "clamp",
+  });
+  const teamName = team === "home" ? matchData.homeShort : matchData.awayShort;
+  const resultColor = (result: "W" | "D" | "L") =>
+    result === "W" ? "#35D58A" : result === "D" ? "#F7D900" : "#F06A72";
+
+  return (
+    <AbsoluteFill
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(2,8,20,0.24)",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 520,
+          width: 900,
+          height: 820,
+          padding: 28,
+          boxSizing: "border-box",
+          borderRadius: 28,
+          overflow: "hidden",
+          background: "linear-gradient(145deg, rgba(3,15,38,0.98), rgba(5,32,62,0.96))",
+          border: "2px solid rgba(247,217,0,0.82)",
+          boxShadow: "0 0 42px rgba(247,217,0,0.16)",
+          opacity,
+          transform: `scale(${zoom})`,
+          transformOrigin: "center top",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ color: gold, fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>
+            LAST 5 MATCHES
+          </div>
+          <div style={{ color: "#FFFFFF", fontSize: 20, fontWeight: 900 }}>
+            {teamName}
+          </div>
+        </div>
+
+        <div style={{ color: "#FFFFFF", fontSize: 34, fontWeight: 900, marginTop: 16 }}>
+          RECENT FORM
+        </div>
+        <div style={{ color: "#9FB0BF", fontSize: 17, marginTop: 6, marginBottom: 22 }}>
+          RESULTS FROM THE FIVE MOST RECENT COMPLETED MATCHES
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {data.matches.map((item, index) => (
+            <div
+              key={`${item.opponentName}-${index}`}
+              style={{
+                height: 104,
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 18px",
+                boxSizing: "border-box",
+                borderRadius: 16,
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.13)",
+              }}
+            >
+              <div style={{ color: "#8193A8", fontSize: 17, fontWeight: 900, width: 34 }}>
+                {index + 1}
+              </div>
+              <Img
+                src={staticFile(item.opponentCrest)}
+                style={{ width: 62, height: 62, objectFit: "contain", marginRight: 18 }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: "#FFFFFF", fontSize: 21, fontWeight: 800 }}>
+                  {item.opponentName}
+                </div>
+                <div style={{ color: "#9FB0BF", fontSize: 15, marginTop: 4 }}>
+                  COMPLETED MATCH
+                </div>
+              </div>
+              <div style={{ color: "#FFFFFF", fontSize: 29, fontWeight: 900, marginRight: 22 }}>
+                {item.selectedScore} – {item.opponentScore}
+              </div>
+              <div
+                style={{
+                  width: 58,
+                  height: 54,
+                  borderRadius: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: `${resultColor(item.result)}22`,
+                  border: `2px solid ${resultColor(item.result)}`,
+                  color: resultColor(item.result),
+                  fontSize: 25,
+                  fontWeight: 900,
+                }}
+              >
+                {item.result}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </AbsoluteFill>
   );
 };
 

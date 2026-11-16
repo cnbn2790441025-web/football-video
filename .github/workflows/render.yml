@@ -86,6 +86,15 @@ jobs:
             echo "No cue file found; using empty cue list"
           fi
 
+          RESULTS_SOURCE="matches/${MATCH_KEY}.results.json"
+          if [[ -f "$RESULTS_SOURCE" ]]; then
+            cp "$RESULTS_SOURCE" src/activeResults.json
+            echo "Loaded results file: $RESULTS_SOURCE"
+          else
+            printf '{"home":{"available":false,"matches":[]},"away":{"available":false,"matches":[]}}\n' > src/activeResults.json
+            echo "No results file found; using empty results data"
+          fi
+
           node -e '
             const d = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
             console.log("Match:", d.homeTeam, "vs", d.awayTeam);

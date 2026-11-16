@@ -1,0 +1,27 @@
+[
+  {
+    "captionIndex": 4,
+    "kind": "results",
+    "team": "home"
+  },
+  {
+    "captionIndex": 5,
+    "kind": "results",
+    "team": "away"
+  },
+  {
+    "captionIndex": 10,
+    "kind": "tactical",
+    "type": "press",
+    "title": "ARSENAL vs EVERTON · PRESS",
+    "subtitle": "Close passing lanes • force play wide"
+  },
+  {
+    "captionIndex": 13,
+    "kind": "prediction"
+  },
+  {
+    "captionIndex": 13,
+    "kind": "outro"
+  }
+]

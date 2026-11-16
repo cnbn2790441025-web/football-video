@@ -88,6 +88,13 @@ fi
 JSON_KEY="$(basename "$JSON_PATH" .json)"
 
 echo
+echo "အသင်းနှစ်သင်း၏ နောက်ဆုံး ၅ ပွဲရလဒ်များ ရယူနေပါသည်..."
+node scripts/fetch-team-results.js "$JSON_PATH" || {
+  echo "ERROR: Results JSON မဖန်တီးနိုင်ပါ။ Cue generation ကို ရပ်လိုက်ပါသည်။"
+  exit 1
+}
+
+echo
 echo "Narration Cue များ ဖန်တီးနေပါသည်..."
 node scripts/generate-narration-cues.js "$JSON_PATH"
 
