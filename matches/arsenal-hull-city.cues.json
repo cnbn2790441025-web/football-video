@@ -6,7 +6,7 @@
     "name": "Kai Havertz",
     "image": "assets/players/kai-havertz__arsenal.png",
     "role": "FORWARD",
-    "offsetSeconds": 0
+    "offsetSeconds": 3
   },
   {
     "captionIndex": 5,
@@ -22,7 +22,7 @@
     "name": "Oliver McBurnie",
     "image": "assets/players/oliver-mcburnie__hull-city.png",
     "role": "FORWARD",
-    "offsetSeconds": 0
+    "offsetSeconds": 3
   },
   {
     "captionIndex": 8,
