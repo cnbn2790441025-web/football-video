@@ -103,8 +103,19 @@ def main():
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", key):
         raise ValueError("Invalid match key.")
 
-    audio = Path(f"public/assets/mp3/{key}.mp3")
-    srt = Path(f"public/assets/srt/{key}.srt")
+    match_file = Path("matches") / f"{key}.json"
+    if not match_file.is_file():
+        raise FileNotFoundError(f"Missing match config: {match_file}")
+
+    match_data = json.loads(match_file.read_text(encoding="utf-8"))
+    audio_value = match_data.get("audioFile")
+    srt_value = match_data.get("subtitleFile")
+
+    if not audio_value or not srt_value:
+        raise ValueError(f"Missing audioFile or subtitleFile in {match_file}")
+
+    audio = Path(audio_value)
+    srt = Path(srt_value)
     output = Path("alignment-test-output")
     output.mkdir(exist_ok=True)
 
