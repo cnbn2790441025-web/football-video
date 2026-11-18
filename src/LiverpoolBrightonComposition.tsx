@@ -418,12 +418,110 @@ export const TacticalGraphic: React.FC<{
 export type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
   | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image: string; role: string; offsetSeconds?: number; durationSeconds?: number }
-  | { captionIndex: number; kind: "results"; team: "home" | "away" }
+  | { captionIndex: number; kind: "results"; team: "home" | "away"; spokenTeamName?: string }
   | { captionIndex: number; kind: "prediction" }
   | { captionIndex: number; kind: "outro" };
 
+const normalizeCueText = (value = "") => String(value)
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .replace(/[^\p{L}\p{M}\p{N}]+/gu, " ")
+  .trim()
+  .replace(/\s+/g, " ")
+  .replace(/(?<=[\p{Script=Myanmar}\p{M}])\s+(?=[\p{Script=Myanmar}\p{M}])/gu, "");
+
+const normalizeRecentFormText = (value = "") =>
+  normalizeCueText(value).replace(/\s+/g, "");
+
+const findSpokenWordOffset = (caption: {
+  start: number;
+  words?: { text?: string; start?: number; end?: number }[];
+}, spokenTeamName?: string) => {
+  if (!spokenTeamName || !Array.isArray(caption.words)) return 0;
+  const target = normalizeCueText(spokenTeamName);
+  if (!target) return 0;
+
+  let combined = "";
+  const ranges: { start: number; end: number; time: number }[] = [];
+  for (const word of caption.words) {
+    const text = normalizeCueText(word.text || "");
+    if (!text || !Number.isFinite(word.start)) continue;
+    const start = combined.length;
+    combined += text;
+    ranges.push({ start, end: combined.length, time: word.start as number });
+  }
+
+  const foundAt = combined.indexOf(target);
+  if (foundAt < 0) return 0;
+  const foundWord = ranges.find(range => foundAt < range.end && foundAt + target.length > range.start);
+  return foundWord ? Math.max(0, foundWord.time - caption.start) : 0;
+};
+
+const findRecentFormPhraseTime = (
+  captions: {
+    end: number;
+    words?: { text?: string; start?: number; end?: number }[];
+  }[],
+  occurrence: number,
+): { time: number; captionEnd: number } | null => {
+  const targets = ["နောက်ဆုံး၅ပွဲ", "နောက်ဆုံးငါးပွဲ", "နောက်ဆုံး5ပွဲ"]
+    .map(normalizeRecentFormText)
+    .filter(Boolean);
+
+  let combined = "";
+  const ranges: { start: number; end: number; time: number; captionEnd: number }[] = [];
+
+  for (const caption of captions) {
+    if (!Array.isArray(caption.words)) continue;
+    for (const word of caption.words) {
+      const text = normalizeRecentFormText(word.text || "");
+      if (!text || !Number.isFinite(word.start)) continue;
+      const start = combined.length;
+      combined += text;
+      ranges.push({
+        start,
+        end: combined.length,
+        time: word.start as number,
+        captionEnd: caption.end,
+      });
+    }
+  }
+
+  const matches: { index: number; time: number; captionEnd: number }[] = [];
+  for (const target of targets) {
+    let searchFrom = 0;
+    while (searchFrom < combined.length) {
+      const index = combined.indexOf(target, searchFrom);
+      if (index < 0) break;
+      const overlappingWords = ranges.filter(
+        range => index < range.end && index + target.length > range.start,
+      );
+      if (overlappingWords.length) {
+        matches.push({
+          index,
+          time: overlappingWords[0].time,
+          captionEnd: overlappingWords[overlappingWords.length - 1].captionEnd,
+        });
+      }
+      searchFrom = index + target.length;
+    }
+  }
+
+  matches.sort((a, b) => a.index - b.index);
+  const unique = matches.filter(
+    (match, index) => index === 0 || match.index !== matches[index - 1].index,
+  );
+  return unique[occurrence - 1] ?? null;
+};
+
 const CueTimeline: React.FC = () => {
-  const captions = activeCaptions as { start: number; end: number; text: string }[];
+  const captions = activeCaptions as {
+    start: number;
+    end: number;
+    text: string;
+    words?: { text?: string; start?: number; end?: number }[];
+  }[];
   const cues = activeCues as CueItem[];
   const { durationInFrames } = useVideoConfig();
   const outroDuration = 150;
@@ -447,13 +545,30 @@ const CueTimeline: React.FC = () => {
         if (!caption || caption.end <= caption.start) return null;
 
         const isPlayer = cue.kind === "player";
+        const offset = isPlayer
+          ? cue.offsetSeconds ?? 0
+          : cue.kind === "results"
+            ? findSpokenWordOffset(caption, cue.spokenTeamName)
+            : 0;
+        const recentFormPhraseTime = cue.kind === "results"
+          ? findRecentFormPhraseTime(captions, cue.team === "home" ? 1 : 2)
+          : null;
+
+        if (cue.kind === "results" && recentFormPhraseTime === null) return null;
+
+        const remainingCaptionSeconds = cue.kind === "results"
+          ? Math.max(0, recentFormPhraseTime!.captionEnd - recentFormPhraseTime!.time)
+          : Math.max(0, caption.end - caption.start - offset);
+
         const durationFrames =
           cue.kind === "prediction" ? 136 :
           Math.max(1, Math.round(
-            (isPlayer ? cue.durationSeconds ?? 6 : caption.end - caption.start) * 30
+            (isPlayer ? cue.durationSeconds ?? 6 : remainingCaptionSeconds) * 30
           ));
-        const offset = isPlayer ? cue.offsetSeconds ?? 0 : 0;
-        const from = Math.round((caption.start + offset) * 30);
+
+        const from = cue.kind === "results"
+          ? Math.max(0, Math.round(recentFormPhraseTime!.time * 30))
+          : Math.round((caption.start + offset) * 30);
 
         return (
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={durationFrames}>

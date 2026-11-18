@@ -2,19 +2,21 @@
   {
     "captionIndex": 4,
     "kind": "results",
-    "team": "home"
+    "team": "home",
+    "spokenTeamName": "Arsenal FC"
   },
   {
     "captionIndex": 5,
     "kind": "results",
-    "team": "away"
+    "team": "away",
+    "spokenTeamName": "Everton FC"
   },
   {
     "captionIndex": 10,
     "kind": "tactical",
-    "type": "press",
-    "title": "ARSENAL vs EVERTON · PRESS",
-    "subtitle": "Close passing lanes • force play wide"
+    "type": "low-block",
+    "title": "ARSENAL vs EVERTON · LOW BLOCK",
+    "subtitle": "Stay compact • protect central space"
   },
   {
     "captionIndex": 13,
