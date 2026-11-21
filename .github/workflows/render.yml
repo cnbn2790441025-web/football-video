@@ -149,6 +149,48 @@ jobs:
               --output src/activeCaptions.json
           fi
 
+      - name: Generate and merge Recent Form cues
+        env:
+          MATCH_KEY: ${{ inputs.match_key }}
+        run: |
+          set -euo pipefail
+          MATCH_FILE="matches/${MATCH_KEY}.json"
+          CUE_OUTPUT="src/generated-results-cues.json"
+          rm -f "$CUE_OUTPUT"
+
+          if node scripts/generate-narration-cues.js "$MATCH_FILE" "$CUE_OUTPUT"; then
+            echo "Recent Form cue generation completed"
+          else
+            status=$?
+            if [[ -f "$CUE_OUTPUT" ]]; then
+              echo "Using generated Results cues despite other cue diagnostics (exit $status)"
+            else
+              echo "Cue generator failed before producing output"
+              exit "$status"
+            fi
+          fi
+
+          node - "$CUE_OUTPUT" <<'NODE'
+          const fs = require('fs');
+          const activePath = 'src/activeCues.json';
+          const generatedPath = process.argv[2];
+          const active = JSON.parse(fs.readFileSync(activePath, 'utf8'));
+          const generated = JSON.parse(fs.readFileSync(generatedPath, 'utf8'));
+
+          if (!Array.isArray(active) || !Array.isArray(generated)) {
+            throw new Error('Cue files must both contain JSON arrays.');
+          }
+
+          const results = generated.filter(cue => cue && cue.kind === 'results');
+          const preserved = active.filter(cue => cue && cue.kind !== 'results');
+          const merged = [...preserved, ...results].sort(
+            (a, b) => (a.captionIndex ?? 0) - (b.captionIndex ?? 0)
+          );
+
+          fs.writeFileSync(activePath, JSON.stringify(merged, null, 2) + '\n');
+          console.log(`Preserved ${preserved.length} existing cues; merged ${results.length} Recent Form cues.`);
+          NODE
+
       - name: Render video
         run: |
           mkdir -p out
