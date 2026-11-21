@@ -36,6 +36,47 @@ function apiGet(endpoint, apiKey) {
   return JSON.parse(output);
 }
 
+function downloadOpponentCrest(crestUrl, opponentName) {
+  if (typeof crestUrl !== "string" || !/^https:\/\//i.test(crestUrl)) {
+    return "";
+  }
+
+  const relativePath = `assets/logos/${assetSlug(opponentName)}.png`;
+  const destination = path.join(ROOT, "public", relativePath);
+  const temporary = `${destination}.download`;
+
+  try {
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    execFileSync(
+      "curl",
+      [
+        "-fLsS",
+        "--connect-timeout", "15",
+        "--max-time", "40",
+        "-o", temporary,
+        crestUrl
+      ],
+      { stdio: "ignore" }
+    );
+
+    if (!fs.existsSync(temporary) || fs.statSync(temporary).size === 0) {
+      throw new Error("Logo download မပြည့်စုံပါ။");
+    }
+
+    const pngSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+    const actualSignature = fs.readFileSync(temporary).subarray(0, 8);
+    if (!actualSignature.equals(pngSignature)) {
+      throw new Error("Downloaded logo is not a valid PNG.");
+    }
+
+    fs.renameSync(temporary, destination);
+    return relativePath;
+  } catch {
+    if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    return "";
+  }
+}
+
 function resolveTeamId(teamName, teams) {
   const found = teams.find(team => sameTeam(team.name, teamName));
   return found ? found.id : null;
@@ -95,7 +136,7 @@ function makeTeamResults(teamName, teamId, matches) {
       date: match.utcDate,
       opponentName: opponent.name,
       opponentId: opponent.id,
-      opponentCrest: `assets/logos/${assetSlug(opponent.name)}.png`,
+      opponentCrest: downloadOpponentCrest(opponent.crest, opponent.name),
       selectedScore,
       opponentScore,
       result

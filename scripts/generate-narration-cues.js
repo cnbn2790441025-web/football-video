@@ -167,27 +167,27 @@ function findPlayerMentions(captions, registry, match, diagnostics) {
 const TACTICAL_RULES = [
   {
     type: "wing-overload",
-    patterns: [/wing overload/, /wide overload/, /တောင်ပံ.*အရေအတွက်/, /တောင်ပံ.*တိုက်စစ်/],
+    patterns: [/wing overload/, /wide overload/, /overload on the wing/, /တောင်ပံ.*အရေအတွက်/, /တောင်ပံ.*တိုက်စစ်/, /ဘေးတောင်ပံ.*တိုက်စစ်/, /တောင်ပံကစား/],
     subtitle: "Create wide numbers • combine on the flank",
   },
   {
     type: "high-press",
-    patterns: [/high press/, /high pressing/, /ဖိအားမြင့်/, /အမြင့်ပိုင်း.*ဖိအား/],
+    patterns: [/high press/, /high pressing/, /press high/, /ဖိအားမြင့်/, /အမြင့်ပိုင်း.*ဖိအား/, /ရှေ့တန်းက.*ဖိအား/, /ရှေ့ကနေ.*ဖိအား/],
     subtitle: "Press high • close passing lanes",
   },
   {
     type: "low-block",
-    patterns: [/low block/, /compact defensive block/, /ခံစစ်.*ကျစ်ကျစ်လျစ်လျစ်/, /ခံစစ်.*ပိတ်ဆို့/],
+    patterns: [/low block/, /compact defensive block/, /deep defensive block/, /ခံစစ်.*ကျစ်ကျစ်လျစ်လျစ်/, /ခံစစ်.*ပိတ်ဆို့/, /ခံစစ်တုံ့ပြန်မှု/, /ခံစစ်.*ပြန်လည်စုဖွဲ့/, /နိမ့်နိမ့်.*ခံစစ်/],
     subtitle: "Stay compact • protect central space",
   },
   {
     type: "counter",
-    patterns: [/counter attack/, /counter attacking/, /တန်ပြန်တိုက်စစ်/],
+    patterns: [/counter attack/, /counter attacking/, /quick transition/, /fast transition/, /တန်ပြန်တိုက်စစ်/, /အမြန်တန်ပြန်/, /တန်ပြန်တိုက်ခိုက်/, /အကူးအပြောင်း.*မြန်/],
     subtitle: "Win possession • attack open space",
   },
   {
     type: "midfield",
-    patterns: [/midfield battle/, /ကွင်းလယ်တိုက်ပွဲ/, /ကွင်းလယ်.*အသာ/],
+    patterns: [/midfield battle/, /midfield control/, /control the midfield/, /ကွင်းလယ်တိုက်ပွဲ/, /ကွင်းလယ်.*အသာ/, /ကွင်းလယ်.*ထိန်းချုပ်/, /ကွင်းလယ်.*စိုးမိုး/],
     subtitle: "Possession • pressure • transitions",
   },
   {
@@ -227,59 +227,94 @@ function detectTactical(captions, match) {
   return cues;
 }
 
-function detectResults(captions, match, results) {
+function detectResults(captions, match, results, mapping) {
   const cues = [];
   if (!results) return cues;
 
-  const recentFormPattern = /(နောက်ဆုံး(?:ငါး|၅|5|five)ပွဲ|last\s*(?:five|5))/i;
+  const recentFormPattern = /(နောက်ဆုံး(?:ငါး|၅|5|five)ပွဲ|last\s*(?:five|5))/gi;
   const headToHeadPattern = /(ထိပ်တိုက်|တွေ့ဆုံမှု|head\s*to\s*head|h2h)/i;
 
-  for (const side of ["home", "away"]) {
+  // Search the complete narration in order, preserving each character's caption.
+  const captionMap = [];
+  const fullText = captions.map((caption, index) => {
+    const text = normalize(caption.text);
+    for (let j = 0; j < text.length; j++) captionMap.push(index);
+    return text;
+  }).join("");
+
+  const occurrences = [];
+  for (const found of fullText.matchAll(recentFormPattern)) {
+    const captionPosition = captionMap[found.index];
+    if (captionPosition === undefined) continue;
+
+    // Exclude a recent-form phrase when its nearby preceding context is H2H.
+    const contextStart = Math.max(0, captionPosition - 2);
+    const context = captions
+      .slice(contextStart, captionPosition + 1)
+      .map(caption => caption.text)
+      .join(" ");
+
+    if (headToHeadPattern.test(context)) continue;
+
+    occurrences.push({
+      captionIndex: captionPosition + 1,
+      startSeconds: captions[captionPosition].start,
+      endSeconds: captions[captionPosition].end,
+    });
+    if (occurrences.length === 2) break;
+  }
+
+  for (const [position, side] of ["home", "away"].entries()) {
     const data = results[side];
     if (!data || data.available !== true || data.count !== 5 ||
-        !Array.isArray(data.matches) || data.matches.length !== 5) continue;
+        !Array.isArray(data.matches) || data.matches.length !== 5) {
+      console.log(`RESULTS OMITTED: ${side} team does not have five complete matches`);
+      continue;
+    }
 
-    const logosReady = data.matches.every(item => {
-      if (!item.opponentName || !item.opponentCrest ||
-          !Number.isFinite(item.selectedScore) ||
-          !Number.isFinite(item.opponentScore) ||
-          !["W", "D", "L"].includes(item.result)) return false;
-      const slug = assetSlug(item.opponentName);
-      return slug && fs.existsSync(path.join("public/assets/logos", `${slug}.png`));
-    });
-    if (!logosReady) {
-      console.log(`RESULTS OMITTED: ${side} team opponent logo/data incomplete`);
+    const resultsDataReady = data.matches.every(item =>
+      item.opponentName &&
+      Number.isFinite(item.selectedScore) &&
+      Number.isFinite(item.opponentScore) &&
+      ["W", "D", "L"].includes(item.result)
+    );
+
+    if (!resultsDataReady) {
+      console.log(`RESULTS OMITTED: ${side} team match data incomplete`);
+      continue;
+    }
+
+    const occurrence = occurrences[position];
+    if (!occurrence) {
+      console.log(`RESULTS NOT FOUND: ${side} recent-form mention`);
       continue;
     }
 
     const teamName = side === "home" ? match.homeTeam : match.awayTeam;
     const shortName = side === "home" ? match.homeShort : match.awayShort;
-    const variants = [teamName, shortName]
-      .filter(Boolean)
-      .map(normalize)
-      .filter(Boolean);
+    const spokenTeamName = (Array.isArray(mapping?.replacements)
+      ? mapping.replacements : [])
+      .filter(item => item?.source && item?.target &&
+        [teamName, shortName].some(name =>
+          name && sameTeam(name, item.source)))
+      .sort((a, b) => b.source.length - a.source.length)[0]?.target || teamName;
 
-    for (let i = 0; i < captions.length; i++) {
-      const current = normalize(captions[i].text);
-      if (!variants.some(name => current.includes(name))) continue;
-
-      const windowText = normalize(captions.slice(i, i + 2).map(c => c.text).join(" "));
-      if (headToHeadPattern.test(windowText)) continue;
-      if (!recentFormPattern.test(windowText)) continue;
-
-      cues.push({ captionIndex: i + 1, kind: "results", team: side });
-      console.log(`RESULTS: ${teamName} (${side})`);
-      break;
-    }
+    cues.push({
+      captionIndex: occurrence.captionIndex,
+      kind: "results",
+      team: side,
+      spokenTeamName,
+      startSeconds: occurrence.startSeconds,
+      endSeconds: occurrence.endSeconds,
+    });
+    console.log(`RESULTS: ${teamName} (${side})`);
   }
 
   return cues;
 }
-
 function detectEndingCues(captions) {
   const cues = [];
   let predictionAdded = false;
-  let outroAdded = false;
 
   captions.forEach((caption, index) => {
     const text = normalize(caption.text);
@@ -290,11 +325,6 @@ function detectEndingCues(captions) {
       predictionAdded = true;
     }
 
-    if (!outroAdded &&
-      /(comment|ကွန်မင့်|ဘယ်အသင်းနိုင်မယ်ထင်လဲ|ခန့်မှန်းပေးကြပါဦး|သင့်ရဲ့ခန့်မှန်းချက်)/i.test(text)) {
-      cues.push({ captionIndex: index + 1, kind: "outro" });
-      outroAdded = true;
-    }
   });
 
   return cues;
@@ -303,6 +333,8 @@ function detectEndingCues(captions) {
 try {
   const absoluteMatchPath = path.resolve(matchPath);
   const match = readJson(absoluteMatchPath);
+  const mappingPath = absoluteMatchPath.replace(/\.json$/i, ".mapping.json");
+  const mapping = fs.existsSync(mappingPath) ? readJson(mappingPath) : null;
   const registry = readJson(path.resolve("data/player-registry.json"));
   const subtitlePath = findSubtitle(match);
   const captions = parseSrt(fs.readFileSync(subtitlePath, "utf8"));
@@ -315,7 +347,7 @@ try {
   const cues = [
     ...findPlayerMentions(captions, registry, match, diagnostics),
     ...detectTactical(captions, match),
-    ...detectResults(captions, match, results),
+    ...detectResults(captions, match, results, mapping),
     ...detectEndingCues(captions),
   ].sort((a, b) => a.captionIndex - b.captionIndex);
 

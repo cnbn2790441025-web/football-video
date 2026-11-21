@@ -418,9 +418,8 @@ export const TacticalGraphic: React.FC<{
 export type CueItem =
   | { captionIndex: number; kind: "tactical"; type: string; title: string; subtitle: string }
   | { captionIndex: number; kind: "player"; team: "home" | "away"; name: string; image: string; role: string; offsetSeconds?: number; durationSeconds?: number }
-  | { captionIndex: number; kind: "results"; team: "home" | "away"; spokenTeamName?: string }
-  | { captionIndex: number; kind: "prediction" }
-  | { captionIndex: number; kind: "outro" };
+  | { captionIndex: number; kind: "results"; team: "home" | "away"; spokenTeamName?: string; startSeconds?: number; endSeconds?: number }
+  | { captionIndex: number; kind: "prediction" };
 
 const normalizeCueText = (value = "") => String(value)
   .normalize("NFD")
@@ -523,51 +522,36 @@ const CueTimeline: React.FC = () => {
     words?: { text?: string; start?: number; end?: number }[];
   }[];
   const cues = activeCues as CueItem[];
-  const { durationInFrames } = useVideoConfig();
-  const outroDuration = 150;
 
   return (
     <>
       {cues.map((cue, i) => {
-        if (cue.kind === "outro") {
-          return (
-            <Sequence
-              key={`cue-outro-${i}`}
-              from={Math.max(0, durationInFrames - outroDuration)}
-              durationInFrames={outroDuration}
-            >
-              <AudienceQuestionGraphic />
-            </Sequence>
-          );
-        }
-
         const caption = captions[cue.captionIndex - 1];
         if (!caption || caption.end <= caption.start) return null;
 
         const isPlayer = cue.kind === "player";
-        const offset = isPlayer
-          ? cue.offsetSeconds ?? 0
-          : cue.kind === "results"
-            ? findSpokenWordOffset(caption, cue.spokenTeamName)
-            : 0;
-        const recentFormPhraseTime = cue.kind === "results"
-          ? findRecentFormPhraseTime(captions, cue.team === "home" ? 1 : 2)
-          : null;
-
-        if (cue.kind === "results" && recentFormPhraseTime === null) return null;
-
-        const remainingCaptionSeconds = cue.kind === "results"
-          ? Math.max(0, recentFormPhraseTime!.captionEnd - recentFormPhraseTime!.time)
-          : Math.max(0, caption.end - caption.start - offset);
+        const offset = isPlayer ? cue.offsetSeconds ?? 0 : 0;
+        const resultsStart = cue.kind === "results"
+          ? cue.startSeconds ?? caption.start
+          : caption.start;
+        const resultsEnd = cue.kind === "results"
+          ? cue.endSeconds ?? caption.end
+          : caption.end;
+        const remainingCaptionSeconds = Math.max(
+          0,
+          caption.end - caption.start - offset
+        );
 
         const durationFrames =
           cue.kind === "prediction" ? 136 :
           Math.max(1, Math.round(
-            (isPlayer ? cue.durationSeconds ?? 6 : remainingCaptionSeconds) * 30
+            (cue.kind === "results"
+              ? Math.max(0, resultsEnd - resultsStart)
+              : isPlayer ? cue.durationSeconds ?? 6 : remainingCaptionSeconds) * 30
           ));
 
         const from = cue.kind === "results"
-          ? Math.max(0, Math.round(recentFormPhraseTime!.time * 30))
+          ? Math.max(0, Math.round(resultsStart * 30))
           : Math.round((caption.start + offset) * 30);
 
         return (
@@ -594,7 +578,7 @@ const CueTimeline: React.FC = () => {
 
 type ResultsMatch = {
   opponentName: string;
-  opponentCrest: string;
+  opponentCrest?: string;
   selectedScore: number;
   opponentScore: number;
   result: "W" | "D" | "L";
@@ -619,7 +603,6 @@ export const ResultsGraphic: React.FC<{
     data.matches.length !== 5 ||
     data.matches.some((m) =>
       !m.opponentName ||
-      !m.opponentCrest ||
       !Number.isFinite(m.selectedScore) ||
       !Number.isFinite(m.opponentScore) ||
       !["W", "D", "L"].includes(m.result)
@@ -700,14 +683,40 @@ export const ResultsGraphic: React.FC<{
               <div style={{ color: "#8193A8", fontSize: 17, fontWeight: 900, width: 34 }}>
                 {index + 1}
               </div>
-              <Img
-                src={staticFile(item.opponentCrest)}
-                style={{ width: 62, height: 62, objectFit: "contain", marginRight: 18 }}
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: "#FFFFFF", fontSize: 21, fontWeight: 800 }}>
+              {item.opponentCrest ? (
+                <Img
+                  src={staticFile(item.opponentCrest)}
+                  style={{ width: 62, height: 62, objectFit: "contain", marginRight: 18 }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 100,
+                    minWidth: 100,
+                    height: 62,
+                    marginRight: 18,
+                    padding: 4,
+                    boxSizing: "border-box",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#FFFFFF",
+                    fontSize: 13,
+                    fontWeight: 900,
+                    textAlign: "center",
+                    lineHeight: 1.15,
+                    overflow: "hidden",
+                  }}
+                >
                   {item.opponentName}
                 </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {item.opponentCrest ? (
+                  <div style={{ color: "#FFFFFF", fontSize: 21, fontWeight: 800 }}>
+                    {item.opponentName}
+                  </div>
+                ) : null}
                 <div style={{ color: "#9FB0BF", fontSize: 15, marginTop: 4 }}>
                   COMPLETED MATCH
                 </div>
@@ -1638,8 +1647,8 @@ MATCH PREDICTION
 
 const AudienceQuestionGraphic: React.FC = () => {
   const frame = useCurrentFrame();
-  const duration = 178;
-  const fade = interpolate(frame, [0, 12, 166, duration], [0, 1, 1, 0], {
+  const duration = 150;
+  const fade = interpolate(frame, [0, 12, 138, duration], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -1740,11 +1749,15 @@ export const LiverpoolBrightonComposition: React.FC = () => {
           <Sequence from={1221} durationInFrames={136}>
             <PredictionGraphic />
           </Sequence>
-          <Sequence from={Math.max(0, durationInFrames - 150)} durationInFrames={150}>
-            <AudienceQuestionGraphic />
-          </Sequence>
         </>
       )}
+
+      <Sequence
+        from={Math.max(0, durationInFrames - 150)}
+        durationInFrames={Math.min(150, durationInFrames)}
+      >
+        <AudienceQuestionGraphic />
+      </Sequence>
 
       <Audio src={staticFile("narration.mp3")} />
       <SubtitleOverlay />

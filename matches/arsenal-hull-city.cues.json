@@ -6,7 +6,7 @@
     "name": "Kai Havertz",
     "image": "assets/players/kai-havertz__arsenal.png",
     "role": "FORWARD",
-    "offsetSeconds": 3
+    "offsetSeconds": 0
   },
   {
     "captionIndex": 5,
@@ -22,21 +22,10 @@
     "name": "Oliver McBurnie",
     "image": "assets/players/oliver-mcburnie__hull-city.png",
     "role": "FORWARD",
-    "offsetSeconds": 3
-  },
-  {
-    "captionIndex": 8,
-    "kind": "tactical",
-    "type": "press",
-    "title": "ARS vs HUL · PRESS",
-    "subtitle": "Close passing lanes • force play wide"
+    "offsetSeconds": 0
   },
   {
     "captionIndex": 10,
     "kind": "prediction"
-  },
-  {
-    "captionIndex": 11,
-    "kind": "outro"
   }
 ]

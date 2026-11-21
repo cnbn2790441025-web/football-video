@@ -1,0 +1,111 @@
+{
+  "matchKey": "arsenal-hull-city",
+  "fetchedAt": "2026-11-20T07:30:34.949Z",
+  "source": "football-data.org",
+  "home": {
+    "teamName": "Arsenal FC",
+    "teamId": 57,
+    "available": true,
+    "count": 5,
+    "matches": [
+      {
+        "date": "2026-10-21T19:00:00Z",
+        "opponentName": "FC Bayern München",
+        "opponentId": 5,
+        "opponentCrest": "assets/logos/bayern-munchen.png",
+        "selectedScore": 2,
+        "opponentScore": 2,
+        "result": "D"
+      },
+      {
+        "date": "2026-10-24T14:00:00Z",
+        "opponentName": "Everton FC",
+        "opponentId": 62,
+        "opponentCrest": "assets/logos/everton.png",
+        "selectedScore": 2,
+        "opponentScore": 0,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-01T16:30:00Z",
+        "opponentName": "Liverpool FC",
+        "opponentId": 64,
+        "opponentCrest": "assets/logos/liverpool.png",
+        "selectedScore": 1,
+        "opponentScore": 0,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-04T20:00:00Z",
+        "opponentName": "SK Slavia Praha",
+        "opponentId": 930,
+        "opponentCrest": "assets/logos/sk-slavia-praha.png",
+        "selectedScore": 2,
+        "opponentScore": 1,
+        "result": "W"
+      },
+      {
+        "date": "2026-11-07T15:00:00Z",
+        "opponentName": "Hull City AFC",
+        "opponentId": 322,
+        "opponentCrest": "assets/logos/hull-city.png",
+        "selectedScore": 1,
+        "opponentScore": 0,
+        "result": "W"
+      }
+    ]
+  },
+  "away": {
+    "teamName": "Hull City AFC",
+    "teamId": 322,
+    "available": true,
+    "count": 5,
+    "matches": [
+      {
+        "date": "2026-10-11T13:00:00Z",
+        "opponentName": "Everton FC",
+        "opponentId": 62,
+        "opponentCrest": "assets/logos/everton.png",
+        "selectedScore": 2,
+        "opponentScore": 2,
+        "result": "D"
+      },
+      {
+        "date": "2026-10-17T14:00:00Z",
+        "opponentName": "Fulham FC",
+        "opponentId": 63,
+        "opponentCrest": "assets/logos/fulham.png",
+        "selectedScore": 0,
+        "opponentScore": 1,
+        "result": "L"
+      },
+      {
+        "date": "2026-10-25T14:00:00Z",
+        "opponentName": "Brentford FC",
+        "opponentId": 402,
+        "opponentCrest": "assets/logos/brentford.png",
+        "selectedScore": 1,
+        "opponentScore": 1,
+        "result": "D"
+      },
+      {
+        "date": "2026-10-31T15:00:00Z",
+        "opponentName": "Ipswich Town FC",
+        "opponentId": 349,
+        "opponentCrest": "assets/logos/ipswich-town.png",
+        "selectedScore": 2,
+        "opponentScore": 2,
+        "result": "D"
+      },
+      {
+        "date": "2026-11-07T15:00:00Z",
+        "opponentName": "Arsenal FC",
+        "opponentId": 57,
+        "opponentCrest": "assets/logos/arsenal.png",
+        "selectedScore": 0,
+        "opponentScore": 1,
+        "result": "L"
+      }
+    ]
+  }
+}
