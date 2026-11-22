@@ -515,6 +515,7 @@ const findRecentFormPhraseTime = (
 };
 
 const CueTimeline: React.FC = () => {
+  const { durationInFrames: videoDurationInFrames } = useVideoConfig();
   const captions = activeCaptions as {
     start: number;
     end: number;
@@ -522,6 +523,18 @@ const CueTimeline: React.FC = () => {
     words?: { text?: string; start?: number; end?: number }[];
   }[];
   const cues = activeCues as CueItem[];
+  const cueStartFrames = cues.flatMap((item) => {
+    const itemCaption = captions[item.captionIndex - 1];
+    if (!itemCaption || itemCaption.end <= itemCaption.start) return [];
+
+    const itemOffset = item.kind === "player" ? item.offsetSeconds ?? 0 : 0;
+    const itemStartSeconds = item.kind === "results"
+      ? item.startSeconds ?? itemCaption.start
+      : itemCaption.start + itemOffset;
+
+    return [Math.max(0, Math.round(itemStartSeconds * 30))];
+  }).sort((a, b) => a - b);
+  const audienceQuestionStartFrame = Math.max(0, videoDurationInFrames - 150);
 
   return (
     <>
@@ -534,25 +547,26 @@ const CueTimeline: React.FC = () => {
         const resultsStart = cue.kind === "results"
           ? cue.startSeconds ?? caption.start
           : caption.start;
-        const resultsEnd = cue.kind === "results"
-          ? cue.endSeconds ?? caption.end
-          : caption.end;
-        const remainingCaptionSeconds = Math.max(
-          0,
-          caption.end - caption.start - offset
-        );
-
-        const durationFrames =
-          cue.kind === "prediction" ? 136 :
-          Math.max(1, Math.round(
-            (cue.kind === "results"
-              ? Math.max(0, resultsEnd - resultsStart)
-              : isPlayer ? cue.durationSeconds ?? 6 : remainingCaptionSeconds) * 30
-          ));
 
         const from = cue.kind === "results"
           ? Math.max(0, Math.round(resultsStart * 30))
-          : Math.round((caption.start + offset) * 30);
+          : Math.max(0, Math.round((caption.start + offset) * 30));
+
+        if (from >= audienceQuestionStartFrame) return null;
+
+        const nextCueStartFrame = cueStartFrames.find(
+          (startFrame) => startFrame > from
+        );
+
+        const cueEndFrame = Math.min(
+          nextCueStartFrame ?? videoDurationInFrames,
+          audienceQuestionStartFrame,
+          videoDurationInFrames,
+        );
+
+        if (cueEndFrame <= from) return null;
+
+        const durationFrames = Math.max(1, cueEndFrame - from);
 
         return (
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={durationFrames}>
@@ -1734,23 +1748,7 @@ export const LiverpoolBrightonComposition: React.FC = () => {
       <Sequence durationInFrames={240}>
         <MatchGraphic />
       </Sequence>
-      {activeCues.length > 0 ? (
-        <CueTimeline />
-      ) : (
-        <>
-          <Sequence from={240} durationInFrames={150}>
-            <BrunoSpotlight />
-          </Sequence>
-          {tacticalScenes.map((scene) => (
-            <Sequence key={`${scene.type}-${scene.from}`} from={scene.from} durationInFrames={scene.duration}>
-              <TacticalGraphic type={scene.type} title={scene.title} subtitle={scene.subtitle} />
-            </Sequence>
-          ))}
-          <Sequence from={1221} durationInFrames={136}>
-            <PredictionGraphic />
-          </Sequence>
-        </>
-      )}
+      <CueTimeline />
 
       <Sequence
         from={Math.max(0, durationInFrames - 150)}
