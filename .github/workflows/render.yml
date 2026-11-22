@@ -120,7 +120,7 @@ jobs:
       - name: Install CTC dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install numpy==1.26.4 huggingface_hub safetensors
+          python -m pip install numpy==1.26.4 huggingface_hub safetensors cmudict==1.1.3
           python -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
 
       - name: Install render dependencies
@@ -149,7 +149,7 @@ jobs:
               --output src/activeCaptions.json
           fi
 
-      - name: Generate and merge Recent Form cues
+      - name: Generate and merge narration cues
         env:
           MATCH_KEY: ${{ inputs.match_key }}
         run: |
@@ -159,11 +159,11 @@ jobs:
           rm -f "$CUE_OUTPUT"
 
           if node scripts/generate-narration-cues.js "$MATCH_FILE" "$CUE_OUTPUT"; then
-            echo "Recent Form cue generation completed"
+            echo "Narration cue generation completed"
           else
             status=$?
             if [[ -f "$CUE_OUTPUT" ]]; then
-              echo "Using generated Results cues despite other cue diagnostics (exit $status)"
+              echo "Using generated cues despite cue diagnostics (exit $status)"
             else
               echo "Cue generator failed before producing output"
               exit "$status"
@@ -181,14 +181,59 @@ jobs:
             throw new Error('Cue files must both contain JSON arrays.');
           }
 
-          const results = generated.filter(cue => cue && cue.kind === 'results');
-          const preserved = active.filter(cue => cue && cue.kind !== 'results');
-          const merged = [...preserved, ...results].sort(
-            (a, b) => (a.captionIndex ?? 0) - (b.captionIndex ?? 0)
-          );
+          const normalize = value => String(value ?? '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^\p{L}\p{M}\p{N}]+/gu, ' ')
+            .trim()
+            .replace(/\s+/g, ' ');
 
+          const cueKey = cue => {
+            const kind = cue.kind ?? 'unknown';
+            const team = cue.team ?? '';
+
+            if (kind === 'results') return `results:${team}`;
+            if (kind === 'player') return `player:${team}:${normalize(cue.name)}`;
+            if (kind === 'tactical') {
+              const identity = cue.type ?? cue.tactic ?? cue.label ?? cue.title ?? cue.captionIndex ?? JSON.stringify(cue);
+              return `tactical:${team}:${normalize(identity)}`;
+            }
+            if (kind === 'prediction') return `prediction:${team}`;
+
+            return [
+              kind,
+              team,
+              cue.captionIndex ?? '',
+              normalize(cue.name ?? cue.type ?? cue.title ?? ''),
+              cue.startSeconds ?? cue.offsetSeconds ?? ''
+            ].join(':');
+          };
+
+          // Results are refreshed from current match data.
+          // Preserve existing manual cues and merge every generated cue kind.
+          const preserved = active.filter(cue => cue && cue.kind !== 'results');
+          const merged = [];
+          const seen = new Set();
+
+          for (const cue of [...preserved, ...generated]) {
+            if (!cue || typeof cue !== 'object') continue;
+            const key = cueKey(cue);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            merged.push(cue);
+          }
+
+          merged.sort((a, b) => (a.captionIndex ?? 0) - (b.captionIndex ?? 0));
           fs.writeFileSync(activePath, JSON.stringify(merged, null, 2) + '\n');
-          console.log(`Preserved ${preserved.length} existing cues; merged ${results.length} Recent Form cues.`);
+
+          const counts = merged.reduce((acc, cue) => {
+            acc[cue.kind ?? 'unknown'] = (acc[cue.kind ?? 'unknown'] || 0) + 1;
+            return acc;
+          }, {});
+
+          console.log(`Preserved ${preserved.length} existing cues; merged ${generated.length} generated cues.`);
+          console.log('Final cue counts:', JSON.stringify(counts));
           NODE
 
       - name: Render video

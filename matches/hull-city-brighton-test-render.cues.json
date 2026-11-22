@@ -1,0 +1,52 @@
+[
+  {
+    "captionIndex": 2,
+    "kind": "tactical",
+    "type": "defensive-stability",
+    "title": "HUL vs BHA · DEFENSIVE STABILITY",
+    "subtitle": "Stay organized • protect the defensive line"
+  },
+  {
+    "captionIndex": 4,
+    "kind": "player",
+    "team": "home",
+    "name": "Oliver McBurnie",
+    "image": "assets/players/oliver-mcburnie__hull-city.png",
+    "role": "FORWARD",
+    "offsetSeconds": 0
+  },
+  {
+    "captionIndex": 5,
+    "kind": "tactical",
+    "type": "ball-retention",
+    "title": "HUL vs BHA · BALL RETENTION",
+    "subtitle": "Keep the ball • maintain controlled possession"
+  },
+  {
+    "captionIndex": 6,
+    "kind": "tactical",
+    "type": "finishing",
+    "title": "HUL vs BHA · FINISHING",
+    "subtitle": "Create the chance • finish the attack"
+  },
+  {
+    "captionIndex": 7,
+    "kind": "player",
+    "team": "away",
+    "name": "Pascal Groß",
+    "image": "assets/players/pascal-gross__brighton.png",
+    "role": "MIDFIELDER / PLAYMAKER",
+    "offsetSeconds": 0
+  },
+  {
+    "captionIndex": 8,
+    "kind": "tactical",
+    "type": "passing",
+    "title": "HUL vs BHA · PASSING",
+    "subtitle": "Find passing lanes • move the ball forward"
+  },
+  {
+    "captionIndex": 10,
+    "kind": "prediction"
+  }
+]
