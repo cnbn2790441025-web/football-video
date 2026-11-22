@@ -76,7 +76,7 @@ const ScoreHeader: React.FC = () => (
 );
 
 
-type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press" | "low-block" | "wing-overload";
+type TacticalType = "press" | "midfield" | "counter" | "attack" | "high-press" | "low-block" | "wing-overload" | "defensive-stability" | "ball-retention" | "finishing" | "passing";
 
 const tacticalScenes: {
   from: number;
@@ -290,6 +290,164 @@ export const TacticalGraphic: React.FC<{
           </svg>
           <div style={{ marginTop: 18, color: "#FFB3B8", fontSize: 17, fontWeight: 800, letterSpacing: 1 }}>
             CLOSE PASSING LANES · FORCE TURNOVER · WIN POSSESSION
+          </div>
+          <div style={{ marginTop: 12, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
+            ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
+
+  if (
+    type === "defensive-stability" ||
+    type === "ball-retention" ||
+    type === "finishing" ||
+    type === "passing"
+  ) {
+    const boardStyle = {
+      "defensive-stability": {
+        label: "DEFENSIVE SHAPE",
+        accent: "#55B8FF",
+        background: "linear-gradient(145deg, rgba(3,18,42,0.98), rgba(5,39,65,0.96))",
+        border: "rgba(75,175,255,0.9)",
+        footer: "KEEP THE LINE COMPACT · COVER CENTRAL SPACE · PROTECT THE BOX",
+      },
+      "ball-retention": {
+        label: "POSSESSION NETWORK",
+        accent: "#65E6C1",
+        background: "linear-gradient(145deg, rgba(3,35,31,0.98), rgba(5,58,48,0.96))",
+        border: "rgba(70,225,180,0.9)",
+        footer: "OFFER SUPPORT · CREATE TRIANGLES · KEEP CONTROL OF THE BALL",
+      },
+      "finishing": {
+        label: "ATTACKING THIRD",
+        accent: "#FFD166",
+        background: "linear-gradient(145deg, rgba(43,25,4,0.98), rgba(67,39,8,0.96))",
+        border: "rgba(255,190,65,0.9)",
+        footer: "ATTACK THE BOX · TARGET THE GOAL · FINISH THE CHANCE",
+      },
+      "passing": {
+        label: "PASSING PATTERNS",
+        accent: "#C69BFF",
+        background: "linear-gradient(145deg, rgba(28,13,48,0.98), rgba(43,22,70,0.96))",
+        border: "rgba(190,145,255,0.9)",
+        footer: "OPEN PASSING LANES · SWITCH PLAY · FIND THE FORWARD PASS",
+      },
+    }[type];
+
+    return (
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "rgba(2,8,20,0.24)" }}>
+        <div style={{
+          position: "absolute",
+          top: 520,
+          width: 900,
+          height: 820,
+          padding: 28,
+          boxSizing: "border-box",
+          borderRadius: 28,
+          overflow: "hidden",
+          background: boardStyle.background,
+          border: `2px solid ${boardStyle.border}`,
+          boxShadow: `0 0 42px ${boardStyle.border}`,
+          transform: `translateY(${zoomDrop}px) scale(${zoom})`,
+          transformOrigin: "center top",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ color: boardStyle.accent, fontSize: 22, fontWeight: 900, letterSpacing: 3 }}>
+              {boardStyle.label}
+            </div>
+            <div style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 800 }}>
+              {matchData.homeShort} · {matchData.awayShort}
+            </div>
+          </div>
+          <div style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 900, marginTop: 18, lineHeight: 1.1 }}>
+            {title}
+          </div>
+          <div style={{ color: "#D8E2EA", fontSize: 21, marginTop: 10 }}>{subtitle}</div>
+
+          <svg viewBox="0 0 840 470" style={{ width: "100%", marginTop: 24, display: "block" }}>
+            <defs>
+              <marker id="newTacticalArrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+                <path d="M0 0 L8 4 L0 8" fill="none" stroke={boardStyle.accent} strokeWidth="1.5" />
+              </marker>
+              <linearGradient id="newTacticalZone" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor={boardStyle.accent} stopOpacity="0.25" />
+                <stop offset="100%" stopColor={boardStyle.accent} stopOpacity="0.04" />
+              </linearGradient>
+            </defs>
+
+            <rect x="2" y="2" width="836" height="466" rx="16" fill="#103C35" stroke="#D5E8DC" strokeWidth="3" />
+            <line x1="420" y1="3" x2="420" y2="467" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <circle cx="420" cy="235" r="68" fill="none" stroke="#D5E8DC" strokeWidth="2" opacity="0.65" />
+            <rect x="2" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="733" y="125" width="105" height="220" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="2" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+            <rect x="800" y="185" width="38" height="100" fill="none" stroke="#D5E8DC" strokeWidth="2" />
+
+            {type === "defensive-stability" ? (
+              <>
+                <rect x="90" y="65" width="390" height="340" rx="26" fill="url(#newTacticalZone)" stroke={boardStyle.accent} strokeWidth="3" strokeDasharray="12 8" />
+                <path d="M115 155 H455 M115 235 H455 M115 315 H455" stroke={boardStyle.accent} strokeWidth="3" strokeDasharray="8 9" opacity="0.7" />
+                {[[145,130],[255,130],[365,130],[445,130],[180,245],[300,245],[420,245],[220,350],[365,350]].map(([x,y], i) => (
+                  <g key={`def-stability-${i}`}>
+                    <circle cx={x} cy={y} r="20" fill="#168BFF" stroke="#FFFFFF" strokeWidth="3" />
+                    <path d={`M${x-8} ${y} H${x+8}`} stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" />
+                  </g>
+                ))}
+                <path d="M500 110 Q600 235 500 360" fill="none" stroke="#FFB84D" strokeWidth="5" strokeDasharray="10 9" />
+                <path d="M560 235 H485" fill="none" stroke={boardStyle.accent} strokeWidth="6" markerEnd="url(#newTacticalArrow)" />
+                <text x="115" y="445" fill="#B8DEFF" fontSize="18" fontWeight="900">COMPACT DEFENSIVE LINE</text>
+              </>
+            ) : type === "ball-retention" ? (
+              <>
+                <circle cx="420" cy="235" r="150" fill="none" stroke={boardStyle.accent} strokeWidth="3" strokeDasharray="12 10" opacity="0.7" />
+                <path d="M250 145 L420 235 L590 145 L610 325 L420 235 L230 325 Z" fill="none" stroke={boardStyle.accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
+                <path d="M250 145 Q420 45 590 145 M610 325 Q420 425 230 325" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeDasharray="8 9" opacity="0.7" />
+                {[[250,145],[420,235],[590,145],[610,325],[230,325]].map(([x,y], i) => (
+                  <g key={`retention-${i}`}>
+                    <circle cx={x} cy={y} r="22" fill="#65E6C1" stroke="#FFFFFF" strokeWidth="3" />
+                    <circle cx={x} cy={y} r="7" fill="#12372F" />
+                  </g>
+                ))}
+                <circle cx={420} cy={235} r="10" fill="#FFFFFF" stroke="#FFD166" strokeWidth="4" />
+                <text x="300" y="445" fill="#B8F5E6" fontSize="18" fontWeight="900">SUPPORT TRIANGLES</text>
+              </>
+            ) : type === "finishing" ? (
+              <>
+                <rect x="490" y="55" width="315" height="360" rx="22" fill="url(#newTacticalZone)" stroke={boardStyle.accent} strokeWidth="3" strokeDasharray="10 8" />
+                <rect x="733" y="155" width="75" height="160" fill="none" stroke="#FFFFFF" strokeWidth="4" />
+                <path d="M780 180 L780 290 M745 235 H800" stroke="#FFD166" strokeWidth="3" opacity="0.8" />
+                <path d="M260 235 C420 235 500 125 690 190 S755 225 785 235" fill="none" stroke="#FFD166" strokeWidth="7" strokeDasharray="12 8" markerEnd="url(#newTacticalArrow)" />
+                <path d="M430 330 Q540 280 690 245" fill="none" stroke="#FFFFFF" strokeWidth="4" strokeDasharray="8 8" markerEnd="url(#newTacticalArrow)" />
+                {[[260,235],[430,330],[520,145],[650,190]].map(([x,y], i) => (
+                  <circle key={`finish-player-${i}`} cx={x} cy={y} r="21" fill="#F7D900" stroke="#FFFFFF" strokeWidth="3" />
+                ))}
+                <circle cx="785" cy="235" r="24" fill="none" stroke="#FF5964" strokeWidth="5" />
+                <circle cx="785" cy="235" r={8 + pulse * 5} fill="#FF5964" opacity="0.85" />
+                <text x="520" y="445" fill="#FFE4A3" fontSize="18" fontWeight="900">SHOT TARGET ZONE</text>
+              </>
+            ) : (
+              <>
+                <path d="M145 110 L330 180 L510 110 L690 235 L510 350 L330 280 L145 350" fill="none" stroke={boardStyle.accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M145 110 Q420 20 690 235 M145 350 Q420 450 690 235" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeDasharray="9 10" opacity="0.65" />
+                <path d="M330 180 L690 235 M330 280 L690 235" fill="none" stroke="#FFD166" strokeWidth="5" strokeDasharray="11 8" markerEnd="url(#newTacticalArrow)" />
+                {[[145,110],[145,350],[330,180],[330,280],[510,110],[510,350],[690,235]].map(([x,y], i) => (
+                  <g key={`passing-${i}`}>
+                    <circle cx={x} cy={y} r="20" fill={i < 3 ? "#F7D900" : "#C69BFF"} stroke="#FFFFFF" strokeWidth="3" />
+                    <circle cx={x} cy={y} r="6" fill="#17212B" />
+                  </g>
+                ))}
+                <text x="290" y="445" fill="#E2CEFF" fontSize="18" fontWeight="900">PASSING LANES & SWITCHES</text>
+              </>
+            )}
+
+            <text x="25" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.homeShort}</text>
+            <text x="690" y="42" fill="#FFFFFF" fontSize="18" fontWeight="900">{matchData.awayShort}</text>
+          </svg>
+
+          <div style={{ marginTop: 18, color: boardStyle.accent, fontSize: 17, fontWeight: 800, letterSpacing: 1 }}>
+            {boardStyle.footer}
           </div>
           <div style={{ marginTop: 12, color: "#9FB0BF", fontSize: 14, letterSpacing: 1 }}>
             ILLUSTRATIVE TACTICAL CONCEPT · NOT LIVE MATCH TRACKING
