@@ -730,14 +730,14 @@ const CueTimeline: React.FC = () => {
           <Sequence key={`cue-${cue.captionIndex}-${i}`} from={from} durationInFrames={durationFrames}>
             {cue.kind === "tactical" ? (
               <TacticalGraphic
-                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block", "wing-overload"].includes(cue.type) ? cue.type as TacticalType : "attack")}
+                type={cue.type === "defensive" ? "press" : (["press", "midfield", "counter", "attack", "high-press", "low-block", "wing-overload", "defensive-stability", "ball-retention", "finishing", "passing"].includes(cue.type) ? cue.type as TacticalType : "attack")}
                 title={cue.title}
                 subtitle={cue.subtitle}
               />
             ) : cue.kind === "player" ? (
               <PlayerCueGraphic cue={cue} duration={durationFrames} />
             ) : cue.kind === "results" ? (
-              <ResultsGraphic team={cue.team} results={activeResults} duration={durationFrames} />
+              <ResultsGraphic team={cue.team} spokenTeamName={cue.spokenTeamName} results={activeResults} duration={durationFrames} />
             ) : (
               <PredictionGraphic />
             )}
@@ -763,9 +763,10 @@ type ResultsData = {
 
 export const ResultsGraphic: React.FC<{
   team: "home" | "away";
+  spokenTeamName?: string;
   results: ResultsData;
   duration: number;
-}> = ({ team, results, duration }) => {
+}> = ({ team, spokenTeamName, results, duration }) => {
   const frame = useCurrentFrame();
   const data = results?.[team];
 
@@ -791,7 +792,7 @@ export const ResultsGraphic: React.FC<{
   const zoom = interpolate(frame, [0, 90], [1, 1.035], {
     extrapolateRight: "clamp",
   });
-  const teamName = team === "home" ? matchData.homeShort : matchData.awayShort;
+  const teamName = spokenTeamName?.trim() || (team === "home" ? matchData.homeShort : matchData.awayShort);
   const resultColor = (result: "W" | "D" | "L") =>
     result === "W" ? "#35D58A" : result === "D" ? "#F7D900" : "#F06A72";
 

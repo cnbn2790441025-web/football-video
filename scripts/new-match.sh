@@ -70,6 +70,7 @@ fi
 
 node scripts/sync-player-registry.js
 node scripts/sync-player-roles.js
+python scripts/generate-player-name-mapping.py
 NODE_OUTPUT="$(node scripts/create-match-json.js \
   "$DATE" "$HOME_TEAM" "$AWAY_TEAM" \
   "TBD" "$AUDIO" "$SUBTITLE")"

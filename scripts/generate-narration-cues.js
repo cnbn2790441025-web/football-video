@@ -79,9 +79,11 @@ function teamForPlayer(player, match) {
   return null;
 }
 
-function findPlayerMentions(captions, registry, match, diagnostics) {
+function findPlayerMentions(captions, registry, match, diagnostics, playerNameMapping) {
   const cues = [];
   const players = Object.entries(registry.players || {});
+  const mappingEntries = Array.isArray(playerNameMapping?.entries)
+    ? playerNameMapping.entries : [];
   const seen = new Set();
 
   for (let i = 0; i < captions.length; i++) {
@@ -97,11 +99,38 @@ function findPlayerMentions(captions, registry, match, diagnostics) {
       if (!team || !player.name) continue;
 
       const name = normalize(player.name);
-      const firstNamePart = name.split(" ")[0];
+      if (!name) continue;
 
-      // Anchor the cue to the caption where the player's name begins.
-      if (!name || !currentText.split(" ").includes(firstNamePart)) continue;
-      if (!(` ${joined} `).includes(` ${name} `)) continue;
+      const mappingEntry = mappingEntries.find(entry =>
+        entry?.source && normalize(entry.source) === name
+      );
+      const variants = [...new Set([
+        name,
+        normalize(mappingEntry?.target || ""),
+        ...(Array.isArray(mappingEntry?.aliases) ? mappingEntry.aliases.map(normalize) : [])
+      ].filter(Boolean))];
+
+      // Match the English registry name, Myanmar target, or approved Myanmar aliases.
+      // The match must begin inside this caption, even if the name continues into
+      // the next two captions.
+      const matchedVariant = variants.find(variant => {
+        const isMyanmar = /\p{Script=Myanmar}/u.test(variant);
+
+        if (isMyanmar) {
+          // Ignore spaces for Myanmar aliases split across SRT captions.
+          const compactVariant = variant.replace(/\s+/g, "");
+          const compactJoined = joined.replace(/\s+/g, "");
+          const compactCurrent = currentText.replace(/\s+/g, "");
+          const position = compactJoined.indexOf(compactVariant);
+
+          return position >= 0 && position < compactCurrent.length;
+        }
+
+        const position = joined.indexOf(variant);
+        if (position < 0 || position >= currentText.length) return false;
+        return (` ${joined} `).includes(` ${variant} `);
+      });
+      if (!matchedVariant) continue;
 
       const key = `${team}:${name}`;
       if (seen.has(key)) continue;
@@ -191,6 +220,26 @@ const TACTICAL_RULES = [
     subtitle: "Possession • pressure • transitions",
   },
   {
+    type: "defensive-stability",
+    patterns: [/defensive stability/i, /ခံစစ်ပိုင်း.*တည်ငြိမ်မှု/, /ခံစစ်.*တည်ငြိမ်မှု/, /ခံစစ်တည်ငြိမ်/],
+    subtitle: "Stay organized • protect the defensive line",
+  },
+  {
+    type: "ball-retention",
+    patterns: [/ball retention/i, /retain possession/i, /keep possession/i, /ဘောလုံးထိန်းသိမ်းနိုင်မှု/, /ဘောလုံးထိန်း\s*သိမ်းနိုင်မှု/, /ဘောလုံးထိန်းသိမ်း/],
+    subtitle: "Keep the ball • maintain controlled possession",
+  },
+  {
+    type: "finishing",
+    patterns: [/finishing/i, /clinical finishing/i, /ဂိုးဧရိယာအတွင်း\s*အဆုံးသတ်နိုင်မှု/, /အဆုံးသတ်နိုင်မှု/, /ဂိုးသွင်းအဆုံးသတ်/],
+    subtitle: "Create the chance • finish the attack",
+  },
+  {
+    type: "passing",
+    patterns: [/passing lanes/i, /passing network/i, /ball distribution/i, /ဘောလုံး\s*ပေးပို့မှု/, /ပေးပို့မှု/],
+    subtitle: "Find passing lanes • move the ball forward",
+  },
+  {
     type: "press",
     patterns: [/pressing/, /press/, /ဖိအားပေး/, /တိုက်စစ်ဖိအား/],
     subtitle: "Close passing lanes • force play wide",
@@ -205,109 +254,119 @@ const TACTICAL_RULES = [
 function detectTactical(captions, match) {
   const cues = [];
   const seen = new Set();
+  const captionMap = [];
+  let fullText = "";
 
+  // Join normalized captions while retaining the caption index for every character.
   captions.forEach((caption, index) => {
-    const text = normalize(caption.text);
-    for (const rule of TACTICAL_RULES) {
-      if (!rule.patterns.some(pattern => pattern.test(text))) continue;
-      if (seen.has(rule.type)) break;
-      seen.add(rule.type);
-
-      cues.push({
-        captionIndex: index + 1,
-        kind: "tactical",
-        type: rule.type,
-        title: `${match.homeShort || "HOME"} vs ${match.awayShort || "AWAY"} · ${rule.type.toUpperCase().replace(/-/g, " ")}`,
-        subtitle: rule.subtitle,
-      });
-      break;
+    if (index > 0) {
+      fullText += " ";
+      captionMap.push(index);
     }
+
+    const text = normalize(caption.text);
+    fullText += text;
+    for (let j = 0; j < text.length; j++) captionMap.push(index);
   });
 
-  return cues;
+  for (const rule of TACTICAL_RULES) {
+    const firstMatch = rule.patterns
+      .map(pattern => pattern.exec(fullText))
+      .filter(Boolean)
+      .sort((a, b) => a.index - b.index)[0];
+
+    if (!firstMatch || seen.has(rule.type)) continue;
+
+    const captionPosition = captionMap[firstMatch.index];
+    if (captionPosition === undefined) continue;
+
+    seen.add(rule.type);
+    cues.push({
+      captionIndex: captionPosition + 1,
+      kind: "tactical",
+      type: rule.type,
+      title: `${match.homeShort || "HOME"} vs ${match.awayShort || "AWAY"} · ${rule.type.toUpperCase().replace(/-/g, " ")}`,
+      subtitle: rule.subtitle,
+    });
+  }
+
+  return cues.sort((a, b) => a.captionIndex - b.captionIndex);
 }
 
-function detectResults(captions, match, results, mapping) {
+function detectResults(captions, match, results, mapping, teamNameMapping) {
   const cues = [];
   if (!results) return cues;
 
-  const recentFormPattern = /(နောက်ဆုံး(?:ငါး|၅|5|five)ပွဲ|last\s*(?:five|5))/gi;
+  const recentFormPattern = /(နောက်ဆုံး(?:ငါး|၅|5|five)ပွဲ|last\s*(?:five|5))/i;
   const headToHeadPattern = /(ထိပ်တိုက်|တွေ့ဆုံမှု|head\s*to\s*head|h2h)/i;
+  const entries = Array.isArray(teamNameMapping?.entries) ? teamNameMapping.entries : [];
 
-  // Search the complete narration in order, preserving each character's caption.
-  const captionMap = [];
-  const fullText = captions.map((caption, index) => {
-    const text = normalize(caption.text);
-    for (let j = 0; j < text.length; j++) captionMap.push(index);
-    return text;
-  }).join("");
-
-  const occurrences = [];
-  for (const found of fullText.matchAll(recentFormPattern)) {
-    const captionPosition = captionMap[found.index];
-    if (captionPosition === undefined) continue;
-
-    // Exclude a recent-form phrase when its nearby preceding context is H2H.
-    const contextStart = Math.max(0, captionPosition - 2);
-    const context = captions
-      .slice(contextStart, captionPosition + 1)
-      .map(caption => caption.text)
-      .join(" ");
-
-    if (headToHeadPattern.test(context)) continue;
-
-    occurrences.push({
-      captionIndex: captionPosition + 1,
-      startSeconds: captions[captionPosition].start,
-      endSeconds: captions[captionPosition].end,
-    });
-    if (occurrences.length === 2) break;
-  }
-
-  for (const [position, side] of ["home", "away"].entries()) {
+  for (const side of ["home", "away"]) {
     const data = results[side];
     if (!data || data.available !== true || data.count !== 5 ||
         !Array.isArray(data.matches) || data.matches.length !== 5) {
-      console.log(`RESULTS OMITTED: ${side} team does not have five complete matches`);
+      console.log("RESULTS OMITTED: " + side + " team does not have five complete matches");
       continue;
     }
 
-    const resultsDataReady = data.matches.every(item =>
-      item.opponentName &&
-      Number.isFinite(item.selectedScore) &&
-      Number.isFinite(item.opponentScore) &&
-      ["W", "D", "L"].includes(item.result)
+    const ready = data.matches.every(item =>
+      item.opponentName && Number.isFinite(item.selectedScore) &&
+      Number.isFinite(item.opponentScore) && ["W", "D", "L"].includes(item.result)
     );
-
-    if (!resultsDataReady) {
-      console.log(`RESULTS OMITTED: ${side} team match data incomplete`);
-      continue;
-    }
-
-    const occurrence = occurrences[position];
-    if (!occurrence) {
-      console.log(`RESULTS NOT FOUND: ${side} recent-form mention`);
+    if (!ready) {
+      console.log("RESULTS OMITTED: " + side + " team match data incomplete");
       continue;
     }
 
     const teamName = side === "home" ? match.homeTeam : match.awayTeam;
     const shortName = side === "home" ? match.homeShort : match.awayShort;
-    const spokenTeamName = (Array.isArray(mapping?.replacements)
-      ? mapping.replacements : [])
-      .filter(item => item?.source && item?.target &&
-        [teamName, shortName].some(name =>
-          name && sameTeam(name, item.source)))
-      .sort((a, b) => b.source.length - a.source.length)[0]?.target || teamName;
+    const entry = entries.find(item =>
+      item?.source && [teamName, shortName].some(name => name && sameTeam(name, item.source))
+    );
+    const aliases = [entry?.target, ...(entry?.aliases || [])]
+      .filter(Boolean).map(normalize);
+
+    if (!aliases.length) {
+      console.log("RESULTS NOT FOUND: " + side + " team mapping");
+      continue;
+    }
+
+    let occurrence = null;
+    for (let i = 0; i < captions.length; i++) {
+      const text = captions[i].text;
+      const phrase = recentFormPattern.exec(text);
+      recentFormPattern.lastIndex = 0;
+      if (!phrase) continue;
+
+      const beforePhrase = normalize(text.slice(0, phrase.index));
+      if (!aliases.some(alias => beforePhrase.includes(alias))) continue;
+
+      const context = captions.slice(Math.max(0, i - 2), i + 1)
+        .map(c => c.text).join(" ");
+      if (headToHeadPattern.test(context)) continue;
+
+      occurrence = {
+        captionIndex: i + 1,
+        startSeconds: captions[i].start,
+        endSeconds: captions[i].end
+      };
+      break;
+    }
+
+    if (!occurrence) {
+      console.log("RESULTS NOT FOUND: " + side + " team-specific recent-form mention");
+      continue;
+    }
 
     cues.push({
       captionIndex: occurrence.captionIndex,
       kind: "results",
       team: side,
-      spokenTeamName,
+      spokenTeamName: entry.target,
       startSeconds: occurrence.startSeconds,
-      endSeconds: occurrence.endSeconds,
+      endSeconds: occurrence.endSeconds
     });
-    console.log(`RESULTS: ${teamName} (${side})`);
+    console.log("RESULTS: " + teamName + " (" + side + ")");
   }
 
   return cues;
@@ -320,7 +379,7 @@ function detectEndingCues(captions) {
     const text = normalize(caption.text);
 
     if (!predictionAdded &&
-      /(ခန့်မှန်းထား|ခန့်မှန်းချက်|prediction|predict)/i.test(text)) {
+      /(ခန့်မှန်းထား|ခန့်မှန်းချက်|ခန့်မှန်းရလဒ်|prediction|predict)/i.test(text)) {
       cues.push({ captionIndex: index + 1, kind: "prediction" });
       predictionAdded = true;
     }
@@ -336,7 +395,13 @@ try {
   const mappingPath = absoluteMatchPath.replace(/\.json$/i, ".mapping.json");
   const mapping = fs.existsSync(mappingPath) ? readJson(mappingPath) : null;
   const registry = readJson(path.resolve("data/player-registry.json"));
-  const subtitlePath = findSubtitle(match);
+  const playerNameMappingPath = path.resolve("data/player-name-mapping.json");
+  const playerNameMapping = fs.existsSync(playerNameMappingPath)
+    ? readJson(playerNameMappingPath) : null;
+  const teamNameMappingPath = path.resolve("data/team-name-mapping.json");
+const teamNameMapping = fs.existsSync(teamNameMappingPath)
+  ? readJson(teamNameMappingPath) : null;
+const subtitlePath = findSubtitle(match);
   const captions = parseSrt(fs.readFileSync(subtitlePath, "utf8"));
     const resultsPath = absoluteMatchPath.replace(/\.json$/i, ".results.json");
     const results = fs.existsSync(resultsPath) ? readJson(resultsPath) : null;
@@ -344,12 +409,24 @@ try {
   if (!captions.length) throw new Error("No valid SRT captions found.");
 
   const diagnostics = [];
-  const cues = [
-    ...findPlayerMentions(captions, registry, match, diagnostics),
+  const generatedCues = [
+    ...findPlayerMentions(captions, registry, match, diagnostics, playerNameMapping),
     ...detectTactical(captions, match),
-    ...detectResults(captions, match, results, mapping),
+    ...detectResults(captions, match, results, mapping, teamNameMapping),
     ...detectEndingCues(captions),
-  ].sort((a, b) => a.captionIndex - b.captionIndex);
+  ];
+
+  const recentFormCaptionIndexes = new Set(
+    generatedCues
+      .filter(cue => cue.kind === "results")
+      .map(cue => cue.captionIndex)
+  );
+
+  const cues = generatedCues
+    .filter(cue =>
+      cue.kind !== "tactical" || !recentFormCaptionIndexes.has(cue.captionIndex)
+    )
+    .sort((a, b) => a.captionIndex - b.captionIndex);
 
   const destination = outputPath
     ? path.resolve(outputPath)
