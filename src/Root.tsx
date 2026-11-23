@@ -1,6 +1,11 @@
 import { MyComposition } from "./Composition";
 import { PosterLightMotionV1Entry } from "./PosterLightMotionComposition";
 import {
+  PosterLightMotionPurpleCyanEntry,
+  PosterLightMotionGoldWhiteEntry,
+  PosterLightMotionGreenAmberEntry,
+} from "./PosterLightMotionVariants";
+import {
   LeedsManUtdEntry,
 } from "./LeedsManUtdComposition";
 import { LeedsManUtdTikTokEntry } from "./LeedsManUtdTikTokComposition";
@@ -15,6 +20,9 @@ export const RemotionRoot: React.FC = () => {
       <MatchPreviewEntry />
       <LeedsManUtdTikTokEntry />
       <PosterLightMotionV1Entry />
+      <PosterLightMotionPurpleCyanEntry />
+      <PosterLightMotionGoldWhiteEntry />
+      <PosterLightMotionGreenAmberEntry />
     </>
   );
 };
