@@ -4,6 +4,12 @@ import {
   PosterLightMotionPurpleCyanEntry,
   PosterLightMotionGoldWhiteEntry,
   PosterLightMotionGreenAmberEntry,
+  PosterLightMotionCrimsonBlackEntry,
+  PosterLightMotionIceBlueWhiteEntry,
+  PosterLightMotionOrangeBlackEntry,
+  PosterLightMotionEmeraldGoldEntry,
+  PosterLightMotionNeonPinkPurpleEntry,
+  PosterLightMotionSilverBlueEntry,
 } from "./PosterLightMotionVariants";
 import {
   LeedsManUtdEntry,
@@ -23,6 +29,12 @@ export const RemotionRoot: React.FC = () => {
       <PosterLightMotionPurpleCyanEntry />
       <PosterLightMotionGoldWhiteEntry />
       <PosterLightMotionGreenAmberEntry />
+      <PosterLightMotionCrimsonBlackEntry />
+      <PosterLightMotionIceBlueWhiteEntry />
+      <PosterLightMotionOrangeBlackEntry />
+      <PosterLightMotionEmeraldGoldEntry />
+      <PosterLightMotionNeonPinkPurpleEntry />
+      <PosterLightMotionSilverBlueEntry />
     </>
   );
 };

@@ -39,6 +39,18 @@ jobs:
 
       - name: Render Green Amber
         run: npx remotion render PosterLightMotionGreenAmber out/stadium-light-green-amber.mp4 --gl=swangle
+      - name: Render Crimson Black
+        run: npx remotion render PosterLightMotionCrimsonBlack out/stadium-light-crimson-black.mp4 --gl=swangle
+      - name: Render Ice Blue White
+        run: npx remotion render PosterLightMotionIceBlueWhite out/stadium-light-ice-blue-white.mp4 --gl=swangle
+      - name: Render Orange Black
+        run: npx remotion render PosterLightMotionOrangeBlack out/stadium-light-orange-black.mp4 --gl=swangle
+      - name: Render Emerald Gold
+        run: npx remotion render PosterLightMotionEmeraldGold out/stadium-light-emerald-gold.mp4 --gl=swangle
+      - name: Render Neon Pink Purple
+        run: npx remotion render PosterLightMotionNeonPinkPurple out/stadium-light-neon-pink-purple.mp4 --gl=swangle
+      - name: Render Silver Blue
+        run: npx remotion render PosterLightMotionSilverBlue out/stadium-light-silver-blue.mp4 --gl=swangle
 
       - name: Upload Stadium Light clips
         uses: actions/upload-artifact@v4

@@ -76,6 +76,85 @@ const themes: Record<string, LightTheme> = {
       "linear-gradient(180deg, rgba(0,185,105,0.15), transparent 22%, transparent 72%, rgba(255,145,25,0.12))",
     edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(0,185,105,0.12)",
   },
+
+  crimsonBlack: {
+    id: "PosterLightMotionCrimsonBlack",
+    background: "#100306",
+    glowLeft: "255,35,55",
+    glowRight: "110,0,15",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(180,0,25,0.1) 25%, rgba(255,35,55,0.95) 48%, rgba(255,170,175,0.65) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(100,0,15,0.12) 28%, rgba(210,15,35,0.95) 50%, rgba(255,120,130,0.6) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(255,35,55,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(180,0,25,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(255,35,55,0.16) 43%, rgba(255,255,255,0.08) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(255,35,55,0.15), transparent 22%, transparent 72%, rgba(110,0,15,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(255,35,55,0.12)",
+  },
+  iceBlueWhite: {
+    id: "PosterLightMotionIceBlueWhite",
+    background: "#030b16",
+    glowLeft: "70,175,255",
+    glowRight: "220,245,255",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(40,145,255,0.1) 25%, rgba(75,190,255,0.95) 48%, rgba(220,250,255,0.75) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(150,220,255,0.12) 28%, rgba(235,250,255,0.95) 50%, rgba(255,255,255,0.7) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(70,175,255,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(225,245,255,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(80,180,255,0.16) 43%, rgba(255,255,255,0.12) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(70,175,255,0.15), transparent 22%, transparent 72%, rgba(225,245,255,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(70,175,255,0.12)",
+  },
+  orangeBlack: {
+    id: "PosterLightMotionOrangeBlack",
+    background: "#100803",
+    glowLeft: "255,105,20",
+    glowRight: "255,190,65",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(230,75,0,0.1) 25%, rgba(255,105,20,0.95) 48%, rgba(255,215,145,0.65) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(200,75,0,0.12) 28%, rgba(255,155,35,0.95) 50%, rgba(255,225,165,0.6) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(255,105,20,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(220,90,10,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(255,115,25,0.16) 43%, rgba(255,255,255,0.08) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(255,105,20,0.15), transparent 22%, transparent 72%, rgba(180,65,0,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(255,105,20,0.12)",
+  },
+  emeraldGold: {
+    id: "PosterLightMotionEmeraldGold",
+    background: "#03100b",
+    glowLeft: "0,210,125",
+    glowRight: "255,190,55",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(0,150,85,0.1) 25%, rgba(0,220,130,0.95) 48%, rgba(170,255,215,0.65) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(190,125,20,0.12) 28%, rgba(255,195,55,0.95) 50%, rgba(255,240,175,0.6) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(0,210,125,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(255,190,55,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(0,210,125,0.16) 43%, rgba(255,255,255,0.08) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(0,210,125,0.15), transparent 22%, transparent 72%, rgba(255,190,55,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(0,210,125,0.12)",
+  },
+  neonPinkPurple: {
+    id: "PosterLightMotionNeonPinkPurple",
+    background: "#100518",
+    glowLeft: "255,45,190",
+    glowRight: "125,45,255",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(255,35,180,0.1) 25%, rgba(255,65,205,0.95) 48%, rgba(255,190,240,0.65) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(100,20,210,0.12) 28%, rgba(145,65,255,0.95) 50%, rgba(220,180,255,0.6) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(255,45,190,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(125,45,255,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(255,45,190,0.16) 43%, rgba(255,255,255,0.08) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(255,45,190,0.15), transparent 22%, transparent 72%, rgba(125,45,255,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(255,45,190,0.12)",
+  },
+  silverBlue: {
+    id: "PosterLightMotionSilverBlue",
+    background: "#070c14",
+    glowLeft: "175,195,220",
+    glowRight: "45,115,210",
+    beamTop: "linear-gradient(90deg, transparent 5%, rgba(150,175,205,0.1) 25%, rgba(210,225,245,0.95) 48%, rgba(255,255,255,0.7) 52%, transparent 78%)",
+    beamBottom: "linear-gradient(90deg, transparent 8%, rgba(25,75,160,0.12) 28%, rgba(55,125,235,0.95) 50%, rgba(175,210,255,0.6) 55%, transparent 82%)",
+    beamTopShadow: "0 0 24px 8px rgba(175,195,220,0.32)",
+    beamBottomShadow: "0 0 24px 8px rgba(45,115,210,0.3)",
+    highlight: "linear-gradient(112deg, transparent 20%, rgba(175,195,220,0.16) 43%, rgba(255,255,255,0.1) 49%, transparent 67%)",
+    edgeTint: "linear-gradient(180deg, rgba(175,195,220,0.15), transparent 22%, transparent 72%, rgba(45,115,210,0.12))",
+    edgeShadow: "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(175,195,220,0.12)",
+  },
 };
 
 const PosterLightMotionVariant: React.FC<{ theme: LightTheme }> = ({ theme }) => {
@@ -217,4 +296,34 @@ export const PosterLightMotionGreenAmberEntry: React.FC = () => (
     width={1080}
     height={1920}
   />
+);
+
+export const PosterLightMotionCrimsonBlackEntry: React.FC = () => (
+  <Composition id={themes.crimsonBlack.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.crimsonBlack }} durationInFrames={900} fps={30} width={1080} height={1920} />
+);
+
+export const PosterLightMotionIceBlueWhiteEntry: React.FC = () => (
+  <Composition id={themes.iceBlueWhite.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.iceBlueWhite }} durationInFrames={900} fps={30} width={1080} height={1920} />
+);
+
+export const PosterLightMotionOrangeBlackEntry: React.FC = () => (
+  <Composition id={themes.orangeBlack.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.orangeBlack }} durationInFrames={900} fps={30} width={1080} height={1920} />
+);
+
+export const PosterLightMotionEmeraldGoldEntry: React.FC = () => (
+  <Composition id={themes.emeraldGold.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.emeraldGold }} durationInFrames={900} fps={30} width={1080} height={1920} />
+);
+
+export const PosterLightMotionNeonPinkPurpleEntry: React.FC = () => (
+  <Composition id={themes.neonPinkPurple.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.neonPinkPurple }} durationInFrames={900} fps={30} width={1080} height={1920} />
+);
+
+export const PosterLightMotionSilverBlueEntry: React.FC = () => (
+  <Composition id={themes.silverBlue.id} component={PosterLightMotionVariant}
+    defaultProps={{ theme: themes.silverBlue }} durationInFrames={900} fps={30} width={1080} height={1920} />
 );
