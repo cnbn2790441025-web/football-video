@@ -3,8 +3,6 @@ import {
   AbsoluteFill,
   Composition,
   Img,
-  Easing,
-  interpolate,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
@@ -12,6 +10,7 @@ import {
 
 type LightTheme = {
   id: string;
+  stadiumImage: string;
   background: string;
   glowLeft: string;
   glowRight: string;
@@ -27,6 +26,7 @@ type LightTheme = {
 const themes: Record<string, LightTheme> = {
   purpleCyan: {
     id: "PosterLightMotionPurpleCyan",
+    stadiumImage: "assets/stadiums/stadium1.png",
     background: "#070318",
     glowLeft: "150,45,255",
     glowRight: "0,220,255",
@@ -44,6 +44,7 @@ const themes: Record<string, LightTheme> = {
   },
   goldWhite: {
     id: "PosterLightMotionGoldWhite",
+    stadiumImage: "assets/stadiums/stadium2.png",
     background: "#090704",
     glowLeft: "255,175,35",
     glowRight: "255,245,215",
@@ -61,6 +62,7 @@ const themes: Record<string, LightTheme> = {
   },
   greenAmber: {
     id: "PosterLightMotionGreenAmber",
+    stadiumImage: "assets/stadiums/stadium3.png",
     background: "#020b07",
     glowLeft: "0,205,115",
     glowRight: "255,145,25",
@@ -79,6 +81,7 @@ const themes: Record<string, LightTheme> = {
 
   crimsonBlack: {
     id: "PosterLightMotionCrimsonBlack",
+    stadiumImage: "assets/stadiums/stadium4.png",
     background: "#100306",
     glowLeft: "255,35,55",
     glowRight: "110,0,15",
@@ -92,6 +95,7 @@ const themes: Record<string, LightTheme> = {
   },
   iceBlueWhite: {
     id: "PosterLightMotionIceBlueWhite",
+    stadiumImage: "assets/stadiums/stadium5.png",
     background: "#030b16",
     glowLeft: "70,175,255",
     glowRight: "220,245,255",
@@ -105,6 +109,7 @@ const themes: Record<string, LightTheme> = {
   },
   orangeBlack: {
     id: "PosterLightMotionOrangeBlack",
+    stadiumImage: "assets/stadiums/stadium6.png",
     background: "#100803",
     glowLeft: "255,105,20",
     glowRight: "255,190,65",
@@ -118,6 +123,7 @@ const themes: Record<string, LightTheme> = {
   },
   emeraldGold: {
     id: "PosterLightMotionEmeraldGold",
+    stadiumImage: "assets/stadiums/stadium1.png",
     background: "#03100b",
     glowLeft: "0,210,125",
     glowRight: "255,190,55",
@@ -131,6 +137,7 @@ const themes: Record<string, LightTheme> = {
   },
   neonPinkPurple: {
     id: "PosterLightMotionNeonPinkPurple",
+    stadiumImage: "assets/stadiums/stadium2.png",
     background: "#100518",
     glowLeft: "255,45,190",
     glowRight: "125,45,255",
@@ -144,6 +151,7 @@ const themes: Record<string, LightTheme> = {
   },
   silverBlue: {
     id: "PosterLightMotionSilverBlue",
+    stadiumImage: "assets/stadiums/stadium3.png",
     background: "#070c14",
     glowLeft: "175,195,220",
     glowRight: "45,115,210",
@@ -161,24 +169,12 @@ const PosterLightMotionVariant: React.FC<{ theme: LightTheme }> = ({ theme }) =>
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
 
-  const cycle = frame % 300;
-  const blueX = interpolate(
-    cycle,
-    [0, 150, 300],
-    [-width * 1.1, width * 1.1, -width * 1.1],
-    { easing: Easing.inOut(Easing.ease) },
-  );
-  const redX = interpolate(
-    cycle,
-    [0, 150, 300],
-    [width * 1.1, -width * 1.1, width * 1.1],
-    { easing: Easing.inOut(Easing.ease) },
-  );
-  const pulse = interpolate(
-    frame % 180,
-    [0, 45, 90, 135, 180],
-    [0.35, 0.75, 0.4, 0.7, 0.35],
-  );
+  const phase = (frame / 900) * Math.PI * 2;
+  const blueX = Math.sin(phase) * width * 1.1;
+  const redX = -blueX;
+  const pulse = 0.55 + 0.2 * Math.sin(phase * 2 - Math.PI / 2);
+  const leftSweepAngle = Math.sin(phase) * 11;
+  const rightSweepAngle = -Math.sin(phase) * 11;
 
   const beam: React.CSSProperties = {
     position: "absolute",
@@ -193,7 +189,7 @@ const PosterLightMotionVariant: React.FC<{ theme: LightTheme }> = ({ theme }) =>
   return (
     <AbsoluteFill style={{ backgroundColor: theme.background, overflow: "hidden" }}>
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile(theme.stadiumImage)}
         style={{
           position: "absolute",
           width: "100%",
@@ -211,12 +207,44 @@ const PosterLightMotionVariant: React.FC<{ theme: LightTheme }> = ({ theme }) =>
         }}
       />
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile(theme.stadiumImage)}
         style={{
           position: "absolute",
           width: "100%",
           height: "100%",
           objectFit: "contain",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "7%",
+          left: "10%",
+          width: "42%",
+          height: "68%",
+          background: `linear-gradient(180deg, rgba(${theme.glowLeft},0.34), rgba(${theme.glowLeft},0.10) 58%, transparent)`,
+          clipPath: "polygon(0 0, 100% 100%, 0 100%)",
+          filter: "blur(18px)",
+          transform: `rotate(${leftSweepAngle}deg)`,
+          transformOrigin: "0% 0%",
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "7%",
+          right: "10%",
+          width: "42%",
+          height: "68%",
+          background: `linear-gradient(180deg, rgba(${theme.glowRight},0.34), rgba(${theme.glowRight},0.10) 58%, transparent)`,
+          clipPath: "polygon(100% 0, 100% 100%, 0 100%)",
+          filter: "blur(18px)",
+          transform: `rotate(${rightSweepAngle}deg)`,
+          transformOrigin: "100% 0%",
+          mixBlendMode: "screen",
+          pointerEvents: "none",
         }}
       />
       <div

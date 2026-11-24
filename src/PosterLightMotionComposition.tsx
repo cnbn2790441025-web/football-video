@@ -3,8 +3,6 @@ import {
   AbsoluteFill,
   Composition,
   Img,
-  Easing,
-  interpolate,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
@@ -14,18 +12,12 @@ const PosterLightMotion: React.FC = () => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
 
-  const cycle = frame % 300;
-  const blueX = interpolate(cycle, [0, 150, 300], [-width * 1.1, width * 1.1, -width * 1.1], {
-    easing: Easing.inOut(Easing.ease),
-  });
-  const redX = interpolate(cycle, [0, 150, 300], [width * 1.1, -width * 1.1, width * 1.1], {
-    easing: Easing.inOut(Easing.ease),
-  });
-  const pulse = interpolate(
-    frame % 180,
-    [0, 45, 90, 135, 180],
-    [0.35, 0.75, 0.4, 0.7, 0.35],
-  );
+  const phase = (frame / 900) * Math.PI * 2;
+  const blueX = Math.sin(phase) * width * 1.1;
+  const redX = -blueX;
+  const pulse = 0.55 + 0.2 * Math.sin(phase * 2 - Math.PI / 2);
+  const leftSweepAngle = Math.sin(phase) * 11;
+  const rightSweepAngle = -Math.sin(phase) * 11;
 
   const beam: React.CSSProperties = {
     position: "absolute",
@@ -40,7 +32,7 @@ const PosterLightMotion: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile("assets/stadiums/stadium1.png")}
         style={{
           position: "absolute",
           width: "100%",
@@ -61,7 +53,7 @@ const PosterLightMotion: React.FC = () => {
       />
 
       <Img
-        src={staticFile("assets/poster-light-motion-v1.png")}
+        src={staticFile("assets/stadiums/stadium1.png")}
         style={{
           position: "absolute",
           width: "100%",
@@ -70,6 +62,38 @@ const PosterLightMotion: React.FC = () => {
         }}
       />
 
+      <div
+        style={{
+          position: "absolute",
+          top: "7%",
+          left: "10%",
+          width: "42%",
+          height: "68%",
+          background: `linear-gradient(180deg, rgba(0,105,255,0.34), rgba(0,105,255,0.10) 58%, transparent)`,
+          clipPath: "polygon(0 0, 100% 100%, 0 100%)",
+          filter: "blur(18px)",
+          transform: `rotate(${leftSweepAngle}deg)`,
+          transformOrigin: "0% 0%",
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "7%",
+          right: "10%",
+          width: "42%",
+          height: "68%",
+          background: `linear-gradient(180deg, rgba(255,20,55,0.34), rgba(255,20,55,0.10) 58%, transparent)`,
+          clipPath: "polygon(100% 0, 100% 100%, 0 100%)",
+          filter: "blur(18px)",
+          transform: `rotate(${rightSweepAngle}deg)`,
+          transformOrigin: "100% 0%",
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
       <div
         style={{
           ...beam,
