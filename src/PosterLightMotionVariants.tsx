@@ -215,38 +215,40 @@ const PosterLightMotionVariant: React.FC<{ theme: LightTheme }> = ({ theme }) =>
           objectFit: "contain",
         }}
       />
-      <div
-        style={{
-          position: "absolute",
-          top: "7%",
-          left: "10%",
-          width: "42%",
-          height: "68%",
-          background: `linear-gradient(180deg, rgba(${theme.glowLeft},0.34), rgba(${theme.glowLeft},0.10) 58%, transparent)`,
-          clipPath: "polygon(0 0, 100% 100%, 0 100%)",
-          filter: "blur(18px)",
-          transform: `rotate(${leftSweepAngle}deg)`,
-          transformOrigin: "0% 0%",
-          mixBlendMode: "screen",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "7%",
-          right: "10%",
-          width: "42%",
-          height: "68%",
-          background: `linear-gradient(180deg, rgba(${theme.glowRight},0.34), rgba(${theme.glowRight},0.10) 58%, transparent)`,
-          clipPath: "polygon(100% 0, 100% 100%, 0 100%)",
-          filter: "blur(18px)",
-          transform: `rotate(${rightSweepAngle}deg)`,
-          transformOrigin: "100% 0%",
-          mixBlendMode: "screen",
-          pointerEvents: "none",
-        }}
-      />
+      {[
+            { side: "left", x: 5, y: 23 },
+            { side: "left", x: 12, y: 35 },
+            { side: "left", x: 19, y: 47 },
+            { side: "right", x: 95, y: 23 },
+            { side: "right", x: 88, y: 35 },
+            { side: "right", x: 81, y: 47 },
+          ].map((lamp, index) => {
+            const angle = Math.sin(phase + index * 0.72) * 7;
+            const color = lamp.side === "left" ? theme.glowLeft : theme.glowRight;
+            const isLeft = lamp.side === "left";
+            return (
+              <div
+                key={`lamp-beam-${index}`}
+                style={{
+                  position: "absolute",
+                  top: `${lamp.y}%`,
+                  left: isLeft ? `${lamp.x}%` : undefined,
+                  right: isLeft ? undefined : `${100 - lamp.x}%`,
+                  width: "38%",
+                  height: "30%",
+                  background: `linear-gradient(180deg, rgba(${color},0.28), rgba(${color},0.09) 58%, transparent)`,
+                  clipPath: isLeft
+                    ? "polygon(0 0, 100% 100%, 0 100%)"
+                    : "polygon(100% 0, 100% 100%, 0 100%)",
+                  filter: "blur(16px)",
+                  transform: `rotate(${isLeft ? angle : -angle}deg)`,
+                  transformOrigin: isLeft ? "0% 0%" : "100% 0%",
+                  mixBlendMode: "screen",
+                  pointerEvents: "none",
+                }}
+              />
+            );
+          })}
       <div
         style={{
           ...beam,
