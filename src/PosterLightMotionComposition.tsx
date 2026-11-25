@@ -32,7 +32,7 @@ const PosterLightMotion: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
       <Img
-        src={staticFile("assets/stadiums/stadium1.png")}
+        src={staticFile("assets/stadiums/old-trafford-stadium.png")}
         style={{
           position: "absolute",
           width: "100%",
@@ -53,7 +53,7 @@ const PosterLightMotion: React.FC = () => {
       />
 
       <Img
-        src={staticFile("assets/stadiums/stadium1.png")}
+        src={staticFile("assets/stadiums/old-trafford-stadium.png")}
         style={{
           position: "absolute",
           width: "100%",
@@ -63,12 +63,8 @@ const PosterLightMotion: React.FC = () => {
       />
 
       {[
-            { side: "left", x: 5, y: 23 },
-            { side: "left", x: 12, y: 35 },
-            { side: "left", x: 19, y: 47 },
-            { side: "right", x: 95, y: 23 },
-            { side: "right", x: 88, y: 35 },
-            { side: "right", x: 81, y: 47 },
+            { side: "left", x: 4, y: 31 },
+            { side: "right", x: 4, y: 31 },
           ].map((lamp, index) => {
             const angle = Math.sin(phase + index * 0.72) * 24;
             const color = lamp.side === "left" ? "0,105,255" : "255,20,55";
