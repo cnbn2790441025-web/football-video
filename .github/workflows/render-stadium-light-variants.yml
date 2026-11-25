@@ -1,4 +1,4 @@
-name: Render Stadium Light Color Variants
+name: Render Old Trafford Blue Red
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  render-stadium-light-variants:
+  render-stadium-light:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,34 +28,13 @@ jobs:
           sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
           fc-cache -f
 
-      - name: Render original Blue Red
+      - name: Render Old Trafford Blue Red
         run: npx remotion render PosterLightMotionV1 out/stadium-light-blue-red.mp4 --gl=swangle
 
-      - name: Render Purple Cyan
-        run: npx remotion render PosterLightMotionPurpleCyan out/stadium-light-purple-cyan.mp4 --gl=swangle
-
-      - name: Render Gold White
-        run: npx remotion render PosterLightMotionGoldWhite out/stadium-light-gold-white.mp4 --gl=swangle
-
-      - name: Render Green Amber
-        run: npx remotion render PosterLightMotionGreenAmber out/stadium-light-green-amber.mp4 --gl=swangle
-      - name: Render Crimson Black
-        run: npx remotion render PosterLightMotionCrimsonBlack out/stadium-light-crimson-black.mp4 --gl=swangle
-      - name: Render Ice Blue White
-        run: npx remotion render PosterLightMotionIceBlueWhite out/stadium-light-ice-blue-white.mp4 --gl=swangle
-      - name: Render Orange Black
-        run: npx remotion render PosterLightMotionOrangeBlack out/stadium-light-orange-black.mp4 --gl=swangle
-      - name: Render Emerald Gold
-        run: npx remotion render PosterLightMotionEmeraldGold out/stadium-light-emerald-gold.mp4 --gl=swangle
-      - name: Render Neon Pink Purple
-        run: npx remotion render PosterLightMotionNeonPinkPurple out/stadium-light-neon-pink-purple.mp4 --gl=swangle
-      - name: Render Silver Blue
-        run: npx remotion render PosterLightMotionSilverBlue out/stadium-light-silver-blue.mp4 --gl=swangle
-
-      - name: Upload Stadium Light clips
+      - name: Upload Old Trafford Blue Red
         uses: actions/upload-artifact@v4
         with:
-          name: stadium-light-color-variants
-          path: out/stadium-light-*.mp4
+          name: old-trafford-blue-red
+          path: out/stadium-light-blue-red.mp4
           if-no-files-found: error
           retention-days: 14
