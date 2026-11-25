@@ -70,7 +70,7 @@ const PosterLightMotion: React.FC = () => {
             { side: "right", x: 88, y: 35 },
             { side: "right", x: 81, y: 47 },
           ].map((lamp, index) => {
-            const angle = Math.sin(phase + index * 0.72) * 7;
+            const angle = Math.sin(phase + index * 0.72) * 24;
             const color = lamp.side === "left" ? "0,105,255" : "255,20,55";
             const isLeft = lamp.side === "left";
             return (
@@ -81,13 +81,13 @@ const PosterLightMotion: React.FC = () => {
                   top: `${lamp.y}%`,
                   left: isLeft ? `${lamp.x}%` : undefined,
                   right: isLeft ? undefined : `${100 - lamp.x}%`,
-                  width: "38%",
-                  height: "30%",
-                  background: `linear-gradient(180deg, rgba(${color},0.28), rgba(${color},0.09) 58%, transparent)`,
+width: "55%",
+height: "52%",
+                  background: `linear-gradient(180deg, rgba(${color},0.62), rgba(${color},0.24) 58%, transparent)`,
                   clipPath: isLeft
                     ? "polygon(0 0, 100% 100%, 0 100%)"
                     : "polygon(100% 0, 100% 100%, 0 100%)",
-                  filter: "blur(16px)",
+                  filter: "blur(8px)",
                   transform: `rotate(${isLeft ? angle : -angle}deg)`,
                   transformOrigin: isLeft ? "0% 0%" : "100% 0%",
                   mixBlendMode: "screen",
