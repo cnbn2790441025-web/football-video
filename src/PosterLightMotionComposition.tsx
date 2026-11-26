@@ -62,36 +62,28 @@ const PosterLightMotion: React.FC = () => {
         }}
       />
 
-      {[
-            { side: "left", x: 4, y: 31 },
-            { side: "right", x: 4, y: 31 },
-          ].map((lamp, index) => {
-            const angle = Math.sin(phase + index * 0.72) * 24;
-            const color = lamp.side === "left" ? "0,105,255" : "255,20,55";
-            const isLeft = lamp.side === "left";
-            return (
-              <div
-                key={`lamp-beam-${index}`}
-                style={{
-                  position: "absolute",
-                  top: `${lamp.y}%`,
-                  left: isLeft ? `${lamp.x}%` : undefined,
-                  right: isLeft ? undefined : `${100 - lamp.x}%`,
-width: "55%",
-height: "52%",
-                  background: `linear-gradient(180deg, rgba(${color},0.62), rgba(${color},0.24) 58%, transparent)`,
-                  clipPath: isLeft
-                    ? "polygon(0 0, 100% 100%, 0 100%)"
-                    : "polygon(100% 0, 100% 100%, 0 100%)",
-                  filter: "blur(8px)",
-                  transform: `rotate(${isLeft ? angle : -angle}deg)`,
-                  transformOrigin: isLeft ? "0% 0%" : "100% 0%",
-                  mixBlendMode: "screen",
-                  pointerEvents: "none",
-                }}
-              />
-            );
-          })}
+      <AbsoluteFill
+        style={{
+          pointerEvents: "none",
+          opacity: 0.45 + pulse * 0.5,
+          background: `
+            radial-gradient(ellipse 7% 5% at 4% 31%,
+              rgba(255,255,255,0.55) 0%,
+              rgba(0,145,255,0.42) 28%,
+              rgba(145,55,255,0.30) 55%,
+              rgba(255,45,125,0.18) 75%,
+              transparent 100%),
+            radial-gradient(ellipse 7% 5% at 96% 31%,
+              rgba(255,255,255,0.55) 0%,
+              rgba(0,145,255,0.42) 28%,
+              rgba(145,55,255,0.30) 55%,
+              rgba(255,45,125,0.18) 75%,
+              transparent 100%)
+          `,
+          filter: "blur(9px)",
+          mixBlendMode: "screen",
+        }}
+      />
       <div
         style={{
           ...beam,
