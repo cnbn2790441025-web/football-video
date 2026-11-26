@@ -15,7 +15,7 @@ const PosterLightMotion: React.FC = () => {
   const phase = (frame / 900) * Math.PI * 2;
   const blueX = Math.sin(phase) * width * 1.1;
   const redX = -blueX;
-  const pulse = 0.55 + 0.2 * Math.sin(phase * 2 - Math.PI / 2);
+  const pulse = 0.5 + 0.5 * (0.5 - 0.5 * Math.cos(phase * 2));
   const leftSweepAngle = Math.sin(phase) * 11;
   const rightSweepAngle = -Math.sin(phase) * 11;
 
@@ -65,38 +65,18 @@ const PosterLightMotion: React.FC = () => {
       <AbsoluteFill
         style={{
           pointerEvents: "none",
-          opacity: 0.9 + pulse * 0.1,
+          opacity: 0.22 + pulse * 0.12,
           background: `
-            linear-gradient(90deg,
-              rgba(0,110,255,0.62) 0%,
-              rgba(35,75,255,0.42) 28%,
-              rgba(105,45,205,0.34) 50%,
-              rgba(205,35,125,0.42) 72%,
-              rgba(255,25,55,0.62) 100%)
+            linear-gradient(110deg,
+              rgba(0,105,255,0.58) 0%,
+              rgba(75,65,220,0.48) 38%,
+              rgba(155,45,165,0.48) 62%,
+              rgba(255,35,65,0.58) 100%)
           `,
-          mixBlendMode: "screen",
+          filter: `hue-rotate(${(frame / 900) * 360}deg)`,
+          mixBlendMode: "soft-light",
         }}
       />
-      <AbsoluteFill
-        style={{
-          pointerEvents: "none",
-          opacity: 0.72 + pulse * 0.28,
-          background: `
-            radial-gradient(ellipse 105% 78% at 0% 42%,
-              rgba(0,135,255,0.72) 0%,
-              rgba(0,105,255,0.42) 42%,
-              rgba(35,65,220,0.18) 72%,
-              transparent 100%),
-            radial-gradient(ellipse 105% 78% at 100% 42%,
-              rgba(255,35,75,0.68) 0%,
-              rgba(255,25,65,0.40) 42%,
-              rgba(195,35,145,0.18) 72%,
-              transparent 100%)
-          `,
-          mixBlendMode: "screen",
-        }}
-      />
-
       <div
         style={{
           ...beam,
