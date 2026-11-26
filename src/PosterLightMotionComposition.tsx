@@ -65,25 +65,29 @@ const PosterLightMotion: React.FC = () => {
       <AbsoluteFill
         style={{
           pointerEvents: "none",
-          opacity: 0.45 + pulse * 0.5,
+          opacity: 0.35 + pulse * 0.65,
           background: `
-            radial-gradient(ellipse 7% 5% at 4% 31%,
-              rgba(255,255,255,0.55) 0%,
-              rgba(0,145,255,0.42) 28%,
-              rgba(145,55,255,0.30) 55%,
-              rgba(255,45,125,0.18) 75%,
+            radial-gradient(ellipse 62% 48% at 4% 30%,
+              rgba(0,125,255,0.62) 0%,
+              rgba(0,100,255,0.38) 38%,
+              rgba(75,45,255,0.18) 65%,
               transparent 100%),
-            radial-gradient(ellipse 7% 5% at 96% 31%,
-              rgba(255,255,255,0.55) 0%,
-              rgba(0,145,255,0.42) 28%,
-              rgba(145,55,255,0.30) 55%,
-              rgba(255,45,125,0.18) 75%,
-              transparent 100%)
+            radial-gradient(ellipse 62% 48% at 96% 30%,
+              rgba(255,25,75,0.58) 0%,
+              rgba(255,20,65,0.34) 38%,
+              rgba(185,35,155,0.18) 65%,
+              transparent 100%),
+            linear-gradient(90deg,
+              rgba(0,90,255,0.24) 0%,
+              rgba(70,55,210,0.12) 35%,
+              rgba(155,35,125,0.12) 65%,
+              rgba(255,25,55,0.24) 100%)
           `,
-          filter: "blur(9px)",
+          filter: "blur(22px)",
           mixBlendMode: "screen",
         }}
       />
+
       <div
         style={{
           ...beam,
