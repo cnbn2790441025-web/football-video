@@ -65,25 +65,34 @@ const PosterLightMotion: React.FC = () => {
       <AbsoluteFill
         style={{
           pointerEvents: "none",
-          opacity: 0.35 + pulse * 0.65,
+          opacity: 0.9 + pulse * 0.1,
           background: `
-            radial-gradient(ellipse 62% 48% at 4% 30%,
-              rgba(0,125,255,0.62) 0%,
-              rgba(0,100,255,0.38) 38%,
-              rgba(75,45,255,0.18) 65%,
-              transparent 100%),
-            radial-gradient(ellipse 62% 48% at 96% 30%,
-              rgba(255,25,75,0.58) 0%,
-              rgba(255,20,65,0.34) 38%,
-              rgba(185,35,155,0.18) 65%,
-              transparent 100%),
             linear-gradient(90deg,
-              rgba(0,90,255,0.24) 0%,
-              rgba(70,55,210,0.12) 35%,
-              rgba(155,35,125,0.12) 65%,
-              rgba(255,25,55,0.24) 100%)
+              rgba(0,110,255,0.62) 0%,
+              rgba(35,75,255,0.42) 28%,
+              rgba(105,45,205,0.34) 50%,
+              rgba(205,35,125,0.42) 72%,
+              rgba(255,25,55,0.62) 100%)
           `,
-          filter: "blur(22px)",
+          mixBlendMode: "screen",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          pointerEvents: "none",
+          opacity: 0.72 + pulse * 0.28,
+          background: `
+            radial-gradient(ellipse 105% 78% at 0% 42%,
+              rgba(0,135,255,0.72) 0%,
+              rgba(0,105,255,0.42) 42%,
+              rgba(35,65,220,0.18) 72%,
+              transparent 100%),
+            radial-gradient(ellipse 105% 78% at 100% 42%,
+              rgba(255,35,75,0.68) 0%,
+              rgba(255,25,65,0.40) 42%,
+              rgba(195,35,145,0.18) 72%,
+              transparent 100%)
+          `,
           mixBlendMode: "screen",
         }}
       />
