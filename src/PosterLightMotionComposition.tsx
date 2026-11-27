@@ -11,6 +11,10 @@ import {
 const PosterLightMotion: React.FC = () => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
+  const pulse = 0.72 + (Math.sin(frame * 0.075) + 1) * 0.14;
+  const leftSweep = Math.sin(frame * 0.025) * 7;
+  const rightSweep = Math.sin(frame * 0.025 + 1.4) * 7;
+
 
   const phase = (frame / 900) * Math.PI * 2;
   const blueX = Math.sin(phase) * width * 1.1;
@@ -83,6 +87,78 @@ const PosterLightMotion: React.FC = () => {
           }}
         />
       </>
+
+      {/* Left floodlight: anchored beam sweeping through the sky */}
+      <div
+        style={{
+          position: "absolute",
+          left: "5%",
+          top: "34.5%",
+          width: "48%",
+          height: "31%",
+          transformOrigin: "0% 50%",
+          transform: `rotate(${-34 + leftSweep}deg)`,
+          clipPath: "polygon(0 43%, 100% 4%, 100% 96%, 0 57%)",
+          background: "linear-gradient(90deg, rgba(225,245,255,0.48), rgba(120,195,255,0.16) 58%, transparent)",
+          filter: "blur(13px)",
+          opacity: pulse,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: "5%",
+          top: "34.5%",
+          width: "43%",
+          height: 5,
+          transformOrigin: "0% 50%",
+          transform: `rotate(${-34 + leftSweep}deg)`,
+          background: "linear-gradient(90deg, rgba(255,255,255,0.9), rgba(160,215,255,0.38), transparent)",
+          filter: "blur(4px)",
+          boxShadow: "0 0 18px 5px rgba(175,220,255,0.25)",
+          opacity: pulse,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Right floodlight: mirrored sky beam */}
+      <div
+        style={{
+          position: "absolute",
+          right: "5%",
+          top: "34.5%",
+          width: "48%",
+          height: "31%",
+          transformOrigin: "100% 50%",
+          transform: `rotate(${214 - rightSweep}deg)`,
+          clipPath: "polygon(0 4%, 100% 43%, 100% 57%, 0 96%)",
+          background: "linear-gradient(270deg, rgba(225,245,255,0.48), rgba(120,195,255,0.16) 58%, transparent)",
+          filter: "blur(13px)",
+          opacity: pulse,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          right: "5%",
+          top: "34.5%",
+          width: "43%",
+          height: 5,
+          transformOrigin: "100% 50%",
+          transform: `rotate(${214 - rightSweep}deg)`,
+          background: "linear-gradient(270deg, rgba(255,255,255,0.9), rgba(160,215,255,0.38), transparent)",
+          filter: "blur(4px)",
+          boxShadow: "0 0 18px 5px rgba(175,220,255,0.25)",
+          opacity: pulse,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
 
       <div
         style={{
