@@ -15,6 +15,8 @@ const PosterLightMotion: React.FC = () => {
   const phase = (frame / 900) * Math.PI * 2;
   const blueX = Math.sin(phase) * width * 1.1;
   const redX = -blueX;
+  const rainbowX = Math.sin(phase + 1.2) * width * 0.85;
+  const rainbowX2 = Math.cos(phase + 2.4) * width * 0.85;
 
   const beam: React.CSSProperties = {
     position: "absolute",
@@ -26,23 +28,6 @@ const PosterLightMotion: React.FC = () => {
     mixBlendMode: "screen",
   };
 
-  const movingBeams = [
-    {
-      left: "26%",
-      color: "0,105,255",
-      angle: Math.sin(phase) * 12 - 8,
-    },
-    {
-      left: "35%",
-      color: "160,65,255",
-      angle: Math.sin(phase + 2.1) * 12,
-    },
-    {
-      left: "44%",
-      color: "255,35,65",
-      angle: Math.sin(phase + 4.2) * 12 + 8,
-    },
-  ];
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
@@ -68,25 +53,36 @@ const PosterLightMotion: React.FC = () => {
         }}
       />
 
-      {movingBeams.map((item, index) => (
+      <>
         <div
-          key={index}
           style={{
-            position: "absolute",
-            left: item.left,
-            top: "44%",
-            width: "30%",
-            height: "22%",
-            transformOrigin: "50% 0%",
-            transform: `rotate(${item.angle}deg)`,
-            clipPath: "polygon(48% 0, 52% 0, 100% 100%, 0 100%)",
-            background: `linear-gradient(180deg, rgba(${item.color},0.02), rgba(${item.color},0.18) 55%, rgba(${item.color},0.72) 100%)`,
-            filter: "blur(5px)",
-            mixBlendMode: "screen",
-            pointerEvents: "none",
+            ...beam,
+            top: "34%",
+            left: 0,
+            height: 9,
+            background:
+              "linear-gradient(90deg, transparent 4%, rgba(0,210,255,0.9) 18%, rgba(80,70,255,0.95) 32%, rgba(210,45,255,0.95) 48%, rgba(255,65,145,0.95) 64%, rgba(255,170,35,0.85) 78%, transparent 96%)",
+            boxShadow:
+              "0 0 22px 7px rgba(140,65,255,0.3), 0 0 28px 5px rgba(0,210,255,0.22)",
+            transform: `translateX(${rainbowX}px) rotate(-17deg)`,
+            opacity: 0.95,
           }}
         />
-      ))}
+        <div
+          style={{
+            ...beam,
+            top: "60%",
+            left: 0,
+            height: 9,
+            background:
+              "linear-gradient(90deg, transparent 3%, rgba(255,40,120,0.9) 17%, rgba(255,105,35,0.95) 31%, rgba(255,220,40,0.95) 46%, rgba(70,255,170,0.9) 62%, rgba(0,190,255,0.95) 78%, transparent 96%)",
+            boxShadow:
+              "0 0 22px 7px rgba(255,70,140,0.28), 0 0 28px 5px rgba(70,255,170,0.2)",
+            transform: `translateX(${rainbowX2}px) rotate(-17deg)`,
+            opacity: 0.95,
+          }}
+        />
+      </>
 
       <div
         style={{
