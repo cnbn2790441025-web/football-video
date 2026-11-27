@@ -6,7 +6,6 @@ import {
   staticFile,
   useCurrentFrame,
   useVideoConfig,
-  interpolateColors,
 } from "remotion";
 
 const PosterLightMotion: React.FC = () => {
@@ -16,14 +15,6 @@ const PosterLightMotion: React.FC = () => {
   const phase = (frame / 900) * Math.PI * 2;
   const blueX = Math.sin(phase) * width * 1.1;
   const redX = -blueX;
-  const pulse = 0.5 + 0.5 * (0.5 - 0.5 * Math.cos(phase * 2));
-  const cycleColor = interpolateColors(
-    frame % 900,
-    [0, 300, 600, 900],
-    ["#006aff", "#a040ff", "#ff2545", "#006aff"],
-  );
-  const leftSweepAngle = Math.sin(phase) * 11;
-  const rightSweepAngle = -Math.sin(phase) * 11;
 
   const beam: React.CSSProperties = {
     position: "absolute",
@@ -34,6 +25,24 @@ const PosterLightMotion: React.FC = () => {
     pointerEvents: "none",
     mixBlendMode: "screen",
   };
+
+  const movingBeams = [
+    {
+      left: "26%",
+      color: "0,105,255",
+      angle: Math.sin(phase) * 12 - 8,
+    },
+    {
+      left: "35%",
+      color: "160,65,255",
+      angle: Math.sin(phase + 2.1) * 12,
+    },
+    {
+      left: "44%",
+      color: "255,35,65",
+      angle: Math.sin(phase + 4.2) * 12 + 8,
+    },
+  ];
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#030712", overflow: "hidden" }}>
@@ -49,15 +58,6 @@ const PosterLightMotion: React.FC = () => {
         }}
       />
 
-      <AbsoluteFill
-        style={{
-          background:
-            `radial-gradient(ellipse at 12% 24%, rgba(0,105,255,${pulse * 0.65}), transparent 48%), radial-gradient(ellipse at 88% 72%, rgba(255,20,55,${pulse * 0.5}), transparent 48%)`,
-          mixBlendMode: "screen",
-          pointerEvents: "none",
-        }}
-      />
-
       <Img
         src={staticFile("assets/stadiums/old-trafford-stadium.png")}
         style={{
@@ -68,14 +68,26 @@ const PosterLightMotion: React.FC = () => {
         }}
       />
 
-      <AbsoluteFill
-        style={{
-          pointerEvents: "none",
-          opacity: 0.18 + pulse * 0.42,
-          background: cycleColor,
-          mixBlendMode: "color",
-        }}
-      />
+      {movingBeams.map((item, index) => (
+        <div
+          key={index}
+          style={{
+            position: "absolute",
+            left: item.left,
+            top: "44%",
+            width: "30%",
+            height: "22%",
+            transformOrigin: "50% 0%",
+            transform: `rotate(${item.angle}deg)`,
+            clipPath: "polygon(48% 0, 52% 0, 100% 100%, 0 100%)",
+            background: `linear-gradient(180deg, rgba(${item.color},0.02), rgba(${item.color},0.18) 55%, rgba(${item.color},0.72) 100%)`,
+            filter: "blur(5px)",
+            mixBlendMode: "screen",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
+
       <div
         style={{
           ...beam,
@@ -101,26 +113,6 @@ const PosterLightMotion: React.FC = () => {
           boxShadow: "0 0 24px 8px rgba(255,20,55,0.3)",
           transform: `translateX(${redX}px) rotate(-17deg)`,
           opacity: 0.85,
-        }}
-      />
-
-      <AbsoluteFill
-        style={{
-          background:
-            `linear-gradient(112deg, transparent 20%, rgba(25,115,255,${pulse * 0.16}) 43%, rgba(255,255,255,${pulse * 0.08}) 49%, transparent 67%)`,
-          transform: `translateX(${blueX * 0.55}px)`,
-          mixBlendMode: "screen",
-          pointerEvents: "none",
-        }}
-      />
-
-      <AbsoluteFill
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(30,100,255,0.15), transparent 22%, transparent 72%, rgba(255,25,50,0.12))",
-          boxShadow:
-            "inset 0 0 70px rgba(0,0,0,0.3), inset 0 0 55px rgba(35,105,255,0.12)",
-          pointerEvents: "none",
         }}
       />
     </AbsoluteFill>
