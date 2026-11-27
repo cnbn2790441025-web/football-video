@@ -54,8 +54,13 @@ const Ball: React.FC<{ x: number; y: number; opacity?: number }> = ({
   opacity = 1,
 }) => (
   <g transform={`translate(${x} ${y})`} opacity={opacity}>
-    <circle r="17" fill="#FFFFFF" stroke="#111827" strokeWidth="3" />
-    <path d="M-7 -8 L7 -8 L12 3 L0 11 L-12 3 Z" fill="#111827" />
+    <circle r="17" cx="1" cy="2" fill="rgba(0,0,0,0.3)" />
+    <circle r="17" fill="#FFFFFF" stroke="#111827" strokeWidth="1.8" />
+    <path d="M-5 -6 L5 -6 L9 2 L0 8 L-9 2 Z" fill="#111827" />
+    <path d="M-5 -6 L-10 -12 L-15 -8 L-13 0 L-9 2" fill="#111827" />
+    <path d="M5 -6 L10 -12 L15 -8 L13 0 L9 2" fill="#111827" />
+    <path d="M-9 2 L-12 10 L-5 15 L0 8" fill="#111827" />
+    <path d="M9 2 L12 10 L5 15 L0 8" fill="#111827" />
   </g>
 );
 
@@ -124,11 +129,11 @@ const WingOverload: React.FC = () => {
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         >
           <defs>
-      <marker id="runArrow" markerWidth="14" markerHeight="14" refX="11" refY="6" orient="auto">
-        <path d="M1 1 L12 6 L1 11" fill="none" stroke="#FFD84D" strokeWidth="2.5" />
+      <marker id="runArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" markerUnits="userSpaceOnUse" orient="auto">
+        <path d="M4 1 L7 4 L4 7" fill="none" stroke="#FFD84D" strokeWidth="2.5" />
       </marker>
-      <marker id="passArrow" markerWidth="14" markerHeight="14" refX="11" refY="6" orient="auto">
-        <path d="M1 1 L12 6 L1 11" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
+      <marker id="passArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" markerUnits="userSpaceOnUse" orient="auto">
+        <path d="M4 1 L7 4 L4 7" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
       </marker>
           </defs>
           {showOverlap && (
