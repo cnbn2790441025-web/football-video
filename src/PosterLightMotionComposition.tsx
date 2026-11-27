@@ -6,6 +6,7 @@ import {
   staticFile,
   useCurrentFrame,
   useVideoConfig,
+  interpolateColors,
 } from "remotion";
 
 const PosterLightMotion: React.FC = () => {
@@ -16,6 +17,11 @@ const PosterLightMotion: React.FC = () => {
   const blueX = Math.sin(phase) * width * 1.1;
   const redX = -blueX;
   const pulse = 0.5 + 0.5 * (0.5 - 0.5 * Math.cos(phase * 2));
+  const cycleColor = interpolateColors(
+    frame % 900,
+    [0, 300, 600, 900],
+    ["#006aff", "#a040ff", "#ff2545", "#006aff"],
+  );
   const leftSweepAngle = Math.sin(phase) * 11;
   const rightSweepAngle = -Math.sin(phase) * 11;
 
@@ -65,16 +71,9 @@ const PosterLightMotion: React.FC = () => {
       <AbsoluteFill
         style={{
           pointerEvents: "none",
-          opacity: 0.22 + pulse * 0.12,
-          background: `
-            linear-gradient(110deg,
-              rgba(0,105,255,0.58) 0%,
-              rgba(75,65,220,0.48) 38%,
-              rgba(155,45,165,0.48) 62%,
-              rgba(255,35,65,0.58) 100%)
-          `,
-          filter: `hue-rotate(${(frame / 900) * 360}deg)`,
-          mixBlendMode: "soft-light",
+          opacity: 0.18 + pulse * 0.42,
+          background: cycleColor,
+          mixBlendMode: "color",
         }}
       />
       <div
