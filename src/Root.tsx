@@ -1,4 +1,5 @@
 import { MyComposition } from "./Composition";
+import { WingOverloadEntry } from "./WingOverloadComposition";
 import { PosterLightMotionV1Entry } from "./PosterLightMotionComposition";
 import {
   PosterLightMotionPurpleCyanEntry,
@@ -35,6 +36,7 @@ export const RemotionRoot: React.FC = () => {
       <PosterLightMotionEmeraldGoldEntry />
       <PosterLightMotionNeonPinkPurpleEntry />
       <PosterLightMotionSilverBlueEntry />
+      <WingOverloadEntry />
     </>
   );
 };
