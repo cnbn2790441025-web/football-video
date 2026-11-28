@@ -6,6 +6,7 @@ import { CutbackAttackEntry } from "./CutbackAttackComposition";
 import { CounterAttackEntry } from "./CounterAttackComposition";
 import { HighPressEntry } from "./HighPressComposition";
 import { LowBlockEntry } from "./LowBlockComposition";
+import { MidBlockEntry } from "./MidBlockComposition";
 import { PosterLightMotionV1Entry } from "./PosterLightMotionComposition";
 import {
   PosterLightMotionPurpleCyanEntry,
@@ -49,6 +50,7 @@ export const RemotionRoot: React.FC = () => {
       <CounterAttackEntry />
       <HighPressEntry />
       <LowBlockEntry />
+      <MidBlockEntry />
     </>
   );
 };
