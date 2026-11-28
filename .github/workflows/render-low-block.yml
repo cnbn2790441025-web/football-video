@@ -1,0 +1,40 @@
+name: Render Low Block
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render-low-block:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install render dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev ffmpeg fonts-noto-core fontconfig
+          fc-cache -f
+
+      - name: Render Low Block
+        run: npx remotion render LowBlock out/low-block.mp4 --gl=swangle
+
+      - name: Upload Low Block
+        uses: actions/upload-artifact@v4
+        with:
+          name: low-block
+          path: out/low-block.mp4
+          if-no-files-found: error
+          retention-days: 14
